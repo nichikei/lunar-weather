@@ -1,171 +1,200 @@
 # Weather App 🌤️
 
-A beautiful iOS-style weather application for Android with glassmorphism design, real-time weather data, and AI-powered outfit suggestions.
+Ứng dụng thời tiết Android với thiết kế glassmorphism phong cách iOS, dữ liệu thời tiết real-time và gợi ý trang phục thông minh bằng AI.
 
-## ✨ Features
+## ✨ Tính Năng
 
-### Core Features
-- 🌡️ **Real-time Weather Data** - Current temperature, conditions, and forecasts
-- 📍 **Location-based Weather** - Auto-detect location or search any city
-- 📊 **Detailed Weather Metrics** - UV Index, humidity, wind speed, pressure, visibility, and more
-- 🕐 **Hourly & Weekly Forecasts** - Comprehensive weather predictions
-- 🌅 **Sunrise & Sunset Times** - Beautiful sunrise/sunset visualization
-- 💨 **Air Quality Index** - Monitor air quality in your area
+### Tính Năng Chính
+- 🌡️ **Dữ Liệu Thời Tiết Real-time** - Nhiệt độ hiện tại, điều kiện thời tiết và dự báo
+- 📍 **Thời Tiết Theo Vị Trí** - Tự động phát hiện vị trí hoặc tìm kiếm thành phố
+- 📊 **Thông Số Thời Tiết Chi Tiết** - Chỉ số UV, độ ẩm, tốc độ gió, áp suất, tầm nhìn xa
+- 🕐 **Dự Báo Theo Giờ & Tuần** - Dự đoán thời tiết toàn diện
+- 🌅 **Thời Gian Mặt Trời Mọc/Lặn** - Hiển thị sunrise/sunset đẹp mắt
+- 💨 **Chỉ Số Chất Lượng Không Khí** - Theo dõi AQI khu vực của bạn
+- ⚠️ **Cảnh Báo Thời Tiết** - Thông báo về các cảnh báo thời tiết nguy hiểm
 
-### Premium Features
-- 👔 **AI Outfit Suggestions** - Smart clothing recommendations based on weather
-- 📈 **Weather Charts** - Visual representation of weather trends
-- 🎨 **Dynamic Backgrounds** - Weather-responsive background images
-- ⚙️ **Customizable Settings** - Personalize your weather experience
+### Tính Năng Premium
+- 👔 **Gợi Ý Trang Phục AI** - Đề xuất quần áo thông minh dựa trên thời tiết
+- 📈 **Biểu Đồ Thời Tiết** - Trực quan hóa xu hướng thời tiết
+- 🎨 **Nền Động** - Hình nền thay đổi theo thời tiết
+- ❤️ **Quản Lý Thành Phố Yêu Thích** - Lưu và theo dõi nhiều địa điểm
+- 📱 **Widget** - Widget màn hình chính hiển thị thời tiết nhanh
+- 🔔 **Thông Báo Thời Tiết** - Nhận cảnh báo và cập nhật thời tiết
 
-## 🎨 Design
+## 🎨 Thiết Kế
 
-### UI/UX Highlights
-- **iOS-style Interface** - Clean, modern, and intuitive design
-- **Glassmorphism Effects** - Frosted glass UI elements with backdrop blur
-- **Premium Typography** - Carefully crafted text hierarchy
-- **Smooth Animations** - Fluid transitions and interactions
-- **Dark Overlay Design** - Enhanced readability with elegant overlays
+### Điểm Nổi Bật UI/UX
+- **Giao Diện Phong Cách iOS** - Thiết kế sạch sẽ, hiện đại và trực quan
+- **Hiệu Ứng Glassmorphism** - Các thành phần UI kính mờ với backdrop blur
+- **Typography Cao Cấp** - Phân cấp văn bản được thiết kế cẩn thận
+- **Animation Mượt Mà** - Chuyển đổi và tương tác mượt mà
+- **Dark Overlay Design** - Khả năng đọc được nâng cao với overlay thanh lịch
 
-### Design System
-- Custom glassmorphic cards
-- Gradient backgrounds
-- Icon-based weather indicators
-- Responsive layout for all screen sizes
+### Hệ Thống Thiết Kế
+- Card glassmorphic tùy chỉnh
+- Nền gradient đẹp mắt
+- Chỉ báo thời tiết dựa trên icon
+- Layout responsive cho mọi kích thước màn hình
 
-## 🛠️ Technologies
+## 🏗️ Kiến Trúc Dự Án
 
-- **Language**: Java
-- **Platform**: Android (API 24+)
-- **Architecture**: MVVM-ready structure
+```
+app/src/main/java/com/example/weatherapp/
+├── ui/
+│   ├── activities/          # Các Activity
+│   │   ├── MainActivity.java
+│   │   ├── SettingsActivity.java
+│   │   ├── SearchActivity.java
+│   │   ├── OutfitSuggestionActivity.java
+│   │   ├── WeatherDetailsActivity.java
+│   │   ├── ChartsActivity.java
+│   │   └── FavoriteCitiesActivity.java
+│   └── adapters/           # Các Adapter
+│       ├── OutfitSuggestionAdapter.java
+│       └── CityWeatherAdapter.java
+├── data/
+│   ├── models/             # Data Models
+│   │   ├── HourlyForecast.java
+│   │   ├── WeeklyForecast.java
+│   │   ├── WeatherAlert.java
+│   │   ├── OutfitSuggestion.java
+│   │   ├── FavoriteCity.java
+│   │   └── CityWeather.java
+│   ├── api/                # API Services
+│   │   ├── WeatherApiService.java
+│   │   ├── OpenAIService.java
+│   │   └── RetrofitClient.java
+│   └── responses/          # API Response Models
+│       ├── WeatherResponse.java
+│       ├── HourlyForecastResponse.java
+│       ├── WeatherAlertsResponse.java
+│       ├── UVIndexResponse.java
+│       ├── AirQualityResponse.java
+│       ├── OpenAIResponse.java
+│       └── OpenAIRequest.java
+├── utils/                  # Utility Classes
+│   ├── LocaleHelper.java
+│   ├── BlurHelper.java
+│   ├── FavoriteCitiesManager.java
+│   └── OutfitSuggestionService.java
+├── notification/           # Notification System
+│   ├── WeatherNotificationManager.java
+│   ├── WeatherNotificationWorker.java
+│   └── NotificationReceiver.java
+└── widget/                 # Home Screen Widget
+    └── WeatherWidget.java
+```
+
+## 🛠️ Công Nghệ
+
+- **Ngôn Ngữ**: Java
+- **Nền Tảng**: Android (API 24+)
+- **Kiến Trúc**: Clean Architecture với package structure chuẩn
 - **UI Framework**: Native Android XML layouts
 - **Weather API**: OpenWeatherMap API
+- **AI API**: OpenAI GPT cho gợi ý trang phục
 - **Location Services**: Android Location API
-- **Data Binding**: AndroidX libraries
+- **Networking**: Retrofit 2
+- **Background Tasks**: WorkManager
+- **Data Persistence**: SharedPreferences & File Storage
 
-## 📱 Screenshots
+## 📋 Yêu Cầu
 
-The app features:
-- Glassmorphic top bar with city name and quick actions
-- Large temperature display with weather description
-- Segmented control for hourly/weekly forecasts
-- Interactive weather detail cards
-- Premium outfit suggestion feature
-- Comprehensive weather charts
+- Android Studio Arctic Fox trở lên
+- Android SDK API 24+ (Android 7.0)
+- OpenWeatherMap API Key
+- OpenAI API Key (cho tính năng AI)
+- Kết nối Internet
 
-## 🚀 Getting Started
+## 🚀 Cài Đặt
 
-### Prerequisites
-- Android Studio Arctic Fox or later
-- Android SDK 24+
-- OpenWeatherMap API key
+1. **Clone repository**
+   ```bash
+   git clone https://github.com/nichikei/weather-app.git
+   cd weather-app
+   ```
 
-### Installation
+2. **Mở project trong Android Studio**
+   - File → Open → Chọn thư mục project
 
-1. Clone the repository:
-```bash
-git clone https://github.com/nichikei/weather-app.git
-```
+3. **Cấu hình API Keys**
+   - Tạo file `local.properties` (nếu chưa có)
+   - Thêm API keys của bạn:
+   ```properties
+   OPENWEATHER_API_KEY=your_openweather_api_key_here
+   OPENAI_API_KEY=your_openai_api_key_here
+   ```
 
-2. Open the project in Android Studio
+4. **Build project**
+   - Build → Clean Project
+   - Build → Rebuild Project
 
-3. Add your OpenWeatherMap API key:
-   - Get a free API key from [OpenWeatherMap](https://openweathermap.org/api)
-   - Add it to your project (check the code for API key location)
+5. **Chạy ứng dụng**
+   - Chọn device/emulator
+   - Run → Run 'app'
 
-4. Build and run the app on your device or emulator
+## 📱 Cách Sử Dụng
 
-## 📦 Project Structure
+1. **Lần Đầu Mở App**
+   - Cấp quyền truy cập vị trí
+   - App sẽ tự động lấy thời tiết vị trí hiện tại
 
-```
-WeatherApp/
-├── app/
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/yourpackage/weatherapp/
-│   │   │   │   ├── MainActivity.java
-│   │   │   │   ├── ChartsActivity.java
-│   │   │   │   ├── OutfitSuggestionActivity.java
-│   │   │   │   ├── SettingsActivity.java
-│   │   │   │   └── ... (other activities and utilities)
-│   │   │   └── res/
-│   │   │       ├── layout/
-│   │   │       │   ├── activity_main.xml
-│   │   │       │   ├── card_*.xml (weather cards)
-│   │   │       │   └── ... (other layouts)
-│   │   │       ├── drawable/
-│   │   │       ├── values/
-│   │   │       └── font/
-│   │   └── androidTest/
-│   └── build.gradle
-└── build.gradle
-```
+2. **Tìm Kiếm Thành Phố**
+   - Nhấn icon tìm kiếm ở top bar
+   - Nhập tên thành phố
+   - Chọn từ kết quả tìm kiếm
 
-## 🎯 Key Components
+3. **Xem Dự Báo**
+   - Vuốt cards để xem dự báo theo giờ/tuần
+   - Nhấn vào card để xem chi tiết
 
-### Main Screen
-- Dynamic weather background
-- Glassmorphic top bar with search and settings
-- Large temperature display
-- Hourly/Weekly forecast toggle
-- Weather detail cards (UV, Wind, Humidity, etc.)
+4. **Gợi Ý Trang Phục**
+   - Nhấn icon trang phục để xem gợi ý AI
+   - Dựa trên nhiệt độ, thời tiết và hoạt động
 
-### Weather Cards
-- **Air Quality Index** - AQI monitoring
-- **UV Index** - Sun exposure tracking
-- **Sunrise/Sunset** - Solar times
-- **Wind** - Speed and direction
-- **Rainfall** - Precipitation probability
-- **Feels Like** - Apparent temperature
-- **Humidity** - Moisture levels
-- **Visibility** - Viewing distance
-- **Pressure** - Atmospheric pressure
+5. **Cài Đặt**
+   - Nhấn icon cài đặt
+   - Tùy chỉnh đơn vị (°C/°F)
+   - Bật/tắt thông báo
+   - Quản lý thành phố yêu thích
 
-### Additional Screens
-- **Charts Activity** - Weather trend visualization
-- **Outfit Suggestion** - AI-powered clothing recommendations
-- **Settings** - App customization options
+## 🎯 Roadmap
 
-## 🌐 API Integration
+- [ ] Thêm nhiều ngôn ngữ (tiếng Anh, v.v.)
+- [ ] Tích hợp Material You dynamic colors
+- [ ] Chế độ offline với cache
+- [ ] Radar thời tiết
+- [ ] Chia sẻ thông tin thời tiết lên social media
+- [ ] Widget nâng cao với nhiều layout
 
-The app uses OpenWeatherMap API for weather data:
-- Current Weather Data API
-- 5 Day / 3 Hour Forecast API
-- One Call API (for comprehensive data)
-- Air Pollution API
+## 🤝 Đóng Góp
+
+Mọi đóng góp đều được chào đón!
+
+1. Fork repository
+2. Tạo branch mới (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push lên branch (`git push origin feature/AmazingFeature`)
+5. Mở Pull Request
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+Project này được phân phối dưới MIT License. Xem file `LICENSE` để biết thêm chi tiết.
 
-## 👨‍💻 Developer
+## 👤 Tác Giả
 
-Created with ❤️ by [nichikei](https://github.com/nichikei)
+**Nichikei**
+- GitHub: [@nichikei](https://github.com/nichikei)
+- Repository: [weather-app](https://github.com/nichikei/weather-app)
 
-## 🤝 Contributing
+## 🙏 Cảm Ơn
 
-Contributions, issues, and feature requests are welcome!
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📞 Contact
-
-GitHub: [@nichikei](https://github.com/nichikei)
-
-Project Link: [https://github.com/nichikei/weather-app](https://github.com/nichikei/weather-app)
-
-## 🙏 Acknowledgments
-
-- OpenWeatherMap for weather data API
-- Material Design Icons
-- Android community for various libraries and tools
-- iOS Weather app for design inspiration
+- [OpenWeatherMap](https://openweathermap.org/) - Weather data API
+- [OpenAI](https://openai.com/) - AI outfit suggestions
+- [Flaticon](https://www.flaticon.com/) - Weather icons
+- [Unsplash](https://unsplash.com/) - Background images
 
 ---
 
-⭐ Star this repo if you find it helpful!
+⭐ Nếu bạn thấy project này hữu ích, hãy cho một star nhé!
 
