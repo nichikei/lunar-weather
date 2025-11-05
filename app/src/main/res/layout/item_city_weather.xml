@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- City Weather Card Item -->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cityCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="20dp"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="22dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@android:color/transparent">
+
+    <LinearLayout
+        android:id="@+id/cardBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/gradient_weather_1"
+        android:padding="20dp"
+        android:gravity="center_vertical">
+
+        <!-- Left side: City info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- City Name -->
+            <TextView
+                android:id="@+id/tvCityName"
+                style="@style/TextStyle.Title2.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hanoi"
+                android:layout_marginBottom="4dp"
+                tools:ignore="HardcodedText" />
+
+            <!-- Country -->
+            <TextView
+                android:id="@+id/tvCountry"
+                style="@style/TextStyle.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vietnam"
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="8dp"
+                tools:ignore="HardcodedText" />
+
+            <!-- Weather Description -->
+            <TextView
+                android:id="@+id/tvWeatherDesc"
+                style="@style/TextStyle.Subheadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Partly Cloudy"
+                tools:ignore="HardcodedText" />
+
+            <!-- Temp Range -->
+            <TextView
+                android:id="@+id/tvTempRange"
+                style="@style/TextStyle.Caption1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="H:28° L:22°"
+                android:textColor="@color/text_secondary"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+        <!-- Right side: Icon and Temperature -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- Weather Icon -->
+            <ImageView
+                android:id="@+id/ivWeatherIcon"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/sun_cloud_mid_rain"
+                android:scaleType="fitCenter"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/app_name" />
+
+            <!-- Temperature -->
+            <TextView
+                android:id="@+id/tvTemperature"
+                style="@style/TextStyle.LargeTitle.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="25°"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
+

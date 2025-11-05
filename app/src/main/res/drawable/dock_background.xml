@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Deep shadow effect -->
+    <item
+        android:left="0dp"
+        android:top="-16dp"
+        android:right="0dp"
+        android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="90"
+                android:startColor="#60000000"
+                android:centerColor="#30000000"
+                android:endColor="#00000000" />
+            <corners
+                android:topLeftRadius="@dimen/corner_radius_large_container"
+                android:topRightRadius="@dimen/corner_radius_large_container"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp" />
+        </shape>
+    </item>
+
+    <!-- Purple glow from bottom -->
+    <item
+        android:left="0dp"
+        android:top="-12dp"
+        android:right="0dp"
+        android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="90"
+                android:startColor="#40503A2E"
+                android:centerColor="#20503A2E"
+                android:endColor="#00503A2E" />
+            <corners
+                android:topLeftRadius="@dimen/corner_radius_large_container"
+                android:topRightRadius="@dimen/corner_radius_large_container"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp" />
+        </shape>
+    </item>
+
+    <!-- Main gradient background (Primary700 → Primary800) -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="0"
+                android:startColor="#D933248F"
+                android:endColor="#F2251B6A" />
+            <corners
+                android:topLeftRadius="@dimen/corner_radius_large_container"
+                android:topRightRadius="@dimen/corner_radius_large_container"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp" />
+        </shape>
+    </item>
+
+    <!-- Glass overlay (optional) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#0AFFFFFF" />
+            <corners
+                android:topLeftRadius="@dimen/corner_radius_large_container"
+                android:topRightRadius="@dimen/corner_radius_large_container"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp" />
+        </shape>
+    </item>
+</layer-list>
+

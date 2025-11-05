@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Pressed state -->
+    <item android:state_pressed="true">
+        <layer-list>
+            <!-- Scale effect simulated with padding -->
+            <item android:left="1dp" android:top="1dp" android:right="1dp" android:bottom="1dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/surface_glass" />
+                    <corners android:radius="@dimen/hourly_pill_radius" />
+                    <stroke
+                        android:width="1dp"
+                        android:color="@color/stroke_on_glass" />
+                </shape>
+            </item>
+            <!-- Brighten overlay (10%) -->
+            <item android:left="1dp" android:top="1dp" android:right="1dp" android:bottom="1dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="#1AFFFFFF" />
+                    <corners android:radius="@dimen/hourly_pill_radius" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <!-- Normal state -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/surface_glass" />
+            <corners android:radius="@dimen/hourly_pill_radius" />
+            <stroke
+                android:width="1dp"
+                android:color="@color/stroke_on_glass" />
+        </shape>
+    </item>
+</selector>
+

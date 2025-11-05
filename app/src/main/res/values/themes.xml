@@ -1,0 +1,89 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.WeatherApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Apply Poppins font family to all text (will be Inter when fonts are added) -->
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="fontFamily">@font/poppins</item>
+
+        <!-- Color System -->
+        <item name="colorPrimary">@color/accent_600</item>
+        <item name="colorPrimaryVariant">@color/primary_800</item>
+        <item name="colorOnPrimary">@color/text_high</item>
+        <item name="colorSecondary">@color/accent_500</item>
+        <item name="colorSecondaryVariant">@color/accent_400</item>
+        <item name="colorOnSecondary">@color/text_high</item>
+        <item name="colorSurface">@color/surface_glass</item>
+        <item name="colorOnSurface">@color/text_high</item>
+        <item name="android:colorBackground">@color/primary_900</item>
+        <item name="colorOnBackground">@color/text_high</item>
+
+        <!-- Typography Appearances -->
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.App.DisplayTemp</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.App.CityTitle</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.App.Subtitle</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.App.MetricValue</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.App.MetricLabel</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.App.Caption</item>
+
+        <!-- Legacy Text Appearance Styles -->
+        <item name="textAppearanceHeadline1">@style/TextAppearance.App.Headline1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.App.Headline2</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.App.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.App.Body2</item>
+
+        <!-- Card & Component Styles -->
+        <item name="materialCardViewStyle">@style/Widget.App.Card.Surface</item>
+        <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
+        <item name="chipStyle">@style/Widget.App.Chip.Pill</item>
+
+        <!-- Shape Appearances -->
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.App.LargeComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.App.MediumComponent</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>
+    </style>
+
+    <style name="Theme.WeatherApp" parent="Base.Theme.WeatherApp" />
+
+    <!-- ========== LUXURY THEME (Transparent System Bars) ========== -->
+
+    <style name="Theme.Weather.Lux" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+
+        <!-- Apply Poppins font family -->
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="fontFamily">@font/poppins</item>
+
+        <!-- Color System -->
+        <item name="colorPrimary">@color/accent_600</item>
+        <item name="colorOnPrimary">@color/text_high</item>
+        <item name="colorSecondary">@color/accent_500</item>
+        <item name="colorOnSecondary">@color/text_high</item>
+        <item name="colorSurface">@color/surface_glass</item>
+        <item name="colorOnSurface">@color/text_high</item>
+        <item name="android:colorBackground">@color/primary_900</item>
+        <item name="colorOnBackground">@color/text_high</item>
+    </style>
+
+    <!-- ========== SHAPE APPEARANCES ========== -->
+
+    <!-- Large Component: 28-32dp -->
+    <style name="ShapeAppearance.App.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/corner_radius_large_container</item>
+    </style>
+
+    <!-- Medium Component: 22-26dp -->
+    <style name="ShapeAppearance.App.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/corner_radius_card</item>
+    </style>
+
+    <!-- Small Component: 18-22dp -->
+    <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/corner_radius_pill</item>
+    </style>
+</resources>

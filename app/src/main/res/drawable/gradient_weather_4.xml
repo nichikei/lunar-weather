@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Weather Linear Gradient 4: Light Blue to Dark Blue -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:type="linear"
+        android:angle="90"
+        android:startColor="@color/weather_linear_4_start"
+        android:endColor="@color/weather_linear_4_end" />
+    <corners android:radius="22dp" />
+</shape>
+

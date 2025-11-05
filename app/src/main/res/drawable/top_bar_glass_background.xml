@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Premium glassmorphic top bar background with rounded corners -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Frosted glass effect -->
+    <solid android:color="#4D2A1B6B" />
+    <!-- Fully rounded corners -->
+    <corners android:radius="28dp" />
+    <!-- Soft border -->
+    <stroke
+        android:width="1.5dp"
+        android:color="#40FFFFFF" />
+</shape>
+

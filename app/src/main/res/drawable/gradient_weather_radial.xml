@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Weather Radial Gradient: Pink to Purple -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:type="radial"
+        android:gradientRadius="150dp"
+        android:centerX="0.35"
+        android:centerY="1.08"
+        android:startColor="@color/weather_radial_1_start"
+        android:endColor="@color/weather_radial_1_end" />
+    <corners android:radius="22dp" />
+</shape>
+

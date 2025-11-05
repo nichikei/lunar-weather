@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Weather Linear Gradient 3: Blue to Pink -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:type="linear"
+        android:angle="0"
+        android:startColor="@color/weather_linear_3_start"
+        android:endColor="@color/weather_linear_3_end" />
+    <corners android:radius="22dp" />
+</shape>
+

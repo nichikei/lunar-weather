@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tab transition animation: 225ms with FastOutSlowIn -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="225"
+    android:interpolator="@android:interpolator/fast_out_slow_in">
+
+    <alpha
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0" />
+
+    <translate
+        android:fromXDelta="5%"
+        android:toXDelta="0%" />
+</set>
+

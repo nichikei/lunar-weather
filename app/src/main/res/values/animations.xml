@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ========== BASE ANIMATION STYLE ========== -->
+    <style name="Animation.App" parent="" />
+
+    <!-- ========== TAB TRANSITION ANIMATIONS ========== -->
+
+    <!-- Tab transition: 200-250ms with FastOutSlowIn interpolator -->
+    <style name="Animation.App.TabTransition">
+        <item name="android:duration">@integer/anim_tab_transition_duration</item>
+        <item name="android:interpolator">@android:interpolator/fast_out_slow_in</item>
+    </style>
+
+    <!-- ========== PILL PRESS ANIMATION ========== -->
+
+    <!-- Pill press: scale 0.98 + brighten overlay -->
+    <style name="Animation.App.PillPress">
+        <item name="android:duration">@integer/anim_pill_press_duration</item>
+        <item name="android:interpolator">@android:interpolator/fast_out_slow_in</item>
+    </style>
+</resources>

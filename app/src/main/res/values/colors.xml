@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- ========== PRIMARY COLORS ========== -->
+    <color name="primary_900">#1B1247</color> <!-- Deep purple background -->
+    <color name="primary_800">#251B6A</color>
+    <color name="primary_700">#33248F</color>
+
+    <!-- ========== ACCENT COLORS ========== -->
+    <color name="accent_600">#7B5CFF</color>
+    <color name="accent_500">#9E4CFF</color>
+    <color name="accent_400">#C07BFF</color>
+
+    <!-- ========== SURFACE/GLASS COLORS ========== -->
+    <color name="surface_glass">#14FFFFFF</color> <!-- 8% white -->
+    <color name="stroke_on_glass">#33FFFFFF</color> <!-- 20% white -->
+    <color name="stroke_on_glass_refined">#40FFFFFF</color> <!-- 25% white - softer refined border -->
+
+    <!-- ========== ICON TINT COLORS ========== -->
+    <color name="icon_tint_subtle">#CCFFFFFF</color> <!-- 80% white - refined icon transparency -->
+    <color name="icon_tint_medium">#E6FFFFFF</color> <!-- 90% white -->
+    <color name="icon_tint_high">#FFFFFF</color> <!-- 100% white -->
+
+    <!-- ========== TEXT COLORS ========== -->
+    <color name="text_high">#FFFFFF</color> <!-- 100% white -->
+    <color name="text_mid">#D4D6FF</color> <!-- 70-80% -->
+    <color name="text_low">#A7ABF7</color> <!-- 55-65% -->
+
+    <!-- Premium search hint color - lavender fade -->
+    <color name="text_search_hint">#90E2DDFD</color> <!-- Lavender fade 56% opacity -->
+
+    <!-- ========== STATUS COLORS ========== -->
+    <color name="success">#65D48C</color>
+    <color name="warning">#FFC55E</color>
+    <color name="info">#63C5FF</color>
+
+    <!-- ========== GRADIENT COLORS ========== -->
+    <!-- BG Cosmic: #1C0D52 → #2B1B8A -->
+    <color name="gradient_bg_cosmic_start">#1C0D52</color>
+    <color name="gradient_bg_cosmic_end">#2B1B8A</color>
+
+        <!-- Launcher Icon Background - Deep purple night theme -->
+    <color name="ic_launcher_background">#090B35</color>
+
+    <!-- Card Accent: #2A1B6B → #3A217F -->
+    <color name="gradient_card_accent_start">#2A1B6B</color>
+    <color name="gradient_card_accent_end">#3A217F</color>
+
+    <!-- Glow Purple: #7B5CFF → #9E4CFF -->
+    <color name="gradient_glow_purple_start">#7B5CFF</color>
+    <color name="gradient_glow_purple_end">#9E4CFF</color>
+
+    <!-- ========== LEGACY ALIASES (for backward compatibility) ========== -->
+    <!-- Text aliases -->
+    <color name="text_primary">@color/text_high</color>
+    <color name="text_secondary">@color/text_mid</color>
+    <color name="text_tertiary">@color/text_low</color>
+    <color name="text_quaternary">#66A7ABF7</color>
+    <color name="text_white">#FFFFFF</color>
+    <color name="text_white_70">@color/text_mid</color>
+    <color name="text_white_60">#99FFFFFF</color>
+    <color name="text_white_50">#80FFFFFF</color>
+    <color name="text_white_30">#4DFFFFFF</color>
+    <color name="text_white_18">#2EFFFFFF</color>
+
+    <!-- Label Colors - Light Mode -->
+    <color name="label_light_primary">#000000</color>
+    <color name="label_light_secondary">#993C3C43</color>
+    <color name="label_light_tertiary">#4D3C3C43</color>
+    <color name="label_light_quaternary">#2E3C3C43</color>
+    <color name="background_light">#F4F7FB</color>
+
+    <!-- Label Colors - Dark Mode -->
+    <color name="label_dark_primary">@color/text_high</color>
+    <color name="label_dark_secondary">@color/text_mid</color>
+    <color name="label_dark_tertiary">@color/text_low</color>
+    <color name="label_dark_quaternary">#4DA7ABF7</color>
+    <color name="background_dark">@color/primary_900</color>
+
+    <!-- Gradient aliases -->
+    <color name="gradient_purple_start">@color/gradient_card_accent_start</color>
+    <color name="gradient_purple_end">@color/gradient_card_accent_end</color>
+    <color name="card_gradient_start">@color/gradient_card_accent_start</color>
+    <color name="card_gradient_end">@color/gradient_card_accent_end</color>
+
+    <!-- Weather Linear Gradients -->
+    <color name="weather_linear_1_start">@color/gradient_bg_cosmic_end</color>
+    <color name="weather_linear_1_end">@color/gradient_bg_cosmic_start</color>
+    <color name="weather_linear_2_start">@color/accent_500</color>
+    <color name="weather_linear_2_end">@color/primary_800</color>
+    <color name="weather_linear_3_start">@color/accent_600</color>
+    <color name="weather_linear_3_end">@color/accent_400</color>
+    <color name="weather_linear_4_start">#AEC9FF</color>
+    <color name="weather_linear_4_end">@color/primary_700</color>
+
+    <!-- Weather Radial Gradients -->
+    <color name="weather_radial_1_start">@color/accent_400</color>
+    <color name="weather_radial_1_end">@color/accent_600</color>
+    <color name="weather_angular_1">@color/accent_600</color>
+
+    <!-- Weather Solid Colors -->
+    <color name="weather_solid_1">@color/primary_700</color>
+    <color name="weather_solid_2">@color/primary_900</color>
+    <color name="weather_solid_3">@color/accent_500</color>
+    <color name="weather_solid_4">@color/accent_400</color>
+
+    <!-- Card Colors -->
+    <color name="card_background">@color/gradient_card_accent_start</color>
+    <color name="card_background_light">@color/gradient_card_accent_end</color>
+    <color name="hourly_card_bg">#337B5CFF</color>
+    <color name="hourly_card_active">@color/primary_700</color>
+    <color name="hourly_card_border">@color/stroke_on_glass</color>
+
+    <!-- Border & Effect Colors -->
+    <color name="border_white_30">@color/stroke_on_glass</color>
+    <color name="border_white_50">#80FFFFFF</color>
+    <color name="overlay_dark">#40000000</color>
+
+    <!-- Accent Colors -->
+    <color name="accent_purple">@color/accent_600</color>
+    <color name="accent_cyan">@color/info</color>
+
+    <!-- Background Colors -->
+    <color name="background_primary">@color/primary_900</color>
+    <color name="background_secondary">@color/primary_800</color>
+
+    <!-- Shadow & Glow Colors -->
+    <color name="shadow_outer_glow">#503A2EFF</color>
+    <color name="shadow_color_soft">#664B4B6B</color> <!-- Soft purple shadow for glass cards -->
+
+    <!-- Tab Label Color -->
+    <color name="tab_label_color">#E6E8FF</color>
+</resources>

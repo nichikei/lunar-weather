@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="64dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/weekly_forecast_item_today_background"
+    android:padding="12dp"
+    android:layout_marginEnd="12dp">
+
+    <!-- Day Text (Today) -->
+    <TextView
+        android:id="@+id/tvDay"
+        style="@style/TextStyle.Subheadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TUE"
+        android:layout_marginBottom="12dp"
+        tools:ignore="HardcodedText" />
+
+    <!-- Weather Icon Container -->
+    <FrameLayout
+        android:layout_width="44dp"
+        android:layout_height="38dp"
+        android:layout_marginBottom="12dp">
+
+        <!-- Weather Icon -->
+        <ImageView
+            android:id="@+id/ivWeeklyIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:src="@drawable/big_rain_drops"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/app_name" />
+    </FrameLayout>
+
+    <!-- Temperature -->
+    <TextView
+        android:id="@+id/tvWeeklyTemp"
+        style="@style/TextStyle.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="21°"
+        tools:ignore="HardcodedText" />
+</LinearLayout>

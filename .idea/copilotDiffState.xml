@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/bg_clear_night_new.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/drawable/bg_clear_night_new.xml" />
+              <option name="originalContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;&#10;    &lt;gradient&#10;        android:type=&quot;linear&quot;&#10;        android:angle=&quot;135&quot;&#10;        android:startColor=&quot;#0F2027&quot;&#10;        android:centerColor=&quot;#203A43&quot;&#10;        android:endColor=&quot;#2C5364&quot; /&gt;&#10;&lt;/shape&gt;" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;&#10;    &lt;gradient&#10;        android:type=&quot;linear&quot;&#10;        android:angle=&quot;135&quot;&#10;        android:startColor=&quot;#0F2027&quot;&#10;        android:centerColor=&quot;#203A43&quot;&#10;        android:endColor=&quot;#2C5364&quot; /&gt;&#10;&lt;/shape&gt;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/big_rain_drops.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/drawable/big_rain_drops.xml" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;bitmap xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    android:src=&quot;@drawable/big_rain_drops&quot; /&gt;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/big_snow.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/drawable/big_snow.xml" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;bitmap xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    android:src=&quot;@drawable/big_snow&quot; /&gt;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/cloud_3_zap.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/drawable/cloud_3_zap.xml" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;bitmap xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    android:src=&quot;@drawable/cloud_3_zap&quot; /&gt;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/moon_cloud_fast_wind.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/drawable/moon_cloud_fast_wind.xml" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;bitmap xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    android:src=&quot;@drawable/moon_cloud_fast_wind&quot; /&gt;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/moon_cloud_mid_rain.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/drawable/moon_cloud_mid_rain.xml" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;bitmap xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    android:src=&quot;@drawable/moon_cloud_mid_rain&quot; /&gt;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/sun_cloud_angled_rain.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/drawable/sun_cloud_angled_rain.xml" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;bitmap xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    android:src=&quot;@drawable/sun_cloud_angled_rain&quot; /&gt;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/sun_cloud_little_rain.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/drawable/sun_cloud_little_rain.xml" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;bitmap xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    android:src=&quot;@drawable/sun_cloud_little_rain&quot; /&gt;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/sun_cloud_mid_rain.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/drawable/sun_cloud_mid_rain.xml" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;bitmap xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    android:src=&quot;@drawable/sun_cloud_mid_rain&quot; /&gt;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/tornado.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/drawable/tornado.xml" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;bitmap xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    android:src=&quot;@drawable/tornado&quot; /&gt;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

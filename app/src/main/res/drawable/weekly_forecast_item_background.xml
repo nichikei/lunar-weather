@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Soft outer shadow (blur simulation) -->
+    <item
+        android:left="0dp"
+        android:top="4dp"
+        android:right="0dp"
+        android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="100dp"
+                android:centerX="0.5"
+                android:centerY="0.5"
+                android:startColor="#40000000"
+                android:centerColor="#20000000"
+                android:endColor="#00000000" />
+            <corners android:radius="30dp" />
+        </shape>
+    </item>
+
+    <!-- Medium shadow -->
+    <item
+        android:left="0dp"
+        android:top="3dp"
+        android:right="0dp"
+        android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="135"
+                android:startColor="#60000000"
+                android:centerColor="#30000000"
+                android:endColor="#00000000" />
+            <corners android:radius="30dp" />
+        </shape>
+    </item>
+
+    <!-- Purple glow -->
+    <item
+        android:left="0dp"
+        android:top="2dp"
+        android:right="0dp"
+        android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="80dp"
+                android:centerX="0.5"
+                android:centerY="0.5"
+                android:startColor="#4048319D"
+                android:centerColor="#2048319D"
+                android:endColor="#0048319D" />
+            <corners android:radius="30dp" />
+        </shape>
+    </item>
+
+    <!-- Main gradient background -->
+    <item
+        android:left="0dp"
+        android:top="0dp"
+        android:right="0dp"
+        android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="140"
+                android:startColor="#4048319D"
+                android:centerColor="#303A4888"
+                android:endColor="#2048319D" />
+            <corners android:radius="30dp" />
+        </shape>
+    </item>
+
+    <!-- Glass frosted overlay -->
+    <item
+        android:left="0dp"
+        android:top="0dp"
+        android:right="0dp"
+        android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#1AFFFFFF" />
+            <corners android:radius="30dp" />
+        </shape>
+    </item>
+
+    <!-- Top light reflection -->
+    <item
+        android:left="0dp"
+        android:top="0dp"
+        android:right="0dp"
+        android:bottom="120dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="90"
+                android:startColor="#33FFFFFF"
+                android:centerColor="#1AFFFFFF"
+                android:endColor="#00FFFFFF" />
+            <corners android:radius="30dp" />
+        </shape>
+    </item>
+
+    <!-- White border -->
+    <item
+        android:left="0dp"
+        android:top="0dp"
+        android:right="0dp"
+        android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="0.8dp"
+                android:color="#66FFFFFF" />
+            <corners android:radius="30dp" />
+        </shape>
+    </item>
+
+    <!-- Inner glow -->
+    <item
+        android:left="1dp"
+        android:top="1dp"
+        android:right="1dp"
+        android:bottom="3dp">
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="0.5dp"
+                android:color="#33FFFFFF" />
+            <corners android:radius="29dp" />
+        </shape>
+    </item>
+
+    <!-- Bottom shadow for depth -->
+    <item
+        android:left="2dp"
+        android:top="120dp"
+        android:right="2dp"
+        android:bottom="4dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="#00000000"
+                android:centerColor="#0D000000"
+                android:endColor="#20000000" />
+            <corners android:radius="28dp" />
+        </shape>
+    </item>
+</layer-list>

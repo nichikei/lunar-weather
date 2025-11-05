@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Premium glowing search icon with subtle luminescence -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Glow effect layer -->
+    <item>
+        <shape android:shape="oval">
+            <size android:width="24dp" android:height="24dp" />
+            <solid android:color="#33E2DDFD" />
+        </shape>
+    </item>
+
+    <!-- Main icon layer -->
+    <item
+        android:drawable="@drawable/ic_search_line"
+        android:width="20dp"
+        android:height="20dp"
+        android:gravity="center" />
+</layer-list>
+

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer glow with optional shadow color -->
+    <item
+        android:left="-10dp"
+        android:top="0dp"
+        android:right="-10dp"
+        android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="500dp"
+                android:centerX="0.5"
+                android:centerY="0.3"
+                android:startColor="#267B5CFF"
+                android:centerColor="#137B5CFF"
+                android:endColor="#007B5CFF" />
+            <corners android:radius="@dimen/corner_radius_card" />
+        </shape>
+    </item>
+
+    <!-- Additional outer glow (optional shadow) -->
+    <item
+        android:left="-8dp"
+        android:top="0dp"
+        android:right="-8dp"
+        android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="400dp"
+                android:centerX="0.5"
+                android:centerY="0.3"
+                android:startColor="@color/shadow_outer_glow"
+                android:centerColor="#28503A2E"
+                android:endColor="#00503A2E" />
+            <corners android:radius="@dimen/corner_radius_card" />
+        </shape>
+    </item>
+
+    <!-- Soft outer shadow (3rd layer) -->
+    <item
+        android:left="0dp"
+        android:top="8dp"
+        android:right="0dp"
+        android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="135"
+                android:startColor="#30000000"
+                android:centerColor="#18000000"
+                android:endColor="#00000000" />
+            <corners android:radius="@dimen/corner_radius_card" />
+        </shape>
+    </item>
+
+    <!-- Medium shadow (2nd layer) -->
+    <item
+        android:left="0dp"
+        android:top="4dp"
+        android:right="0dp"
+        android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="300dp"
+                android:centerX="0.5"
+                android:centerY="0.2"
+                android:startColor="#25000000"
+                android:centerColor="#10000000"
+                android:endColor="#00000000" />
+            <corners android:radius="@dimen/corner_radius_card" />
+        </shape>
+    </item>
+
+    <!-- Main card with Glass Morphism -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/surface_glass" />
+            <corners android:radius="@dimen/corner_radius_card" />
+            <stroke
+                android:width="1dp"
+                android:color="@color/stroke_on_glass" />
+        </shape>
+    </item>
+</layer-list>

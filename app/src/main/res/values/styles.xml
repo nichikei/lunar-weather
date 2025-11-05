@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ========== INTER FONT FAMILY (Typography Styles) ========== -->
+
+    <!-- Display Temperature: Inter Light 64sp, letterSpacing -0.5 -->
+    <style name="TextAppearance.App.DisplayTemp" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="android:fontFamily">@font/poppins_light</item> <!-- Replace with Inter Light when available -->
+        <item name="fontFamily">@font/poppins_light</item>
+        <item name="android:textSize">@dimen/text_size_display_temp</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_display_temp</item>
+        <item name="android:textColor">@color/text_high</item>
+    </style>
+
+    <!-- City Title: Inter Medium 32sp, letterSpacing -0.25 -->
+    <style name="TextAppearance.App.CityTitle" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:fontFamily">@font/poppins_medium</item> <!-- Replace with Inter Medium when available -->
+        <item name="fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">@dimen/text_size_city_title</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_city_title</item>
+        <item name="android:textColor">@color/text_high</item>
+    </style>
+
+    <!-- Subtitle/Condition: Inter Regular 18sp -->
+    <style name="TextAppearance.App.Subtitle" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/poppins</item> <!-- Replace with Inter Regular when available -->
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:textSize">@dimen/text_size_subtitle</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_normal</item>
+        <item name="android:textColor">@color/text_mid</item>
+    </style>
+
+    <!-- Metric Value (card): Inter SemiBold 20sp -->
+    <style name="TextAppearance.App.MetricValue" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">@font/poppins_semibold</item> <!-- Replace with Inter SemiBold when available -->
+        <item name="fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">@dimen/text_size_metric_value</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_normal</item>
+        <item name="android:textColor">@color/text_high</item>
+    </style>
+
+    <!-- Metric Label: Inter Medium 14sp, letterSpacing +0.2 -->
+    <style name="TextAppearance.App.MetricLabel" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:fontFamily">@font/poppins_medium</item> <!-- Replace with Inter Medium when available -->
+        <item name="fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">@dimen/text_size_metric_label</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_metric_label</item>
+        <item name="android:textColor">@color/text_low</item>
+    </style>
+
+    <!-- Caption/Hint: Inter Regular 12sp, letterSpacing +0.2 -->
+    <style name="TextAppearance.App.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">@font/poppins</item> <!-- Replace with Inter Regular when available -->
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:textSize">@dimen/text_size_caption</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_caption</item>
+        <item name="android:textColor">@color/text_low</item>
+    </style>
+
+    <!-- Tab Label: 14sp Medium, #E6E8FF -->
+    <style name="TextAppearance.App.TabLabel" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:fontFamily">@font/poppins_medium</item> <!-- Replace with Inter Medium when available -->
+        <item name="fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">@dimen/tab_label_size</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_normal</item>
+        <item name="android:textColor">@color/tab_label_color</item>
+    </style>
+
+    <!-- Hourly Pill Temperature: 18-20sp SemiBold -->
+    <style name="TextAppearance.App.HourlyTemp" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">@font/poppins_semibold</item> <!-- Replace with Inter SemiBold when available -->
+        <item name="fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">@dimen/hourly_pill_temp_size</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_normal</item>
+        <item name="android:textColor">@color/text_high</item>
+    </style>
+
+    <!-- ========== DASHBOARD TILE STYLES ========== -->
+
+    <!-- Tile Header: 14sp Medium -->
+    <style name="TextAppearance.App.TileHeader" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">@dimen/tile_header_text_size</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_normal</item>
+        <item name="android:textColor">@color/text_low</item>
+    </style>
+
+    <!-- Tile Primary Value: 20sp SemiBold -->
+    <style name="TextAppearance.App.TileValuePrimary" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">@dimen/tile_value_primary_size</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_normal</item>
+        <item name="android:textColor">@color/text_high</item>
+    </style>
+
+    <!-- Tile Secondary Value: 12sp Regular -->
+    <style name="TextAppearance.App.TileValueSecondary" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:textSize">@dimen/tile_value_secondary_size</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_normal</item>
+        <item name="android:textColor">@color/text_mid</item>
+    </style>
+
+    <!-- Compass/Gauge Text: 12sp Regular -->
+    <style name="TextAppearance.App.CompassText" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:textSize">@dimen/compass_text_size</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_normal</item>
+        <item name="android:textColor">@color/text_mid</item>
+    </style>
+
+    <!-- Dock Menu Label: 10-12sp Regular -->
+    <style name="TextAppearance.App.DockMenuLabel" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:textSize">@dimen/dock_menu_label_size</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">@color/text_mid</item>
+    </style>
+
+    <!-- ========== CARD STYLES ========== -->
+
+    <!-- Surface Card with elevation -->
+    <style name="Widget.App.Card.Surface" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/corner_radius_card</item>
+        <item name="cardElevation">@dimen/elevation_surface_card</item>
+        <item name="contentPadding">@dimen/card_padding_vertical</item>
+    </style>
+
+    <!-- Large Container Card -->
+    <style name="Widget.App.Card.LargeContainer" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/corner_radius_large_container</item>
+        <item name="cardElevation">@dimen/elevation_surface_card</item>
+    </style>
+
+    <!-- ========== BUTTON & FAB STYLES ========== -->
+
+    <!-- FAB with shadow -->
+    <style name="Widget.App.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="android:layout_width">@dimen/fab_size</item>
+        <item name="android:layout_height">@dimen/fab_size</item>
+        <item name="cornerRadius">@dimen/fab_corner_radius</item>
+        <item name="elevation">@dimen/elevation_fab</item>
+        <item name="backgroundTint">@color/accent_600</item>
+    </style>
+
+    <!-- Pill/Chip Style -->
+    <style name="Widget.App.Chip.Pill" parent="Widget.Material3.Chip.Suggestion">
+        <item name="chipCornerRadius">@dimen/corner_radius_pill</item>
+        <item name="chipBackgroundColor">@color/surface_glass</item>
+        <item name="chipStrokeColor">@color/stroke_on_glass</item>
+        <item name="chipStrokeWidth">1dp</item>
+    </style>
+
+    <!-- ========== BOTTOM DOCK STYLE ========== -->
+
+    <style name="Widget.App.BottomDock">
+        <item name="android:elevation">@dimen/elevation_bottom_dock</item>
+        <item name="android:background">@drawable/gradient_card_accent</item>
+        <item name="android:padding">@dimen/spacing_large</item>
+    </style>
+
+    <!-- ========== LEGACY TEXT APPEARANCE (Updated) ========== -->
+
+    <style name="TextAppearance.App.Headline1" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="fontFamily">@font/poppins_bold</item>
+        <item name="android:textSize">@dimen/text_size_city_title</item>
+        <item name="android:textColor">@color/text_high</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline2" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/text_high</item>
+    </style>
+
+    <style name="TextAppearance.App.Body1" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:textSize">@dimen/text_size_subtitle</item>
+        <item name="android:textColor">@color/text_mid</item>
+    </style>
+
+    <style name="TextAppearance.App.Body2" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">@font/poppins_light</item>
+        <item name="fontFamily">@font/poppins_light</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_mid</item>
+    </style>
+
+    <!-- ========== BASE WIDGET STYLE (Fix for hierarchy) ========== -->
+
+    <style name="Widget.App" parent="" />
+</resources>

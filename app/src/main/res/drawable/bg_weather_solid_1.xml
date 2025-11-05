@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Weather Solid Background 1: Purple -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/weather_solid_1" />
+    <corners android:radius="22dp" />
+</shape>
+

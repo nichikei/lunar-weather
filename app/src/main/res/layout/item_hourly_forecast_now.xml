@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="64dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/hourly_forecast_item_now_background"
+    android:padding="12dp"
+    android:layout_marginEnd="12dp">
+
+    <!-- Hour Text (Now) -->
+    <TextView
+        android:id="@+id/tvHour"
+        style="@style/TextStyle.Subheadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Now"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="none"
+        android:layout_marginBottom="12dp"
+        tools:ignore="HardcodedText" />
+
+    <!-- Weather Icon Container - Same structure as regular card -->
+    <FrameLayout
+        android:layout_width="44dp"
+        android:layout_height="38dp"
+        android:layout_marginBottom="12dp">
+
+        <!-- Weather Icon -->
+        <ImageView
+            android:id="@+id/ivHourlyIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginTop="-4dp"
+            android:src="@drawable/sun_cloud_mid_rain"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/app_name" />
+
+        <!-- Rain Probability - Hidden but takes up space for consistency -->
+        <TextView
+            android:id="@+id/tvRainProbability"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:text="0%"
+            android:textColor="@color/accent_cyan"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            android:visibility="invisible"
+            tools:ignore="HardcodedText" />
+    </FrameLayout>
+
+    <!-- Temperature -->
+    <TextView
+        android:id="@+id/tvHourlyTemp"
+        style="@style/TextStyle.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="19°"
+        tools:ignore="HardcodedText" />
+</LinearLayout>

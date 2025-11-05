@@ -1,0 +1,118 @@
+<resources>
+    <string name="app_name">LunaWeather</string>
+
+    <!-- Main Screen -->
+    <string name="search_city_hint">Tìm kiếm thành phố</string>
+    <string name="use_current_location">Dùng Vị Trí Hiện Tại</string>
+    <string name="hourly_forecast">Dự Báo Theo Giờ</string>
+    <string name="weekly_forecast">Dự Báo Theo Tuần</string>
+    <string name="now">Bây giờ</string>
+
+    <!-- Weather Details -->
+    <string name="feels_like">CẢM GIÁC NHƯ</string>
+    <string name="humidity">ĐỘ ẨM</string>
+    <string name="wind">GIÓ</string>
+    <string name="pressure">ÁP SUẤT</string>
+    <string name="uv_index">CHỈ SỐ UV</string>
+    <string name="sunrise">MẶT TRỜI MỌC</string>
+    <string name="visibility">TẦM NHÌN</string>
+    <string name="rainfall">LƯỢNG MƯA</string>
+
+    <!-- Settings -->
+    <string name="settings">Cài Đặt</string>
+    <string name="back_button">Quay lại</string>
+    <string name="more_options">Tùy chọn khác</string>
+    <string name="navigate">Điều hướng</string>
+
+    <!-- Temperature Unit -->
+    <string name="temperature_unit">NHIỆT ĐỘ</string>
+    <string name="celsius">Độ C</string>
+    <string name="fahrenheit">Độ F</string>
+    <string name="celsius_unit">°C</string>
+    <string name="fahrenheit_unit">°F</string>
+    <string name="temperature_icon">Biểu tượng nhiệt độ</string>
+
+    <!-- Wind Speed Unit -->
+    <string name="wind_speed_unit">TỐC ĐỘ GIÓ</string>
+    <string name="meters_per_second">Mét trên giây</string>
+    <string name="kilometers_per_hour">Kilômét trên giờ</string>
+    <string name="ms_unit">m/s</string>
+    <string name="kmh_unit">km/h</string>
+    <string name="wind_icon">Biểu tượng gió</string>
+
+    <!-- Pressure Unit -->
+    <string name="pressure_unit">ÁP SUẤT</string>
+    <string name="hectopascals">Hectopascal</string>
+    <string name="millibars">Millibar</string>
+    <string name="hpa_unit">hPa</string>
+    <string name="mbar_unit">mbar</string>
+    <string name="pressure_icon">Biểu tượng áp suất</string>
+
+    <!-- Language -->
+    <string name="language">NGÔN NGỮ</string>
+    <string name="english">English</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="en_code">EN</string>
+    <string name="vi_code">VI</string>
+    <string name="language_icon">Biểu tượng ngôn ngữ</string>
+
+    <!-- Preferences -->
+    <string name="preferences">TÙY CHỌN</string>
+    <string name="dark_mode">Chế Độ Tối</string>
+    <string name="use_dark_theme">Sử dụng giao diện tối</string>
+    <string name="dark_mode_icon">Biểu tượng chế độ tối</string>
+    <string name="notifications">Thông Báo</string>
+    <string name="weather_alerts_and_updates">Cảnh báo và cập nhật thời tiết</string>
+    <string name="notifications_icon">Biểu tượng thông báo</string>
+
+    <!-- About -->
+    <string name="about">Giới Thiệu</string>
+    <string name="about_icon">Biểu tượng giới thiệu</string>
+    <string name="app_version">Ứng Dụng Thời Tiết v1.0.0</string>
+
+    <!-- Outfit Suggestions -->
+    <string name="outfit_suggestions">Gợi Ý Trang Phục</string>
+    <string name="ai_powered_suggestions">Gợi Ý Từ AI</string>
+    <string name="what_to_wear">Mặc Gì Hôm Nay</string>
+    <string name="back">Quay Lại</string>
+    <string name="weather_icon">Biểu Tượng Thời Tiết</string>
+
+    <!-- Messages -->
+    <string name="loading">Đang tải…</string>
+    <string name="error_city_not_found">Không tìm thấy thành phố. Vui lòng thử lại.</string>
+    <string name="error_network">Lỗi mạng. Vui lòng kiểm tra kết nối.</string>
+    <string name="permission_location_rationale">Cần quyền truy cập vị trí để lấy thông tin thời tiết tại vị trí của bạn.</string>
+    <string name="permission_denied">Quyền truy cập bị từ chối</string>
+    <string name="getting_location">Đang lấy vị trí của bạn…</string>
+    <string name="location_not_available">Không thể lấy vị trí</string>
+
+    <!-- Units -->
+    <string name="unit_celsius">°C</string>
+    <string name="unit_fahrenheit">°F</string>
+    <string name="unit_ms">m/s</string>
+    <string name="unit_kmh">km/h</string>
+    <string name="unit_hpa">hPa</string>
+    <string name="unit_mbar">mbar</string>
+    <string name="unit_km">km</string>
+    <string name="unit_mm">mm</string>
+
+    <!-- Days of Week -->
+    <string name="sunday">CN</string>
+    <string name="monday">T2</string>
+    <string name="tuesday">T3</string>
+    <string name="wednesday">T4</string>
+    <string name="thursday">T5</string>
+    <string name="friday">T6</string>
+    <string name="saturday">T7</string>
+
+    <!-- Widget -->
+    <string name="widget_description">Widget thông tin thời tiết</string>
+
+    <!-- Charts -->
+    <string name="charts_title">%1$s - Biểu Đồ</string>
+    <string name="temperature_trend">Xu Hướng Nhiệt Độ</string>
+    <string name="weather_statistics">Thống Kê Thời Tiết</string>
+    <string name="rain_probability">Xác Suất Mưa</string>
+    <string name="wind_speed_chart">Tốc Độ Gió</string>
+    <string name="humidity_levels">Mức Độ Ẩm</string>
+</resources>

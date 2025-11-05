@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ========== BASE UNIT ========== -->
+    <dimen name="base_unit">8dp</dimen>
+
+    <!-- ========== SPACING & GRID ========== -->
+    <!-- Gutter -->
+    <dimen name="gutter_list">16dp</dimen>
+    <dimen name="gutter_grid">16dp</dimen>
+
+    <!-- Screen Padding -->
+    <dimen name="screen_padding_small">20dp</dimen>
+    <dimen name="screen_padding_medium">22dp</dimen>
+    <dimen name="screen_padding_large">24dp</dimen>
+
+    <!-- Card Padding -->
+    <dimen name="card_padding_vertical">16dp</dimen>
+    <dimen name="card_padding_horizontal_small">16dp</dimen>
+    <dimen name="card_padding_horizontal_medium">18dp</dimen>
+    <dimen name="card_padding_horizontal_large">20dp</dimen>
+
+    <!-- Spacing -->
+    <dimen name="hourly_pill_spacing">12dp</dimen>
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium">12dp</dimen>
+    <dimen name="spacing_large">16dp</dimen>
+    <dimen name="spacing_xl">24dp</dimen>
+    <dimen name="spacing_xxl">32dp</dimen>
+
+    <!-- ========== CORNER RADIUS ========== -->
+    <!-- Large Container/Tab -->
+    <dimen name="corner_radius_large_container_min">28dp</dimen>
+    <dimen name="corner_radius_large_container_max">32dp</dimen>
+    <dimen name="corner_radius_large_container">30dp</dimen>
+
+    <!-- Card/Tile -->
+    <dimen name="corner_radius_card_min">22dp</dimen>
+    <dimen name="corner_radius_card_max">26dp</dimen>
+    <dimen name="corner_radius_card">24dp</dimen>
+
+    <!-- Pill/Chip -->
+    <dimen name="corner_radius_pill_min">18dp</dimen>
+    <dimen name="corner_radius_pill_max">22dp</dimen>
+    <dimen name="corner_radius_pill">20dp</dimen>
+
+    <!-- FAB -->
+    <dimen name="fab_size">56dp</dimen>
+    <dimen name="fab_corner_radius">28dp</dimen>
+
+    <!-- ========== ELEVATION & SHADOW ========== -->
+    <dimen name="elevation_surface_card">12dp</dimen>
+    <dimen name="elevation_bottom_dock">16dp</dimen>
+    <dimen name="elevation_fab">8dp</dimen>
+
+    <!-- ========== TEXT SIZES ========== -->
+    <!-- Display Temp -->
+    <dimen name="text_size_display_temp">64sp</dimen>
+
+    <!-- City Title -->
+    <dimen name="text_size_city_title">32sp</dimen>
+
+    <!-- Subtitle/Condition -->
+    <dimen name="text_size_subtitle">18sp</dimen>
+
+    <!-- Metric Value (card) -->
+    <dimen name="text_size_metric_value">20sp</dimen>
+
+    <!-- Metric Label -->
+    <dimen name="text_size_metric_label">14sp</dimen>
+
+    <!-- Caption/Hint -->
+    <dimen name="text_size_caption">12sp</dimen>
+
+    <!-- ========== LETTER SPACING ========== -->
+    <!-- Letter spacing in Android is in EM units -->
+    <item name="letter_spacing_display_temp" format="float" type="dimen">-0.01</item> <!-- -0.5sp ≈ -0.01em at 64sp -->
+    <item name="letter_spacing_city_title" format="float" type="dimen">-0.008</item> <!-- -0.25sp ≈ -0.008em at 32sp -->
+    <item name="letter_spacing_metric_label" format="float" type="dimen">0.014</item> <!-- +0.2sp ≈ 0.014em at 14sp -->
+    <item name="letter_spacing_caption" format="float" type="dimen">0.017</item> <!-- +0.2sp ≈ 0.017em at 12sp -->
+    <item name="letter_spacing_normal" format="float" type="dimen">0.0</item>
+
+    <!-- ========== ICON SIZES ========== -->
+    <dimen name="icon_size_small">16dp</dimen>
+    <dimen name="icon_size_medium">24dp</dimen>
+    <dimen name="icon_size_large">32dp</dimen>
+    <dimen name="icon_size_xlarge">48dp</dimen>
+    <dimen name="icon_size_weather">64dp</dimen>
+
+    <!-- ========== WEATHER HERO LAYOUT ========== -->
+    <!-- Padding & Spacing -->
+    <dimen name="hero_padding_top_min">24dp</dimen>
+    <dimen name="hero_padding_top_max">32dp</dimen>
+    <dimen name="hero_padding_top">28dp</dimen>
+
+    <!-- Text Spacing -->
+    <dimen name="hero_text_spacing_small">6dp</dimen>
+    <dimen name="hero_text_spacing_medium">10dp</dimen>
+
+    <!-- Illustration Height (36-42% of screen) -->
+    <dimen name="hero_illustration_height_min">36</dimen> <!-- percentage -->
+    <dimen name="hero_illustration_height_max">42</dimen> <!-- percentage -->
+
+    <!-- ========== TAB CONTAINER (Hourly/Weekly) ========== -->
+    <!-- Tab Container Height -->
+    <dimen name="tab_container_height_min">56dp</dimen>
+    <dimen name="tab_container_height_max">64dp</dimen>
+    <dimen name="tab_container_height">60dp</dimen>
+
+    <!-- Tab Container Radius -->
+    <dimen name="tab_container_radius">30dp</dimen>
+
+    <!-- Tab Indicator -->
+    <dimen name="tab_indicator_height">2dp</dimen>
+    <dimen name="tab_indicator_width">40dp</dimen>
+
+    <!-- Tab Label -->
+    <dimen name="tab_label_size">14sp</dimen>
+
+    <!-- Tab Inner Padding -->
+    <dimen name="tab_inner_padding">16dp</dimen>
+
+    <!-- ========== HOURLY PILLS ========== -->
+    <!-- Pill Size -->
+    <dimen name="hourly_pill_width_min">68dp</dimen>
+    <dimen name="hourly_pill_width_max">76dp</dimen>
+    <dimen name="hourly_pill_width">72dp</dimen>
+
+    <dimen name="hourly_pill_height_min">120dp</dimen>
+    <dimen name="hourly_pill_height_max">132dp</dimen>
+    <dimen name="hourly_pill_height">126dp</dimen>
+
+    <!-- Pill Radius -->
+    <dimen name="hourly_pill_radius">22dp</dimen>
+
+    <!-- Pill Icon Size -->
+    <dimen name="hourly_pill_icon_size_min">28dp</dimen>
+    <dimen name="hourly_pill_icon_size_max">32dp</dimen>
+    <dimen name="hourly_pill_icon_size">30dp</dimen>
+
+    <!-- Pill Temperature Text -->
+    <dimen name="hourly_pill_temp_size_min">18sp</dimen>
+    <dimen name="hourly_pill_temp_size_max">20sp</dimen>
+    <dimen name="hourly_pill_temp_size">19sp</dimen>
+
+    <!-- Pill Spacing -->
+    <dimen name="hourly_pill_item_spacing">12dp</dimen>
+    <dimen name="hourly_pill_padding_vertical">12dp</dimen>
+    <dimen name="hourly_pill_padding_horizontal">8dp</dimen>
+</resources>

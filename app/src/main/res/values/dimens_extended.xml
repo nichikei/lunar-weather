@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ========== DASHBOARD TILES (Grid 2 columns) ========== -->
+    <!-- Tile Size -->
+    <dimen name="tile_min_height_min">128dp</dimen>
+    <dimen name="tile_min_height_max">144dp</dimen>
+    <dimen name="tile_min_height">136dp</dimen>
+
+    <!-- Tile Radius & Padding -->
+    <dimen name="tile_radius">24dp</dimen>
+    <dimen name="tile_padding">16dp</dimen>
+
+    <!-- Tile Header -->
+    <dimen name="tile_header_icon_size">18dp</dimen>
+    <dimen name="tile_header_text_size">14sp</dimen>
+
+    <!-- Tile Values -->
+    <dimen name="tile_value_primary_size">20sp</dimen>
+    <dimen name="tile_value_secondary_size">12sp</dimen>
+
+    <!-- Mini Chart -->
+    <dimen name="mini_chart_height_min">40dp</dimen>
+    <dimen name="mini_chart_height_max">56dp</dimen>
+    <dimen name="mini_chart_height">48dp</dimen>
+    <dimen name="mini_chart_stroke_width">1.5dp</dimen>
+
+    <!-- Wind Compass / Pressure Gauge -->
+    <dimen name="compass_stroke_width">2dp</dimen>
+    <dimen name="compass_tick_width">0.75dp</dimen>
+    <dimen name="compass_text_size">12sp</dimen>
+    <dimen name="compass_size">80dp</dimen>
+
+    <!-- ========== BOTTOM DOCK / FAB ========== -->
+    <!-- Dock Height -->
+    <dimen name="dock_height_min">88dp</dimen>
+    <dimen name="dock_height_max">96dp</dimen>
+    <dimen name="dock_height">92dp</dimen>
+
+    <!-- Middle FAB -->
+    <dimen name="dock_fab_size">56dp</dimen>
+    <dimen name="dock_fab_icon_size">24dp</dimen>
+    <dimen name="dock_fab_elevation">12dp</dimen>
+
+    <!-- Dock Menu Icons -->
+    <dimen name="dock_menu_icon_size">24dp</dimen>
+    <dimen name="dock_menu_label_size_min">10sp</dimen>
+    <dimen name="dock_menu_label_size_max">12sp</dimen>
+    <dimen name="dock_menu_label_size">11sp</dimen>
+
+    <!-- ========== ANIMATION & EFFECTS ========== -->
+    <!-- Animation Durations (in milliseconds) -->
+    <integer name="anim_tab_transition_duration">225</integer>
+    <integer name="anim_pill_press_duration">150</integer>
+    <integer name="anim_lottie_fps_min">30</integer>
+    <integer name="anim_lottie_fps_max">60</integer>
+
+    <!-- Scale & Effects -->
+    <item name="scale_pill_pressed" format="float" type="dimen">0.98</item>
+    <item name="overlay_brighten_amount" format="float" type="dimen">0.10</item>
+    <item name="parallax_scroll_ratio" format="float" type="dimen">0.8</item>
+    <item name="blur_max_radius" format="float" type="dimen">30.0</item>
+</resources>
+

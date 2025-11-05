@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardBackground"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/weather_detail_card_background"
+    android:padding="16dp">
+
+    <!-- Icon and Title Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:id="@+id/tvDetailIcon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:text="🌡️"
+            android:textSize="24sp"
+            android:gravity="center"
+            android:layout_marginEnd="8dp"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/tvDetailTitle"
+            style="@style/TextStyle.CardTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FEELS LIKE"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+
+    <!-- Value -->
+    <TextView
+        android:id="@+id/tvDetailValue"
+        style="@style/TextStyle.CardValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="23°"
+        android:layout_marginBottom="8dp"
+        tools:ignore="HardcodedText" />
+
+    <!-- Description -->
+    <TextView
+        android:id="@+id/tvDetailDescription"
+        style="@style/TextStyle.CardDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Similar to the actual temperature."
+        android:maxLines="2"
+        android:ellipsize="end"
+        tools:ignore="HardcodedText" />
+</LinearLayout>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background">
+
+    <!-- Background Blur Circles -->
+    <View
+        android:layout_width="352dp"
+        android:layout_height="352dp"
+        android:layout_marginStart="-3dp"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/blur_circle"
+        android:alpha="0.3" />
+
+    <View
+        android:layout_width="365dp"
+        android:layout_height="365dp"
+        android:layout_marginStart="122dp"
+        android:layout_marginTop="470dp"
+        android:background="@drawable/blur_circle"
+        android:alpha="0.3" />
+
+    <!-- Top Navigation Bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="50dp"
+        android:paddingBottom="10dp"
+        android:background="#40000000">
+
+        <!-- Navigation -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="9dp"
+            android:gravity="center_vertical">
+
+            <!-- Back Button -->
+            <LinearLayout
+                android:id="@+id/btnBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless">
+
+                <!-- Back Arrow Icon -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_revert"
+                    android:tint="@color/text_white"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="Back"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Weather"
+                    android:textColor="@color/text_white"
+                    android:textSize="17sp"
+                    android:fontFamily="sans-serif"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <!-- Search Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/weather_detail_card_background"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+
+
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Search location..."
+                android:textColorHint="#99FFFFFF"
+                android:textColor="@color/text_white"
+                android:textSize="17sp"
+                android:background="@android:color/transparent"
+                android:fontFamily="sans-serif"
+                android:inputType="text"
+                android:autofillHints="postalAddress"
+                android:imeOptions="actionSearch"
+                tools:ignore="HardcodedText" />
+
+            <ImageButton
+                android:id="@+id/btnSearchIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_search"
+                android:tint="#FFFFFF"
+                android:padding="8dp"
+                android:contentDescription="Search"
+                tools:ignore="UseAppTint" />
+        </LinearLayout>
+
+        <!-- Use Current Location Button -->
+        <LinearLayout
+            android:id="@+id/btnUseCurrentLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/weather_detail_card_background"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_location_glow"
+                android:layout_marginEnd="12dp"
+                android:contentDescription="Location" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Use Current Location"
+                android:textColor="@color/text_white"
+                android:textSize="17sp"
+                android:fontFamily="sans-serif-medium"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="›"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp"
+                android:fontFamily="sans-serif-light"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Cities List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewCities"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/topBar"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="26dp"
+        android:paddingBottom="20dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never" />
+</RelativeLayout>
+
