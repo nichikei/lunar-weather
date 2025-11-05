@@ -96,5 +96,19 @@
                 tools:ignore="HardcodedText" />
         </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
 
+    <!-- Favorite Button (Heart Icon) -->
+    <ImageButton
+        android:id="@+id/btnFavorite"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="12dp"
+        android:background="@drawable/weather_detail_card_background"
+        android:src="@drawable/ic_heart_line"
+        android:padding="12dp"
+        android:scaleType="fitCenter"
+        android:contentDescription="Add to favorites"
+        app:tint="@android:color/white" />
+
+</androidx.cardview.widget.CardView>

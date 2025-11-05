@@ -80,7 +80,7 @@ public class SettingsActivity extends AppCompatActivity {
         // Load Language - Fixed logic - Default to Vietnamese
         String language = sharedPreferences.getString(KEY_LANGUAGE, "vi");
         binding.switchEnglish.setChecked(language.equals("en"));
-        binding.switchVietnamese.setChecked(language.equals("vi"));
+       
     }
 
     private void setupListeners() {

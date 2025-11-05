@@ -26,7 +26,7 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,24 +35,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SearchActivity"
+            android:name=".ui.activities.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ui.activities.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".FavoriteCitiesActivity"
+            android:name=".ui.activities.FavoriteCitiesActivity"
             android:exported="false" />
         <activity
-            android:name=".ChartsActivity"
+            android:name=".ui.activities.ChartsActivity"
             android:exported="false" />
         <activity
-            android:name=".OutfitSuggestionActivity"
+            android:name=".ui.activities.OutfitSuggestionActivity"
             android:exported="false" />
 
         <!-- Notification Receiver -->
         <receiver
-            android:name=".NotificationReceiver"
+            android:name=".notification.NotificationReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.example.weatherapp.ACTION_REFRESH_WEATHER" />
@@ -61,7 +61,7 @@
 
         <!-- Weather Widget -->
         <receiver
-            android:name=".WeatherWidget"
+            android:name=".widget.WeatherWidget"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

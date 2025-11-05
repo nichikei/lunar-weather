@@ -48,21 +48,21 @@ $failed = 0
 
 foreach ($file in $filesToFix) {
     $fullPath = Join-Path $baseDir $file
-
+    
     if (Test-Path $fullPath) {
         try {
             # Read content as UTF-8 (which includes BOM if present)
             $content = Get-Content $fullPath -Raw -Encoding UTF8
-
+            
             # Remove BOM character if present
             if ($content[0] -eq [char]0xFEFF) {
                 $content = $content.Substring(1)
             }
-
+            
             # Write back without BOM
             $utf8NoBom = New-Object System.Text.UTF8Encoding $false
             [System.IO.File]::WriteAllText($fullPath, $content, $utf8NoBom)
-
+            
             Write-Host "Fixed: $file" -ForegroundColor Green
             $fixed++
         }
@@ -85,4 +85,3 @@ if ($failed -gt 0) {
 Write-Host "`nDone! Now rebuild your project in Android Studio:" -ForegroundColor Yellow
 Write-Host "  Build > Clean Project" -ForegroundColor White
 Write-Host "  Build > Rebuild Project" -ForegroundColor White
-

@@ -223,6 +223,18 @@ public class MainActivity extends AppCompatActivity {
         // Apply blur effect to top glass bar (API 31+)
         applyTopBarBlurEffect();
 
+        // Check if opened from FavoriteCitiesActivity with a specific city
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("CITY_NAME")) {
+            String cityName = intent.getStringExtra("CITY_NAME");
+            if (cityName != null && !cityName.isEmpty()) {
+                currentCityName = cityName;
+                fetchAllWeatherData(cityName);
+                return;
+            }
+        }
+
+        // Default: fetch weather for Hanoi
         fetchAllWeatherData(currentCityName);
     }
 
@@ -289,6 +301,19 @@ public class MainActivity extends AppCompatActivity {
             searchLauncher.launch(intent);
         });
 
+        // Top Bar Favorites Icon - NEW
+        if (binding.btnFavoritesIcon != null) {
+            binding.btnFavoritesIcon.setOnClickListener(v -> {
+                openFavoriteCitiesActivity();
+            });
+        }
+
+        // FAB Add to Favorites Button - NEW
+        if (binding.fabAddToFavorites != null) {
+            binding.fabAddToFavorites.setOnClickListener(v -> {
+                toggleFavoriteCity();
+            });
+        }
 
         // Search button click
         binding.btnSearch.setOnClickListener(v -> {
@@ -869,6 +894,9 @@ public class MainActivity extends AppCompatActivity {
         double tempMin = weatherData.getMain().getTempMin();
         binding.tvTempRange.setText(String.format(Locale.getDefault(),
                 "H:%.0f%s   L:%.0f%s", tempMax, tempSymbol, tempMin, tempSymbol));
+
+        // Update favorite icon based on current city
+        updateFavoriteIcon();
 
         // Update 10-Day Forecast Summary
         TextView tvForecastSummary = binding.getRoot().findViewById(R.id.tvForecastSummary);
@@ -1539,5 +1567,82 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         binding = null;
     }
-}
 
+    /**
+     * Toggle favorite status of current city
+     */
+    private void toggleFavoriteCity() {
+        if (currentCityName == null || currentCityName.isEmpty()) {
+            Toast.makeText(this, "No city loaded", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        boolean isFavorite = favoritesManager.isFavorite(currentCityName);
+
+        if (isFavorite) {
+            // Remove from favorites
+            boolean removed = favoritesManager.removeFavoriteCity(currentCityName);
+            if (removed) {
+                binding.fabAddToFavorites.setImageResource(R.drawable.ic_heart_line);
+                Toast.makeText(this, currentCityName + " removed from favorites", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // Add to favorites
+            String country = "";
+            if (currentWeatherData != null && currentWeatherData.getSys() != null) {
+                country = currentWeatherData.getSys().getCountry();
+            }
+
+            FavoriteCity favoriteCity = new FavoriteCity(
+                    currentCityName,
+                    country,
+                    currentLat,
+                    currentLon
+            );
+
+            // Set weather information if available
+            if (currentWeatherData != null) {
+                favoriteCity.setCurrentTemp(currentWeatherData.getMain().getTemp());
+                if (!currentWeatherData.getWeather().isEmpty()) {
+                    favoriteCity.setWeatherCondition(currentWeatherData.getWeather().get(0).getMain());
+                    favoriteCity.setWeatherDescription(currentWeatherData.getWeather().get(0).getDescription());
+                }
+            }
+
+            boolean added = favoritesManager.addFavoriteCity(favoriteCity);
+            if (added) {
+                binding.fabAddToFavorites.setImageResource(R.drawable.ic_heart_filled);
+                Toast.makeText(this, currentCityName + " added to favorites", Toast.LENGTH_SHORT).show();
+
+                // Show dialog to open favorites
+                new android.app.AlertDialog.Builder(this)
+                        .setTitle("Added to Favorites")
+                        .setMessage(currentCityName + " has been added to your favorite cities. Would you like to view your favorites list?")
+                        .setPositiveButton("View Favorites", (dialog, which) -> {
+                            openFavoriteCitiesActivity();
+                        })
+                        .setNegativeButton("Continue", null)
+                        .show();
+            } else {
+                // Check if it's because of max limit
+                if (favoritesManager.getFavoriteCitiesCount() >= 10) {
+                    Toast.makeText(this, "Maximum 10 favorite cities allowed", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "City already in favorites", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    /**
+     * Update FAB icon based on favorite status
+     */
+    private void updateFavoriteIcon() {
+        if (binding.fabAddToFavorites != null && currentCityName != null) {
+            boolean isFavorite = favoritesManager.isFavorite(currentCityName);
+            binding.fabAddToFavorites.setImageResource(
+                    isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_heart_line
+            );
+        }
+    }
+}
