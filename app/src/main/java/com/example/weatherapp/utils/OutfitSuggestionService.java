@@ -25,8 +25,8 @@ import okhttp3.logging.HttpLoggingInterceptor;
 public class OutfitSuggestionService {
     private static final String TAG = "OutfitSuggestionService";
 
-    // Google Gemini API - MIỄN PHÍ 100%!
-    // Lấy API key tại: https://makersuite.google.com/app/apikey
+    private double toC(double kelvin) { return kelvin - 273.15; }
+
     private static final String GEMINI_API_KEY = "AIzaSyAPtCim4ke9C8SwsY2bXszsQotGfxE-XH4";
     private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=";
 
@@ -50,7 +50,7 @@ public class OutfitSuggestionService {
     }
 
     public interface OutfitSuggestionCallback {
-        void onSuccess(List<OutfitSuggestion> suggestions);
+        void onSuccess(List<OutfitSuggestion> suggestions, String source);
         void onError(String error);
     }
 
@@ -58,7 +58,7 @@ public class OutfitSuggestionService {
         // Kiểm tra API key - KHÔNG dùng API nếu key là placeholder
         if (GEMINI_API_KEY.isEmpty() || GEMINI_API_KEY.equals("YOUR_GEMINI_API_KEY_HERE")) {
             Log.d(TAG, "Using default offline suggestions - No API key");
-            callback.onSuccess(getDefaultOutfitSuggestions(weatherData));
+            callback.onSuccess(getDefaultOutfitSuggestions(weatherData), "OFFLINE");
             return;
         }
 
@@ -74,15 +74,15 @@ public class OutfitSuggestionService {
 
                 if (suggestions != null && !suggestions.isEmpty()) {
                     Log.d(TAG, "✅ Gemini API SUCCESS - Got " + suggestions.size() + " suggestions");
-                    callback.onSuccess(suggestions);
+                    callback.onSuccess(suggestions, "AI");
                 } else {
                     Log.w(TAG, "⚠️ Gemini API returned empty - Using default");
-                    callback.onSuccess(getDefaultOutfitSuggestions(weatherData));
+                    callback.onSuccess(getDefaultOutfitSuggestions(weatherData), "OFFLINE");
                 }
             } catch (Exception e) {
                 Log.e(TAG, "❌ Gemini API ERROR: " + e.getMessage());
                 // Fallback to default suggestions
-                callback.onSuccess(getDefaultOutfitSuggestions(weatherData));
+                callback.onSuccess(getDefaultOutfitSuggestions(weatherData), "OFFLINE");
             }
         }).start();
     }
@@ -156,7 +156,7 @@ public class OutfitSuggestionService {
     }
 
     private String createPrompt(WeatherResponse weatherData) {
-        double temp = weatherData.getMain().getTemp();
+        double temp = toC(weatherData.getMain().getTemp());
         String condition = weatherData.getWeather().get(0).getMain();
         String description = weatherData.getWeather().get(0).getDescription();
         double windSpeed = weatherData.getWind().getSpeed();

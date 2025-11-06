@@ -23,18 +23,242 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
 
 /**
+ * ════════════════════════════════════════════════════════════════════════════════════════════════
  * ACTIVITY HIỂN THỊ BIỂU ĐỒ THỐNG KÊ THỜI TIẾT
+ * ════════════════════════════════════════════════════════════════════════════════════════════════
  *
- * Activity này hiển thị 5 loại biểu đồ:
- * 1. Biểu đồ đường: Nhiệt độ theo giờ (Temperature Chart)
- * 2. Biểu đồ cột: Các chỉ số thời tiết hiện tại (Weather Stats Chart)
- * 3. Biểu đồ đường: Xác suất mưa theo giờ (Rain Probability Chart)
- * 4. Biểu đồ đường: Tốc độ gió theo giờ (Wind Speed Chart)
- * 5. Biểu đồ đường: Độ ẩm theo giờ (Humidity Chart)
+ * Activity này hiển thị 5 loại biểu đồ thống kê thời tiết chi tiết:
  *
- * Sử dụng thư viện MPAndroidChart để vẽ biểu đồ
+ * ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+ * │  1. BIỂU ĐỒ ĐƯỜNG - NHIỆT ĐỘ THEO GIỜ (Temperature Chart)                                  │
+ * │     • Hiển thị xu hướng thay đổi nhiệt độ trong 12 giờ tới                                 │
+ * │     • Đường cong màu tím với hiệu ứng gradient fill                                         │
+ * │     • Trục X: Thời gian (Now, 3h, 6h, 9h, 12h...)                                          │
+ * │     • Trục Y: Nhiệt độ (°C hoặc °F)                                                         │
+ * │                                                                                              │
+ * │  2. BIỂU ĐỒ CỘT - CÁC CHỈ SỐ THỜI TIẾT HIỆN TẠI (Weather Stats Chart)                     │
+ * │     • 4 cột với màu sắc khác nhau đại diện cho 4 chỉ số:                                   │
+ * │       - Cột Xanh dương: Độ ẩm (%)                                                           │
+ * │       - Cột Xanh lá: Tốc độ gió (km/h hoặc m/s)                                            │
+ * │       - Cột Cam: Áp suất khí quyển (hPa)                                                    │
+ * │       - Cột Hồng: Chỉ số UV                                                                 │
+ * │                                                                                              │
+ * │  3. BIỂU ĐỒ ĐƯỜNG - XÁC SUẤT MƯA THEO GIỜ (Rain Probability Chart)                         │
+ * │     • Hiển thị khả năng có mưa (0-100%) trong 12 giờ tới                                   │
+ * │     • Đường cong màu xanh nước biển                                                          │
+ * │     • Trục X: Thời gian                                                                      │
+ * │     • Trục Y: Xác suất mưa (%)                                                              │
+ * │                                                                                              │
+ * │  4. BIỂU ĐỒ ĐƯỜNG - TỐC ĐỘ GIÓ THEO GIỜ (Wind Speed Chart)                                 │
+ * │     • Hiển thị sự thay đổi của tốc độ gió                                                   │
+ * │     • Đường cong màu xanh lá                                                                 │
+ * │     • Trục X: Thời gian                                                                      │
+ * │     • Trục Y: Tốc độ gió (km/h hoặc m/s)                                                    │
+ * │                                                                                              │
+ * │  5. BIỂU ĐỒ ĐƯỜNG - ĐỘ ẨM THEO GIỜ (Humidity Chart)                                        │
+ * │     • Hiển thị sự thay đổi độ ẩm không khí                                                  │
+ * │     • Đường cong màu xanh cyan                                                               │
+ * │     • Trục X: Thời gian                                                                      │
+ * │     • Trục Y: Độ ẩm (0-100%)                                                                │
+ * └─────────────────────────────────────────────────────────────────────────────────────────────┘
+ *
+ * ════════════════════════════════════════════════════════════════════════════════════════════════
+ * 📊 LUỒNG HOẠT ĐỘNG TỔNG THỂ 📊
+ * ════════════════════════════════════════════════════════════════════════════════════════════════
+ *
+ * BƯỚC 1: KHỞI ĐỘNG TỪ MAINACTIVITY
+ * ──────────────────────────────────────────────────────────────────────────────────────────────
+ * [MainActivity] → Người dùng nhấn nút "View Charts" (btnViewCharts)
+ * ↓
+ * [MainActivity.openChartsActivity()]
+ * ↓ Kiểm tra dữ liệu có sẵn không?
+ * ├─→ Nếu KHÔNG có dữ liệu: Hiển thị Toast "Weather data not available yet"
+ * └─→ Nếu CÓ dữ liệu: Tạo Intent và truyền 3 loại dữ liệu:
+ * • hourly_data: Dữ liệu dự báo theo giờ (HourlyForecastResponse)
+ * • current_data: Dữ liệu thời tiết hiện tại (WeatherResponse)
+ * • uv_index: Chỉ số UV hiện tại (int)
+ * ↓
+ * startActivity(intent) → Mở ChartsActivity
+ *
+ *
+ * BƯỚC 2: NHẬN DỮ LIỆU VÀ KHỞI TẠO (onCreate)
+ * ──────────────────────────────────────────────────────────────────────────────────────────────
+ * [ChartsActivity.onCreate()]
+ * ↓
+ * ① Nhận dữ liệu từ Intent:
+ * • hourlyForecastData = getIntent().getSerializableExtra("hourly_data")
+ * • currentWeatherData = getIntent().getSerializableExtra("current_data")
+ * • currentUVIndex = getIntent().getIntExtra("uv_index", 0)
+ * ↓
+ * ② Load cài đặt người dùng từ SharedPreferences:
+ * • windSpeedUnit = "ms" hoặc "kmh" (đơn vị tốc độ gió)
+ * ↓
+ * ③ Setup UI Components:
+ * • Nút Back (btnBack) → finish() khi nhấn
+ * • Tiêu đề (tvChartTitle) → Hiển thị: "Tên thành phố - Weather Statistics"
+ * ↓
+ * ④ Khởi tạo tất cả 5 biểu đồ:
+ * • setupTemperatureChart()      → Biểu đồ nhiệt độ
+ * • setupWeatherStatsChart()     → Biểu đồ các chỉ số thời tiết
+ * • setupRainProbabilityChart()  → Biểu đồ xác suất mưa
+ * • setupWindSpeedChart()        → Biểu đồ tốc độ gió
+ * • setupHumidityChart()         → Biểu đồ độ ẩm
+ *
+ *
+ * BƯỚC 3: THIẾT LẬP TỪNG BIỂU ĐỒ (Quy trình chung cho mỗi biểu đồ)
+ * ──────────────────────────────────────────────────────────────────────────────────────────────
+ * [setupXXXChart()]
+ * ↓
+ * ① Kiểm tra dữ liệu:
+ * if (dữ liệu == null) return; → Thoát nếu không có dữ liệu
+ * ↓
+ * ② Tìm view biểu đồ trong layout:
+ * Chart chart = findViewById(R.id.xxxChart);
+ * if (chart == null) return; → Thoát nếu không tìm thấy view
+ * ↓
+ * ③ Tạo danh sách điểm dữ liệu (Entries):
+ * List<Entry> entries = new ArrayList<>();
+ * for (dữ liệu từ API) {
+ * entries.add(new Entry(index, value));
+ * // Entry(vị trí trục X, giá trị trục Y)
+ * }
+ * ↓
+ * ④ Tạo DataSet và cấu hình màu sắc/kiểu dáng:
+ * • Màu đường/cột (setColor)
+ * • Màu điểm dữ liệu (setCircleColor)
+ * • Độ dày đường (setLineWidth)
+ * • Hiệu ứng fill gradient (setDrawFilled, setFillColor)
+ * • Làm mượt đường cong (setMode: CUBIC_BEZIER)
+ * • Formatter giá trị (setValueFormatter)
+ * ↓
+ * ⑤ Gán dữ liệu vào biểu đồ:
+ * chart.setData(lineData hoặc barData);
+ * ↓
+ * ⑥ Áp dụng cấu hình chung:
+ * • setupChart(chart) hoặc setupBarChart(chart)
+ * • Cấu hình trục X, Y
+ * • Cấu hình lưới (grid)
+ * • Cấu hình tương tác (touch, drag, zoom)
+ * ↓
+ * ⑦ Custom formatter cho trục X (nếu cần):
+ * • Chuyển đổi index → giờ thực tế (14h, 17h, 20h...)
+ * • Hoặc tên cột cho biểu đồ cột
+ * ↓
+ * ⑧ Animation và render:
+ * • chart.animateXY(1200, 1200) → Animation 1.2 giây
+ * • chart.invalidate() → Vẽ lại biểu đồ
+ *
+ *
+ * BƯỚC 4: XỬ LÝ DỮ LIỆU API CHO BIỂU ĐỒ
+ * ──────────────────────────────────────────────────────────────────────────────────────────────
+ * Biểu đồ 1, 3, 4, 5: SỬ DỤNG hourlyForecastData (Dự báo theo giờ)
+ * ├─→ API Endpoint: api.openweathermap.org/data/2.5/forecast
+ * ├─→ Dữ liệu trả về: List<HourlyItem> (mỗi 3 giờ một điểm)
+ * ├─→ Mỗi HourlyItem chứa:
+ * │    • dt: Timestamp (Unix time)
+ * │    • main.temp: Nhiệt độ
+ * │    • main.humidity: Độ ẩm
+ * │    • wind.speed: Tốc độ gió
+ * │    • pop: Xác suất mưa (0-1)
+ * └─→ Lấy tối đa 12 điểm = 36 giờ dự báo
+ *
+ * Biểu đồ 2: SỬ DỤNG currentWeatherData (Thời tiết hiện tại)
+ * ├─→ API Endpoint: api.openweathermap.org/data/2.5/weather
+ * ├─→ Dữ liệu trả về: WeatherResponse
+ * ├─→ Chứa:
+ * │    • main.humidity: Độ ẩm hiện tại
+ * │    • main.pressure: Áp suất khí quyển
+ * │    • wind.speed: Tốc độ gió hiện tại
+ * │    • (UV từ biến currentUVIndex riêng)
+ * └─→ Hiển thị 4 cột với 4 giá trị này
+ *
+ *
+ * BƯỚC 5: CHUYỂN ĐỔI GIÁ TRỊ VÀ ĐƠN VỊ
+ * ──────────────────────────────────────────────────────────────────────────────────────────────
+ * • Nhiệt độ: Sử dụng trực tiếp từ API (đã được MainActivity xử lý theo Celsius/Fahrenheit)
+ * • Tốc độ gió:
+ * if (windSpeedUnit == "kmh") → windSpeed * 3.6 (m/s → km/h)
+ * • Xác suất mưa:
+ * API trả về 0-1 → Nhân 100 để có % (0-100%)
+ * • Áp suất:
+ * Chia 10 để cột không quá cao → Nhân lại 10 khi hiển thị label
+ * • UV:
+ * Nhân 10 để cột không quá thấp → Chia lại 10 khi hiển thị label
+ *
+ *
+ * BƯỚC 6: TƯƠNG TÁC NGƯỜI DÙNG
+ * ──────────────────────────────────────────────────────────────────────────────────────────────
+ * [Người dùng xem biểu đồ]
+ * ↓
+ * • Scroll lên/xuống: ScrollView cho phép cuộn xem tất cả 5 biểu đồ
+ * • Chạm vào điểm: Hiển thị giá trị chính xác của điểm đó
+ * • Kéo biểu đồ: Drag ngang để xem các điểm khác (nếu có nhiều dữ liệu)
+ * • Nhấn nút Back: Quay lại MainActivity
+ * ↓
+ * [finish()] → Đóng ChartsActivity, quay về MainActivity
+ *
+ *
+ * ════════════════════════════════════════════════════════════════════════════════════════════════
+ * 🎨 THƯ VIỆN SỬ DỤNG 🎨
+ * ════════════════════════════════════════════════════════════════════════════════════════════════
+ *
+ * MPAndroidChart v3.1.0
+ * ├─→ Repository: https://github.com/PhilJay/MPAndroidChart
+ * ├─→ Gradle: implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+ * ├─→ Các component sử dụng:
+ * │    • LineChart: Biểu đồ đường (nhiệt độ, mưa, gió, độ ẩm)
+ * │    • BarChart: Biểu đồ cột (các chỉ số thời tiết)
+ * │    • Entry: Điểm dữ liệu cho biểu đồ đường
+ * │    • BarEntry: Điểm dữ liệu cho biểu đồ cột
+ * │    • LineDataSet: Bộ dữ liệu cho biểu đồ đường
+ * │    • BarDataSet: Bộ dữ liệu cho biểu đồ cột
+ * │    • ValueFormatter: Format giá trị hiển thị
+ * │    • XAxis: Cấu hình trục X
+ * └─→ Tính năng:
+ * • Animation mượt mà
+ * • Touch interaction
+ * • Custom màu sắc và gradient
+ * • Zoom và pan
+ *
+ *
+ * ════════════════════════════════════════════════════════════════════════════════════════════════
+ * 📁 CẤU TRÚC FILE LIÊN QUAN 📁
+ * ════════════════════════════════════════════════════════════════════════════════════════════════
+ *
+ * Java Files:
+ * ├─ ChartsActivity.java (file này)
+ * │   └─ Xử lý logic và hiển thị tất cả biểu đồ
+ * │
+ * ├─ MainActivity.java
+ * │   ├─ openChartsActivity() → Phương thức mở ChartsActivity
+ * │   └─ btnViewCharts.setOnClickListener() → Sự kiện nhấn nút
+ * │
+ * └─ Data Models:
+ * ├─ HourlyForecastResponse.java → Dữ liệu dự báo theo giờ
+ * └─ WeatherResponse.java → Dữ liệu thời tiết hiện tại
+ *
+ * Layout Files:
+ * ├─ activity_charts.xml
+ * │   └─ Layout chính của ChartsActivity (ScrollView chứa 5 biểu đồ)
+ * │
+ * └─ Card Layouts (được include vào activity_charts.xml):
+ * ├─ card_temperature_chart.xml → Layout biểu đồ nhiệt độ
+ * ├─ card_weather_stats_chart.xml → Layout biểu đồ các chỉ số
+ * ├─ card_rain_probability_chart.xml → Layout biểu đồ xác suất mưa
+ * ├─ card_wind_speed_chart.xml → Layout biểu đồ tốc độ gió
+ * └─ card_humidity_chart.xml → Layout biểu đồ độ ẩm
+ *
+ * ════════════════════════════════════════════════════════════════════════════════════════════════
  */
 public class ChartsActivity extends AppCompatActivity {
 
@@ -93,11 +317,11 @@ public class ChartsActivity extends AppCompatActivity {
      * - Trục X hiển thị thời gian: 0h, 3h, 6h, 9h, 12h...
      * - API trả về dữ liệu mỗi 3 giờ một lần
      * - Ví dụ: Nếu bây giờ là 14h (2PM), các điểm sẽ là:
-     *   • Điểm 0: 14h (Now)
-     *   • Điểm 1: 17h (3h sau)
-     *   • Điểm 2: 20h (6h sau)
-     *   • Điểm 3: 23h (9h sau)
-     *   • Điểm 4: 02h (12h sau - ngày hôm sau)
+     * • Điểm 0: 14h (Now)
+     * • Điểm 1: 17h (3h sau)
+     * • Điểm 2: 20h (6h sau)
+     * • Điểm 3: 23h (9h sau)
+     * • Điểm 4: 02h (12h sau - ngày hôm sau)
      *
      * === TRỤC Y (DỌC): NHIỆT ĐỘ ===
      * - Trục Y hiển thị nhiệt độ: 20°C, 22°C, 25°C, 28°C...
@@ -106,14 +330,14 @@ public class ChartsActivity extends AppCompatActivity {
      * VÍ DỤ BIỂU ĐỒ:
      *
      * Nhiệt độ (°C)
-     *   30│                    ●
-     *   28│              ●         ●
-     *   26│        ●
-     *   24│  ●
-     *   22│
-     *     └─────────────────────────────> Thời gian
-     *      Now  3h   6h   9h   12h
-     *      14h  17h  20h  23h  02h
+     * 30│                    ●
+     * 28│              ●         ●
+     * 26│        ●
+     * 24│  ●
+     * 22│
+     * └─────────────────────────────> Thời gian
+     * Now  3h   6h   9h   12h
+     * 14h  17h  20h  23h  02h
      */
     private void setupTemperatureChart() {
         // Kiểm tra dữ liệu có tồn tại không
@@ -129,7 +353,7 @@ public class ChartsActivity extends AppCompatActivity {
         List<Entry> entries = new ArrayList<>();
 
         // Lấy tối đa 12 điểm dữ liệu (tương đương 36 giờ, vì mỗi điểm cách 3h)
-        int count = Math.min(12, hourlyForecastData.getList().size());
+        int count = Math.min(9, hourlyForecastData.getList().size());
         for (int i = 0; i < count; i++) {
             HourlyForecastResponse.HourlyItem item = hourlyForecastData.getList().get(i);
             float temp = (float) item.getMain().getTemp();
@@ -192,7 +416,7 @@ public class ChartsActivity extends AppCompatActivity {
 
                     // Hiển thị "Now" cho điểm đầu tiên, còn lại hiển thị giờ
                     if (index == 0) {
-                        return "Now";
+                        return hour + "h";
                     } else {
                         return hour + "h";
                     }
@@ -265,10 +489,10 @@ public class ChartsActivity extends AppCompatActivity {
 
         // === MÀU SẮC CHO 4 CỘT ===
         int[] colors = {
-            0xFF4FC3F7,  // Xanh dương - Độ ẩm (nước)
-            0xFF66BB6A,  // Xanh lá - Gió
-            0xFFFFB347,  // Cam - Áp suất
-            0xFFFF6B9D   // Hồng - UV (nguy hiểm)
+                0xFF4FC3F7,  // Xanh dương - Độ ẩm (nước)
+                0xFF66BB6A,  // Xanh lá - Gió
+                0xFFFFB347,  // Cam - Áp suất
+                0xFFFF6B9D   // Hồng - UV (nguy hiểm)
         };
         dataSet.setColors(colors);
 
@@ -337,19 +561,19 @@ public class ChartsActivity extends AppCompatActivity {
         LineChart chart = findViewById(R.id.rainProbabilityChart);
         if (chart == null) return;
 
-        List<Entry> entries = new ArrayList<>();
-        int count = Math.min(12, hourlyForecastData.getList().size());
+        List<HourlyForecastResponse.HourlyItem> list = hourlyForecastData.getList();
 
+        // 24h tới = 8 điểm (mỗi điểm cách 3h)
+        int count = Math.min(9, list.size());
+
+        // Entries: X = index (0..7), Y = % mưa
+        List<Entry> entries = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            HourlyForecastResponse.HourlyItem item = hourlyForecastData.getList().get(i);
-            // getPop() trả về 0-1, nhân 100 để có %
-            float rainProb = (float) (item.getPop() * 100);
-            entries.add(new Entry(i, rainProb));
+            double pop0to1 = list.get(i).getPop();
+            entries.add(new Entry(i, (float) (pop0to1 * 100f)));
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "Rain Probability");
-
-        // Màu xanh nước biển cho mưa
         dataSet.setColor(0xFF4FC3F7);
         dataSet.setCircleColor(0xFF81D4FA);
         dataSet.setLineWidth(3.5f);
@@ -362,20 +586,44 @@ public class ChartsActivity extends AppCompatActivity {
         dataSet.setFillAlpha(100);
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         dataSet.setCubicIntensity(0.15f);
-        dataSet.setDrawValues(false);  // Không hiển thị giá trị trên điểm
+        dataSet.setDrawValues(true);
 
-        LineData lineData = new LineData(dataSet);
-        chart.setData(lineData);
+        chart.setData(new LineData(dataSet));
+        setupChart(chart); // nếu bạn đã có hàm này để style chung
 
-        setupChart(chart);
-
-        // Set giới hạn trục Y: 0% đến 100%
+        // Y: 0–100%
         chart.getAxisLeft().setAxisMinimum(0f);
         chart.getAxisLeft().setAxisMaximum(100f);
+        chart.getAxisRight().setEnabled(false);
 
-        chart.animateXY(1200, 1200);
+        // X: hiển thị giờ thực (HHh) theo timezone city
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);          // mỗi 1 index là 1 nhãn
+        xAxis.setLabelCount(count, true);  // đúng 8 nhãn cho 24h tới
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int idx = Math.round(value);
+                if (idx < 0 || idx >= count) return "";
+                HourlyForecastResponse.HourlyItem it = list.get(idx);
+
+                long tsMs = it.getDt() * 1000L;
+                // cộng timezone offset (giây) nếu API có
+                int tzSec = hourlyForecastData.getCity() != null ? hourlyForecastData.getCity().getTimezone() : 0;
+                long localMs = tsMs + tzSec * 1000L;
+
+                java.util.Calendar cal = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
+                cal.setTimeInMillis(localMs);
+                int h = cal.get(java.util.Calendar.HOUR_OF_DAY);
+                return (h < 10 ? "0" + h : String.valueOf(h)) + "h";
+            }
+        });
+
+        chart.animateXY(800, 800);
         chart.invalidate();
     }
+
 
     /**
      * THIẾT LẬP BIỂU ĐỒ TỐC ĐỘ GIÓ (Wind Speed Chart)
@@ -390,44 +638,93 @@ public class ChartsActivity extends AppCompatActivity {
         LineChart chart = findViewById(R.id.windSpeedChart);
         if (chart == null) return;
 
+        List<HourlyForecastResponse.HourlyItem> list = hourlyForecastData.getList();
+        int count = Math.min(9, list.size()); // 24h tới (8 mốc × 3h)
+
+        // ==== DỮ LIỆU ====
         List<Entry> entries = new ArrayList<>();
-        int count = Math.min(12, hourlyForecastData.getList().size());
-
         for (int i = 0; i < count; i++) {
-            HourlyForecastResponse.HourlyItem item = hourlyForecastData.getList().get(i);
-            float windSpeed = (float) item.getWind().getSpeed();
-
-            // Chuyển đổi đơn vị nếu cần
-            if (windSpeedUnit.equals("kmh")) {
-                windSpeed = windSpeed * 3.6f;
-            }
-            entries.add(new Entry(i, windSpeed));
+            float speed = (float) list.get(i).getWind().getSpeed(); // m/s
+            if ("kmh".equalsIgnoreCase(windSpeedUnit)) speed *= 3.6f; // đổi km/h nếu cần
+            entries.add(new Entry(i, speed)); // X=index, Y=tốc độ gió
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "Wind Speed");
+        LineDataSet ds = new LineDataSet(entries, "Wind Speed");
+        ds.setColor(0xFF66BB6A);
+        ds.setCircleColor(0xFF81C784);
+        ds.setLineWidth(3.5f);
+        ds.setCircleRadius(5f);
+        ds.setDrawCircleHole(true);
+        ds.setCircleHoleColor(0xFF4CAF50);
+        ds.setCircleHoleRadius(2.5f);
+        ds.setDrawFilled(true);
+        ds.setFillColor(0xFF66BB6A);
+        ds.setFillAlpha(100);
+        ds.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        ds.setCubicIntensity(0.15f);
+        ds.setDrawValues(true);
 
-        // Màu xanh lá cho gió
-        dataSet.setColor(0xFF66BB6A);
-        dataSet.setCircleColor(0xFF81C784);
-        dataSet.setLineWidth(3.5f);
-        dataSet.setCircleRadius(5f);
-        dataSet.setDrawCircleHole(true);
-        dataSet.setCircleHoleColor(0xFF4CAF50);
-        dataSet.setCircleHoleRadius(2.5f);
-        dataSet.setDrawFilled(true);
-        dataSet.setFillColor(0xFF66BB6A);
-        dataSet.setFillAlpha(100);
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        dataSet.setCubicIntensity(0.15f);
-        dataSet.setDrawValues(false);
+        chart.setData(new LineData(ds));
 
-        LineData lineData = new LineData(dataSet);
-        chart.setData(lineData);
 
-        setupChart(chart);
-        chart.animateXY(1200, 1200);
+        // ==== TRỤC Y ====
+        chart.getAxisRight().setEnabled(false);
+        YAxis yLeft = chart.getAxisLeft();
+        yLeft.setAxisMinimum(0f); // tốc độ gió không âm
+        // *** THÊM CÀI ĐẶT MÀU SẮC TRỤC Y ***
+        yLeft.setTextColor(0xCCFFFFFF);
+        yLeft.setTextSize(11f);
+        yLeft.setDrawGridLines(true);
+        yLeft.setGridColor(0x30FFFFFF);
+        yLeft.setGridLineWidth(1f);
+        yLeft.setDrawAxisLine(false);
+
+
+        // ==== TRỤC X: HIỂN THỊ GIỜ (HHh) ====
+        XAxis x = chart.getXAxis();
+        x.setPosition(XAxis.XAxisPosition.BOTTOM);
+        x.setGranularity(1f);             // mỗi index = 1 nhãn
+        x.setLabelCount(count, true);     // đúng 8 nhãn
+        x.setDrawGridLines(false);
+        x.setAvoidFirstLastClipping(true);
+        // *** THÊM CÀI ĐẶT MÀU SẮC TRỤC X ***
+        x.setTextColor(0xCCFFFFFF);
+        x.setTextSize(11f);
+        x.setDrawAxisLine(true);
+        x.setAxisLineColor(0x40FFFFFF);
+        x.setAxisLineWidth(1.5f);
+
+
+        final int tzSec = (hourlyForecastData.getCity() != null)
+                ? hourlyForecastData.getCity().getTimezone() : 0;
+
+        x.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int index = Math.round(value);                  // tránh 2.7, 3.2 khi zoom/pan
+                if (index < 0 || index >= count) return "";
+                long tsMs = list.get(index).getDt() * 1000L;    // giây → mili-giây
+                long localMs = tsMs + tzSec * 1000L;            // cộng offset timezone
+
+                java.util.Calendar cal = java.util.Calendar.getInstance(
+                        java.util.TimeZone.getTimeZone("UTC"));
+                cal.setTimeInMillis(localMs);
+                int h = cal.get(java.util.Calendar.HOUR_OF_DAY);
+                return (h < 10 ? "0" + h : String.valueOf(h)) + "h";
+            }
+        });
+
+        chart.getDescription().setEnabled(false);
+        chart.getLegend().setEnabled(false);
+        chart.setTouchEnabled(true);
+        chart.setDragEnabled(true);
+        chart.setScaleEnabled(true);
+        chart.setPinchZoom(true);
+
+        chart.animateXY(1000, 1000);
         chart.invalidate();
     }
+
 
     /**
      * THIẾT LẬP BIỂU ĐỒ ĐỘ ẨM (Humidity Chart)
@@ -442,44 +739,90 @@ public class ChartsActivity extends AppCompatActivity {
         LineChart chart = findViewById(R.id.humidityChart);
         if (chart == null) return;
 
-        List<Entry> entries = new ArrayList<>();
-        int count = Math.min(12, hourlyForecastData.getList().size());
+        List<HourlyForecastResponse.HourlyItem> list = hourlyForecastData.getList();
+        int count = Math.min(9, list.size()); // 24h tới (8 mốc × 3h)
 
+        // ==== DỮ LIỆU ====
+        List<Entry> entries = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            HourlyForecastResponse.HourlyItem item = hourlyForecastData.getList().get(i);
-            float humidity = (float) item.getMain().getHumidity();
-            entries.add(new Entry(i, humidity));
+            float humidity = (float) list.get(i).getMain().getHumidity(); // 0..100
+            entries.add(new Entry(i, humidity)); // X=index, Y=độ ẩm %
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "Humidity");
+        LineDataSet ds = new LineDataSet(entries, "Humidity");
+        ds.setColor(0xFF26C6DA);
+        ds.setCircleColor(0xFF4DD0E1);
+        ds.setLineWidth(3.5f);
+        ds.setCircleRadius(5f);
+        ds.setDrawCircleHole(true);
+        ds.setCircleHoleColor(0xFF00BCD4);
+        ds.setCircleHoleRadius(2.5f);
+        ds.setDrawFilled(true);
+        ds.setFillColor(0xFF26C6DA);
+        ds.setFillAlpha(100);
+        ds.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        ds.setCubicIntensity(0.15f);
+        ds.setDrawValues(true);
 
-        // Màu xanh cyan cho độ ẩm
-        dataSet.setColor(0xFF26C6DA);
-        dataSet.setCircleColor(0xFF4DD0E1);
-        dataSet.setLineWidth(3.5f);
-        dataSet.setCircleRadius(5f);
-        dataSet.setDrawCircleHole(true);
-        dataSet.setCircleHoleColor(0xFF00BCD4);
-        dataSet.setCircleHoleRadius(2.5f);
-        dataSet.setDrawFilled(true);
-        dataSet.setFillColor(0xFF26C6DA);
-        dataSet.setFillAlpha(100);
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        dataSet.setCubicIntensity(0.15f);
-        dataSet.setDrawValues(false);
+        chart.setData(new LineData(ds));
 
-        LineData lineData = new LineData(dataSet);
-        chart.setData(lineData);
+        // ==== TRỤC Y: 0–100% ====
+        chart.getAxisRight().setEnabled(false);
+        YAxis yLeft = chart.getAxisLeft();
+        yLeft.setAxisMinimum(0f);
+        yLeft.setAxisMaximum(100f);
+        // *** THÊM CÀI ĐẶT MÀU SẮC TRỤC Y ***
+        yLeft.setTextColor(0xCCFFFFFF);
+        yLeft.setTextSize(11f);
+        yLeft.setDrawGridLines(true);
+        yLeft.setGridColor(0x30FFFFFF);
+        yLeft.setGridLineWidth(1f);
+        yLeft.setDrawAxisLine(false);
 
-        setupChart(chart);
+        // ==== TRỤC X: HIỂN THỊ GIỜ (HHh) ====
+        XAxis x = chart.getXAxis();
+        x.setPosition(XAxis.XAxisPosition.BOTTOM);
+        x.setGranularity(1f);
+        x.setLabelCount(count, true);
+        x.setDrawGridLines(false);
+        x.setAvoidFirstLastClipping(true);
+        // *** THÊM CÀI ĐẶT MÀU SẮC TRỤC X ***
+        x.setTextColor(0xCCFFFFFF);
+        x.setTextSize(11f);
+        x.setDrawAxisLine(true);
+        x.setAxisLineColor(0x40FFFFFF);
+        x.setAxisLineWidth(1.5f);
 
-        // Set giới hạn trục Y: 0% đến 100%
-        chart.getAxisLeft().setAxisMinimum(0f);
-        chart.getAxisLeft().setAxisMaximum(100f);
+        final int tzSec = (hourlyForecastData.getCity() != null)
+                ? hourlyForecastData.getCity().getTimezone() : 0;
 
-        chart.animateXY(1200, 1200);
+        x.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int index = Math.round(value);
+                if (index < 0 || index >= count) return "";
+                long tsMs = list.get(index).getDt() * 1000L;   // giây → mili-giây
+                long localMs = tsMs + tzSec * 1000L;           // cộng offset timezone
+
+                java.util.Calendar cal = java.util.Calendar.getInstance(
+                        java.util.TimeZone.getTimeZone("UTC"));
+                cal.setTimeInMillis(localMs);
+                int h = cal.get(java.util.Calendar.HOUR_OF_DAY);
+                return (h < 10 ? "0" + h : String.valueOf(h)) + "h";
+            }
+        });
+
+        chart.getDescription().setEnabled(false);
+        chart.getLegend().setEnabled(false);
+        chart.setTouchEnabled(true);
+        chart.setDragEnabled(true);
+        chart.setScaleEnabled(true);
+        chart.setPinchZoom(true);
+
+        chart.animateXY(1000, 1000);
         chart.invalidate();
     }
+
 
     /**
      * CÀI ĐẶT CHUNG CHO TẤT CẢ BIỂU ĐỒ ĐƯỜNG (Line Chart)

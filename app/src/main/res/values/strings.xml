@@ -71,7 +71,7 @@
     <string name="app_version">Weather App v1.0.0</string>
 
     <!-- Outfit Suggestions -->
-    <string name="outfit_suggestions">Outfit Suggestions</string>
+    <string name="outfit_suggestions">Outfit Suggetions</string>
     <string name="ai_powered_suggestions">AI-Powered Recommendations</string>
     <string name="what_to_wear">What to Wear</string>
     <string name="back">Back</string>

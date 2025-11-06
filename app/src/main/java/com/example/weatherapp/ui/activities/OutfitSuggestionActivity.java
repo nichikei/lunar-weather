@@ -163,7 +163,7 @@ public class OutfitSuggestionActivity extends AppCompatActivity {
              *                    Mỗi item có: name, description, icon
              */
             @Override
-            public void onSuccess(List<OutfitSuggestion> suggestions) {
+            public void onSuccess(List<OutfitSuggestion> suggestions, String source) {
                 // runOnUiThread vì callback này chạy trên background thread
                 // Phải chuyển về UI thread để update giao diện
                 runOnUiThread(() -> {
@@ -173,6 +173,7 @@ public class OutfitSuggestionActivity extends AppCompatActivity {
 
                     // Cập nhật adapter với danh sách gợi ý mới
                     // Adapter sẽ tự động refresh RecyclerView
+
                     adapter.updateSuggestions(suggestions);
                 });
             }

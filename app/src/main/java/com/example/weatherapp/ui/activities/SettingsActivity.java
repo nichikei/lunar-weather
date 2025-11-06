@@ -196,32 +196,14 @@ public class SettingsActivity extends AppCompatActivity {
 
             if (isChecked) {
                 isUpdatingLanguage = true;
-                binding.switchVietnamese.setChecked(false);
+
                 isUpdatingLanguage = false;
                 saveLanguage("en");
                 applyLanguage("en");
-            } else if (!binding.switchVietnamese.isChecked()) {
-                isUpdatingLanguage = true;
-                binding.switchEnglish.setChecked(true);
-                isUpdatingLanguage = false;
             }
         });
 
-        binding.switchVietnamese.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isUpdatingLanguage) return;
 
-            if (isChecked) {
-                isUpdatingLanguage = true;
-                binding.switchEnglish.setChecked(false);
-                isUpdatingLanguage = false;
-                saveLanguage("vi");
-                applyLanguage("vi");
-            } else if (!binding.switchEnglish.isChecked()) {
-                isUpdatingLanguage = true;
-                binding.switchVietnamese.setChecked(true);
-                isUpdatingLanguage = false;
-            }
-        });
 
         // About button
         binding.btnAbout.setOnClickListener(v -> {

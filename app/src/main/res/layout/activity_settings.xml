@@ -553,53 +553,7 @@
                         android:layout_marginStart="48dp"
                         android:layout_marginEnd="12dp" />
 
-                    <!-- Vietnamese Option -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="16dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="@drawable/settings_row_background">
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_language"
-                            app:tint="@color/text_primary"
-                            android:contentDescription="@string/language_icon" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/vietnamese"
-                            android:textColor="@color/text_primary"
-                            android:textSize="16sp"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginStart="12dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/vi_code"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_marginEnd="10dp" />
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switchVietnamese"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:minWidth="48dp"
-                            android:minHeight="48dp"
-                            android:checked="false"
-                            app:thumbTint="@color/settings_switch_thumb_tint"
-                            app:trackTint="@color/settings_switch_track_tint" />
-                    </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
