@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.common;
+package com.example.weatherapp.ui.helpers;
 
 import android.view.View;
 import android.view.ViewGroup;

@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.weatherapp.R;
 import com.example.weatherapp.data.responses.HourlyForecastResponse;
 import com.example.weatherapp.data.responses.WeatherResponse;
-import com.example.weatherapp.ui.charts.ChartHelper;
+import com.example.weatherapp.ui.helpers.ChartHelper;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;

@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.common;
+package com.example.weatherapp.ui.helpers;
 
 import android.content.Intent;
 import android.os.Build;

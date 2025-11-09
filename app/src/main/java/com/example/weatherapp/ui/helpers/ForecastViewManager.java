@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.weather;
+package com.example.weatherapp.ui.helpers;
 
 import android.content.Context;
 import android.view.LayoutInflater;

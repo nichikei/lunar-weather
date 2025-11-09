@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.location;
+package com.example.weatherapp.ui.helpers;
 
 import android.Manifest;
 import android.app.Activity;
