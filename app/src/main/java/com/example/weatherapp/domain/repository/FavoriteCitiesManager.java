@@ -1,4 +1,4 @@
-package com.example.weatherapp.utils;
+package com.example.weatherapp.domain.repository;
 
 import android.content.Context;
 import android.content.SharedPreferences;

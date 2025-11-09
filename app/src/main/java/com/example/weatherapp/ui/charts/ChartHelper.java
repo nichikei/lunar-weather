@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.helpers;
+package com.example.weatherapp.ui.charts;
 
 import com.example.weatherapp.data.responses.HourlyForecastResponse;
 import com.github.mikephil.charting.charts.BarChart;

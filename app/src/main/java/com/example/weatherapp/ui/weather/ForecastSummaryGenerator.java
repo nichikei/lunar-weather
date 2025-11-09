@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.helpers;
+package com.example.weatherapp.ui.weather;
 
 import com.example.weatherapp.data.responses.HourlyForecastResponse;
 

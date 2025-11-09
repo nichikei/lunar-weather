@@ -1,4 +1,4 @@
-package com.example.weatherapp.utils;
+package com.example.weatherapp.domain.services;
 
 import android.content.Context;
 import android.util.Log;

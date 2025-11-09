@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.weatherapp.R;
 import com.example.weatherapp.data.models.OutfitSuggestion;
 import com.example.weatherapp.data.responses.WeatherResponse;
+import com.example.weatherapp.domain.services.OutfitSuggestionService;
 import com.example.weatherapp.ui.adapters.OutfitSuggestionAdapter;
-import com.example.weatherapp.utils.OutfitSuggestionService;
 
 import java.util.ArrayList;
 import java.util.List;

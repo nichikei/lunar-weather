@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.helpers;
+package com.example.weatherapp.ui.navigation;
 
 import android.content.Intent;
 import android.widget.Toast;

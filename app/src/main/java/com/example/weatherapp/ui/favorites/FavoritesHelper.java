@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.helpers;
+package com.example.weatherapp.ui.favorites;
 
 import android.content.Intent;
 import android.widget.Toast;
@@ -6,9 +6,9 @@ import android.widget.Toast;
 import com.example.weatherapp.data.models.FavoriteCity;
 import com.example.weatherapp.data.responses.WeatherResponse;
 import com.example.weatherapp.R;
+import com.example.weatherapp.domain.repository.FavoriteCitiesManager;
 import com.example.weatherapp.ui.activities.MainActivity;
 import com.example.weatherapp.ui.activities.FavoriteCitiesActivity;
-import com.example.weatherapp.utils.FavoriteCitiesManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 /**

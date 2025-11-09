@@ -17,7 +17,7 @@ import com.example.weatherapp.R;
 import com.example.weatherapp.data.models.CityWeather;
 import com.example.weatherapp.databinding.ActivitySearchBinding;
 import com.example.weatherapp.ui.adapters.CityWeatherAdapter;
-import com.example.weatherapp.ui.helpers.LocationHelper;
+import com.example.weatherapp.ui.location.LocationHelper;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;

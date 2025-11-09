@@ -1,0 +1,111 @@
+PACKAGE STRUCTURE - Clean Architecture with SRP
+================================================
+
+weatherapp/
+│
+├── data/                           # DATA LAYER - External data sources
+│   ├── api/                       # Retrofit API services
+│   │   ├── RetrofitClient.java
+│   │   └── WeatherApiService.java
+│   ├── local/                     # Local storage (SharedPreferences, Database)
+│   │   └── prefs/
+│   │       └── PreferenceManager.java
+│   ├── models/                    # Data models (DTOs)
+│   │   ├── CityWeather.java
+│   │   ├── FavoriteCity.java
+│   │   └── OutfitSuggestion.java
+│   ├── repository/                # Repository implementations
+│   │   └── WeatherRepository.java
+│   └── responses/                 # API response models
+│       ├── WeatherResponse.java
+│       ├── HourlyForecastResponse.java
+│       └── AirQualityResponse.java
+│
+├── domain/                         # DOMAIN LAYER - Business logic (NEW!)
+│   ├── repository/                # Business data managers
+│   │   └── FavoriteCitiesManager.java  [MOVED from utils/]
+│   └── services/                  # Business services
+│       └── OutfitSuggestionService.java [MOVED from utils/]
+│
+├── ui/                            # PRESENTATION LAYER - UI components
+│   ├── activities/                # Android Activities
+│   │   ├── MainActivity.java
+│   │   ├── ChartsActivity.java
+│   │   ├── SettingsActivity.java
+│   │   └── ...
+│   ├── adapters/                  # RecyclerView Adapters
+│   │   ├── CityWeatherAdapter.java
+│   │   └── OutfitSuggestionAdapter.java
+│   ├── base/                      # Base classes
+│   │   └── BaseActivity.java
+│   ├── helpers/                   # UI Helper classes
+│   │   ├── WeatherDataManager.java
+│   │   ├── UIUpdateHelper.java
+│   │   ├── LocationHelper.java
+│   │   ├── ChartHelper.java
+│   │   ├── PreferenceHelper.java
+│   │   └── ...
+│   └── viewholders/               # Custom ViewHolders
+│
+├── utils/                         # UTILITIES - Pure helper functions
+│   ├── BlurHelper.java           # UI blur effects
+│   ├── DateUtils.java            # Date formatting
+│   ├── NetworkUtils.java         # Network checking
+│   ├── PermissionUtils.java      # Permission helpers
+│   ├── Constants.java            # App constants
+│   └── LocaleHelper.java         # Localization
+│
+├── notification/                  # FEATURE: Notifications
+│   ├── WeatherNotificationManager.java
+│   ├── WeatherNotificationWorker.java
+│   └── NotificationReceiver.java
+│
+└── widget/                        # FEATURE: App Widgets
+    └── WeatherWidget.java
+
+
+PACKAGE RESPONSIBILITIES (Single Responsibility Principle)
+===========================================================
+
+✅ data/         - Handles ALL external data (API, DB, SharedPrefs)
+✅ domain/       - Contains business logic independent of Android framework
+✅ ui/           - Contains ALL presentation/view logic
+✅ utils/        - Pure utility functions (no business logic)
+✅ notification/ - Self-contained notification feature
+✅ widget/       - Self-contained widget feature
+
+
+KEY CHANGES FROM OLD STRUCTURE
+================================
+
+❌ OLD (utils/ - VIOLATED SRP):
+   - FavoriteCitiesManager.java    → Business logic mixed with utilities
+   - OutfitSuggestionService.java  → AI service mixed with utilities
+   - DateUtils.java                → Pure utility ✓
+   - NetworkUtils.java             → Pure utility ✓
+
+✅ NEW (Clean separation):
+   - domain/repository/FavoriteCitiesManager.java  → Business data management
+   - domain/services/OutfitSuggestionService.java  → Business service (AI)
+   - utils/DateUtils.java                          → Pure utility
+   - utils/NetworkUtils.java                       → Pure utility
+
+
+BENEFITS
+=========
+
+1. **Single Responsibility**: Each package has ONE clear purpose
+2. **Maintainability**: Easy to find and modify code
+3. **Testability**: Business logic (domain/) can be tested without Android
+4. **Scalability**: Easy to add new features without cluttering existing packages
+5. **Team Collaboration**: Clear boundaries reduce merge conflicts
+6. **Clean Architecture**: Follows industry best practices
+
+
+FUTURE IMPROVEMENTS
+====================
+
+Consider adding:
+- domain/usecases/    → Use case classes (optional for complex business flows)
+- presentation/       → Rename ui/ to presentation/ (more standard naming)
+- di/                 → Dependency injection modules (if using Dagger/Hilt)

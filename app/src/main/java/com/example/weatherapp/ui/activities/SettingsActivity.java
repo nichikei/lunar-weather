@@ -11,7 +11,7 @@ import androidx.work.WorkManager;
 import com.example.weatherapp.databinding.ActivitySettingsBinding;
 import com.example.weatherapp.notification.WeatherNotificationManager;
 import com.example.weatherapp.notification.WeatherNotificationWorker;
-import com.example.weatherapp.ui.helpers.PreferenceHelper;
+import com.example.weatherapp.ui.settings.PreferenceHelper;
 import com.example.weatherapp.utils.LocaleHelper;
 
 public class SettingsActivity extends AppCompatActivity {

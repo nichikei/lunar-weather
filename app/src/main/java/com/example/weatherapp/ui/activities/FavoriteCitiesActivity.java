@@ -20,7 +20,7 @@ import com.example.weatherapp.data.api.RetrofitClient;
 import com.example.weatherapp.data.api.WeatherApiService;
 import com.example.weatherapp.data.models.FavoriteCity;
 import com.example.weatherapp.data.responses.WeatherResponse;
-import com.example.weatherapp.utils.FavoriteCitiesManager;
+import com.example.weatherapp.domain.repository.FavoriteCitiesManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;

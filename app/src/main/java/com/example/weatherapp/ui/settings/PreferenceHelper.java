@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.helpers;
+package com.example.weatherapp.ui.settings;
 
 import android.content.SharedPreferences;
 import android.widget.CompoundButton;

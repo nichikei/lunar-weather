@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.helpers;
+package com.example.weatherapp.notification;
 
 import android.Manifest;
 import android.content.Context;

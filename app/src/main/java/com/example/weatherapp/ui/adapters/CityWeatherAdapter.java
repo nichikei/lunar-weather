@@ -18,8 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.weatherapp.R;
 import com.example.weatherapp.data.models.CityWeather;
 import com.example.weatherapp.data.models.FavoriteCity;
+import com.example.weatherapp.domain.repository.FavoriteCitiesManager;
 import com.example.weatherapp.ui.activities.FavoriteCitiesActivity;
-import com.example.weatherapp.utils.FavoriteCitiesManager;
 
 import java.util.List;
 import java.util.Locale;
