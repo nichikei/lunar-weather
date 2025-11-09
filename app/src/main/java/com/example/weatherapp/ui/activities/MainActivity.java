@@ -6,10 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,23 +14,22 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.WorkManager;
 
 import com.example.weatherapp.R;
-import com.example.weatherapp.data.models.FavoriteCity;
 import com.example.weatherapp.data.responses.AirQualityResponse;
 import com.example.weatherapp.data.responses.HourlyForecastResponse;
 import com.example.weatherapp.data.responses.WeatherResponse;
 import com.example.weatherapp.databinding.ActivityMainBinding;
-import com.example.weatherapp.notification.WeatherNotificationWorker;
+import com.example.weatherapp.ui.helpers.FavoritesHelper;
 import com.example.weatherapp.ui.helpers.ForecastSummaryGenerator;
 import com.example.weatherapp.ui.helpers.ForecastViewManager;
 import com.example.weatherapp.ui.helpers.LocationHelper;
+import com.example.weatherapp.ui.helpers.NavigationHelper;
+import com.example.weatherapp.ui.helpers.NotificationHelper;
+import com.example.weatherapp.ui.helpers.UISetupHelper;
 import com.example.weatherapp.ui.helpers.UIUpdateHelper;
 import com.example.weatherapp.ui.helpers.WeatherDataManager;
 import com.example.weatherapp.utils.FavoriteCitiesManager;
@@ -41,8 +37,6 @@ import com.example.weatherapp.utils.LocaleHelper;
 import com.example.weatherapp.widget.WeatherWidget;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
     private UIUpdateHelper uiUpdateHelper;
     private LocationHelper locationHelper;
     private ForecastViewManager forecastViewManager;
+    private UISetupHelper uiSetupHelper;
+    private NavigationHelper navigationHelper;
+    private FavoritesHelper favoritesHelper;
+    private NotificationHelper notificationHelper;
     
     // Data
     private WeatherResponse currentWeatherData;
@@ -81,13 +79,12 @@ public class MainActivity extends AppCompatActivity {
     // Notification permission launcher
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // Permission granted - schedule notifications
-                    scheduleWeatherNotifications();
-                    Toast.makeText(this, "Weather notifications enabled", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Permission denied
-                    Toast.makeText(this, "Notification permission denied", Toast.LENGTH_SHORT).show();
+                if (notificationHelper != null) {
+                    if (isGranted) {
+                        notificationHelper.onPermissionGranted();
+                    } else {
+                        notificationHelper.onPermissionDenied();
+                    }
                 }
             });
 
@@ -202,10 +199,10 @@ public class MainActivity extends AppCompatActivity {
         initializeHelpers();
 
         // Request notification permission for Android 13+
-        checkNotificationPermission();
+        notificationHelper.checkNotificationPermission();
 
         // Schedule weather notifications
-        scheduleWeatherNotifications();
+        notificationHelper.scheduleWeatherNotifications();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -216,10 +213,10 @@ public class MainActivity extends AppCompatActivity {
         setupListeners();
 
         // Apply glass morphism effects to UI elements
-        applyGlassMorphismEffects();
+        uiSetupHelper.applyGlassMorphismEffects();
 
         // Apply blur effect to top glass bar (API 31+)
-        applyTopBarBlurEffect();
+        uiSetupHelper.applyTopBarBlurEffect();
 
         // Check if opened from FavoriteCitiesActivity with a specific city
         Intent intent = getIntent();
@@ -236,43 +233,17 @@ public class MainActivity extends AppCompatActivity {
         fetchAllWeatherData(currentCityName);
     }
 
-    /**
-     * Apply blur effect to the glass capsule top bar using native Android blur
-     * Uses setBackgroundBlurRadius (Android 12+) - only blurs backdrop, content stays sharp
-     */
-    private void applyTopBarBlurEffect() {
-        View topGlassBar = findViewById(R.id.topGlassBar);
-        if (topGlassBar == null) return;
 
-        // Calculate corner radius in pixels
-        float density = getResources().getDisplayMetrics().density;
-        float cornerRadiusPx = 32f * density; // 32dp corner radius
-
-        // Set outline provider for rounded corners
-        topGlassBar.setOutlineProvider(new android.view.ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, android.graphics.Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), cornerRadiusPx);
-            }
-        });
-        topGlassBar.setClipToOutline(true);
-
-        // Create glass morphism background with higher opacity for better visibility
-        android.graphics.drawable.GradientDrawable background = new android.graphics.drawable.GradientDrawable();
-        background.setColor(android.graphics.Color.argb(40, 255, 255, 255)); // ~16% white opacity - more visible
-        background.setCornerRadius(cornerRadiusPx);
-        background.setStroke((int)(1.5f * density), android.graphics.Color.argb(80, 255, 255, 255)); // ~31% white border
-        topGlassBar.setBackground(background);
-
-        // Set elevation for depth
-        topGlassBar.setElevation(12f * density);
-    }
 
     private void initializeHelpers() {
         weatherDataManager = new WeatherDataManager(this, API_KEY);
         uiUpdateHelper = new UIUpdateHelper(binding, temperatureUnit, windSpeedUnit, pressureUnit);
         locationHelper = new LocationHelper(this, fusedLocationClient);
         forecastViewManager = new ForecastViewManager(this, binding.hourlyForecastContainer, temperatureUnit);
+        uiSetupHelper = new UISetupHelper(this, binding);
+        navigationHelper = new NavigationHelper(this);
+        favoritesHelper = new FavoritesHelper(this, favoritesManager, binding.fabAddToFavorites);
+        notificationHelper = new NotificationHelper(this, sharedPreferences, requestPermissionLauncher);
     }
 
     private void loadSettings() {
@@ -288,132 +259,65 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        // Top Bar Glass Capsule - Settings Icon
-        binding.btnSettingsIcon.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-            settingsLauncher.launch(intent);
-        });
+        uiSetupHelper.setupListeners(settingsLauncher, searchLauncher, new UISetupHelper.UIActionCallbacks() {
+            @Override
+            public void onSearchRequested() {
+                String cityName = binding.etCityName.getText().toString().trim();
+                if (!cityName.isEmpty()) {
+                    currentCityName = cityName;
+                    fetchAllWeatherData(cityName);
+                    toggleSearchBar();
+                } else {
+                    Toast.makeText(MainActivity.this, "Please enter a city name", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-        // Top Bar Glass Capsule - Search Icon
-        binding.btnSearchIcon.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-            searchLauncher.launch(intent);
-        });
-
-        // Top Bar City Name - tap to search location
-        binding.tvTopBarCityName.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-            searchLauncher.launch(intent);
-        });
-
-        // Top Bar Favorites Icon - NEW
-        if (binding.btnFavoritesIcon != null) {
-            binding.btnFavoritesIcon.setOnClickListener(v -> {
-                openFavoriteCitiesActivity();
-            });
-        }
-
-        // FAB Add to Favorites Button - NEW
-        if (binding.fabAddToFavorites != null) {
-            binding.fabAddToFavorites.setOnClickListener(v -> {
-                toggleFavoriteCity();
-            });
-        }
-
-        // Search button click
-        binding.btnSearch.setOnClickListener(v -> {
-            String cityName = binding.etCityName.getText().toString().trim();
-            if (!cityName.isEmpty()) {
-                currentCityName = cityName;
-                fetchAllWeatherData(cityName);
+            @Override
+            public void onLocationRequested() {
+                checkLocationPermissionAndGetLocation();
                 toggleSearchBar();
-            } else {
-                Toast.makeText(MainActivity.this, "Please enter a city name", Toast.LENGTH_SHORT).show();
             }
-        });
 
-        // Current Location button click - NEW
-        binding.btnCurrentLocation.setOnClickListener(v -> {
-            checkLocationPermissionAndGetLocation();
-            toggleSearchBar();
-        });
-
-        // View Charts button click - NEW
-        binding.btnViewCharts.setOnClickListener(v -> {
-            openChartsActivity();
-        });
-
-        // Outfit Suggestion button click - NEW
-        binding.btnOutfitSuggestion.setOnClickListener(v -> {
-            openOutfitSuggestionActivity();
-        });
-
-        // Hourly/Weekly toggle buttons
-        binding.btnHourly.setOnClickListener(v -> {
-            if (!isHourlyView) {
-                isHourlyView = true;
-                animateTabSelection(true);
-                updateForecastView();
+            @Override
+            public void onToggleFavorite() {
+                favoritesHelper.toggleFavorite(currentCityName, currentWeatherData, currentLat, currentLon);
             }
-        });
 
-        binding.btnWeekly.setOnClickListener(v -> {
-            if (isHourlyView) {
-                isHourlyView = false;
-                animateTabSelection(false);
-                updateForecastView();
+            @Override
+            public void onViewChartsRequested() {
+                navigationHelper.openChartsActivity(hourlyForecastData, currentWeatherData, currentUVIndex);
+            }
+
+            @Override
+            public void onOutfitSuggestionRequested() {
+                navigationHelper.openOutfitSuggestionActivity(currentWeatherData);
+            }
+
+            @Override
+            public void onFavoritesListRequested() {
+                favoritesHelper.openFavoritesList();
+            }
+
+            @Override
+            public void onTabChanged(boolean isHourly) {
+                if (isHourlyView != isHourly) {
+                    isHourlyView = isHourly;
+                    uiSetupHelper.animateTabSelection(isHourly);
+                    updateForecastView();
+                }
             }
         });
     }
 
     private void toggleSearchBar() {
         isSearchVisible = !isSearchVisible;
-        binding.searchContainer.setVisibility(isSearchVisible ? View.VISIBLE : View.GONE);
+        uiSetupHelper.toggleSearchBar(isSearchVisible);
     }
 
-    /**
-     * Apply glass morphism effects to UI elements for a modern, translucent look
-     * BLUR EFFECT ĐÃ TẮT - chỉ dùng background drawable để UI rõ ràng
-     */
-    private void applyGlassMorphismEffects() {
-        // TẮT blur effect - gây mờ quá mức
-        // Chỉ dùng glass panel background (semi-transparent white)
-        // Background drawables already have overlay #33FFFFFF and stroke #4DFFFFFF
 
-        // KHÔNG apply blur nữa để UI rõ ràng
-        /* DISABLED - causes blur
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            applyBlurEffect(binding.searchContainer);
-
-            // Apply blur to the main forecast card container
-            View forecastCard = findViewById(R.id.weatherDetailsSection);
-            if (forecastCard != null) {
-                applyBlurEffect(forecastCard);
-            }
-        }
-        */
-    }
-
-    /**
-     * Apply blur effect to a view (API 31+)
-     * DISABLED - causes too much blur
-     */
-    private void applyBlurEffect(View view) {
-        // KHÔNG apply blur để UI rõ ràng
-        /* DISABLED
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            android.graphics.RenderEffect blurEffect = android.graphics.RenderEffect.createBlurEffect(
-                    10f, 10f, android.graphics.Shader.TileMode.CLAMP
-            );
-            view.setRenderEffect(blurEffect);
-        }
-        */
-    }
 
     private void fetchAllWeatherData(String cityName) {
-        binding.progressBar.setVisibility(View.VISIBLE);
-        binding.weatherDetailsSection.setVisibility(View.GONE);
-        binding.tvError.setVisibility(View.GONE);
+        uiSetupHelper.showLoading();
 
         weatherDataManager.fetchWeatherByCity(cityName, temperatureUnit, new WeatherDataManager.WeatherDataCallback() {
             @Override
@@ -437,8 +341,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onWeatherError(String message) {
-                binding.progressBar.setVisibility(View.GONE);
-                showError(message);
+                uiSetupHelper.showError(message);
             }
         });
     }
@@ -478,16 +381,14 @@ public class MainActivity extends AppCompatActivity {
         weatherDataManager.fetchHourlyForecast(cityName, temperatureUnit, new WeatherDataManager.ForecastCallback() {
             @Override
             public void onForecastSuccess(HourlyForecastResponse response) {
-                binding.progressBar.setVisibility(View.GONE);
                 hourlyForecastData = response;
                 updateForecastView();
-                binding.weatherDetailsSection.setVisibility(View.VISIBLE);
+                uiSetupHelper.showWeatherDetails();
             }
 
             @Override
             public void onForecastError(String message) {
-                binding.progressBar.setVisibility(View.GONE);
-                binding.weatherDetailsSection.setVisibility(View.VISIBLE);
+                uiSetupHelper.showWeatherDetails();
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
@@ -497,44 +398,20 @@ public class MainActivity extends AppCompatActivity {
         weatherDataManager.fetchHourlyForecastByCoordinates(lat, lon, temperatureUnit, new WeatherDataManager.ForecastCallback() {
             @Override
             public void onForecastSuccess(HourlyForecastResponse response) {
-                binding.progressBar.setVisibility(View.GONE);
                 hourlyForecastData = response;
                 updateForecastView();
-                binding.weatherDetailsSection.setVisibility(View.VISIBLE);
+                uiSetupHelper.showWeatherDetails();
             }
 
             @Override
             public void onForecastError(String message) {
-                binding.progressBar.setVisibility(View.GONE);
-                binding.weatherDetailsSection.setVisibility(View.VISIBLE);
+                uiSetupHelper.showWeatherDetails();
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void openChartsActivity() {
-        if (hourlyForecastData == null || currentWeatherData == null) {
-            Toast.makeText(this, "Weather data not available yet", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        Intent intent = new Intent(this, ChartsActivity.class);
-        intent.putExtra("hourly_data", hourlyForecastData);
-        intent.putExtra("current_data", currentWeatherData);
-        intent.putExtra("uv_index", currentUVIndex);
-        startActivity(intent);
-    }
-
-    private void openOutfitSuggestionActivity() {
-        if (currentWeatherData == null) {
-            Toast.makeText(this, "Weather data not available yet", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Intent intent = new Intent(this, OutfitSuggestionActivity.class);
-        intent.putExtra("weather_data", currentWeatherData);
-        startActivity(intent);
-    }
 
     private void updateForecastView() {
         if (currentWeatherData == null) return;
@@ -561,7 +438,7 @@ public class MainActivity extends AppCompatActivity {
         uiUpdateHelper.updateMainWeatherInfo(weatherData);
 
         // Update favorite icon
-        updateFavoriteIcon();
+        favoritesHelper.updateFavoriteIcon(currentCityName);
 
         // Update forecast summary
         TextView tvForecastSummary = binding.getRoot().findViewById(R.id.tvForecastSummary);
@@ -580,75 +457,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void animateTabSelection(boolean isHourly) {
-        View indicator = binding.getRoot().findViewById(R.id.tabIndicator);
 
-        if (indicator == null) return;
-
-        indicator.animate().cancel();
-
-        if (isHourly) {
-            binding.btnHourly.setTextColor(getResources().getColor(R.color.text_primary, null));
-            binding.btnWeekly.setTextColor(getResources().getColor(R.color.text_secondary, null));
-        } else {
-            binding.btnHourly.setTextColor(getResources().getColor(R.color.text_secondary, null));
-            binding.btnWeekly.setTextColor(getResources().getColor(R.color.text_primary, null));
-        }
-
-        indicator.post(() -> {
-            float targetX = isHourly ? 0 : ((View) indicator.getParent()).getWidth() - indicator.getWidth();
-            indicator.animate()
-                    .translationX(targetX)
-                    .setDuration(250)
-                    .start();
-        });
-    }
-
-
-
-    private void showError(String message) {
-        binding.tvError.setText(message);
-        binding.tvError.setVisibility(View.VISIBLE);
-        binding.weatherDetailsSection.setVisibility(View.GONE);
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-    }
-
-
-
-    private void checkNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Request permission
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-            }
-        }
-    }
-
-    private void scheduleWeatherNotifications() {
-        // Check if notifications are enabled in settings
-        boolean notificationsEnabled = sharedPreferences.getBoolean("notifications", true);
-
-        if (notificationsEnabled) {
-            // For testing: Use OneTimeWorkRequest with 2 minute delay (PeriodicWork minimum is 15 minutes)
-            // This will trigger once after 2 minutes
-            androidx.work.OneTimeWorkRequest weatherWorkRequest = new androidx.work.OneTimeWorkRequest.Builder(
-                    WeatherNotificationWorker.class)
-                    .setInitialDelay(2, TimeUnit.MINUTES)
-                    .build();
-
-            WorkManager.getInstance(this).enqueueUniqueWork(
-                    "WeatherNotification",
-                    androidx.work.ExistingWorkPolicy.REPLACE,
-                    weatherWorkRequest
-            );
-
-            android.util.Log.d("MainActivity", "Weather notification scheduled for 2 minutes from now");
-        } else {
-            // Cancel all scheduled notifications
-            WorkManager.getInstance(this).cancelUniqueWork("WeatherNotification");
-        }
-    }
 
     private void checkLocationPermissionAndGetLocation() {
         if (locationHelper.hasLocationPermission()) {
@@ -675,9 +484,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchWeatherByCoordinates(double lat, double lon) {
-        binding.progressBar.setVisibility(View.VISIBLE);
-        binding.weatherDetailsSection.setVisibility(View.GONE);
-        binding.tvError.setVisibility(View.GONE);
+        uiSetupHelper.showLoading();
 
         weatherDataManager.fetchWeatherByCoordinates(lat, lon, temperatureUnit, new WeatherDataManager.WeatherDataCallback() {
             @Override
@@ -698,8 +505,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onWeatherError(String message) {
-                binding.progressBar.setVisibility(View.GONE);
-                showError(message);
+                uiSetupHelper.showError(message);
             }
         });
     }
@@ -716,53 +522,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @SuppressWarnings("unused")
-    private void addCurrentCityToFavorites() {
-        if (currentWeatherData == null) {
-            Toast.makeText(this, "No city data available", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String country = currentWeatherData.getSys() != null ?
-                currentWeatherData.getSys().getCountry() : "Unknown";
-
-        FavoriteCity favoriteCity = new FavoriteCity(
-                currentCityName,
-                country,
-                currentLat,
-                currentLon
-        );
-
-        favoriteCity.setCurrentTemp(currentWeatherData.getMain().getTemp());
-        favoriteCity.setWeatherCondition(
-                currentWeatherData.getWeather() != null && !currentWeatherData.getWeather().isEmpty() ?
-                        currentWeatherData.getWeather().get(0).getMain() : "Unknown"
-        );
-        favoriteCity.setWeatherDescription(
-                currentWeatherData.getWeather() != null && !currentWeatherData.getWeather().isEmpty() ?
-                        currentWeatherData.getWeather().get(0).getDescription() : "Unknown"
-        );
-
-        if (favoritesManager.addFavoriteCity(favoriteCity)) {
-            Toast.makeText(this, currentCityName + " added to favorites", Toast.LENGTH_SHORT).show();
-        } else {
-            if (favoritesManager.isFavorite(currentCityName)) {
-                Toast.makeText(this, currentCityName + " is already in favorites", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Maximum 10 favorite cities allowed", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private void openFavoriteCitiesActivity() {
-        Intent intent = new Intent(this, FavoriteCitiesActivity.class);
-        startActivity(intent);
-    }
-
-    // Weather Alerts feature - currently disabled (incomplete implementation)
-    // TODO: Implement Weather Alerts feature in future version
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -770,83 +529,5 @@ public class MainActivity extends AppCompatActivity {
             locationHelper.cleanup();
         }
         binding = null;
-    }
-
-    /**
-     * Toggle favorite status of current city
-     */
-    private void toggleFavoriteCity() {
-        if (currentCityName == null || currentCityName.isEmpty()) {
-            Toast.makeText(this, "No city loaded", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        boolean isFavorite = favoritesManager.isFavorite(currentCityName);
-
-        if (isFavorite) {
-            // Remove from favorites
-            boolean removed = favoritesManager.removeFavoriteCity(currentCityName);
-            if (removed) {
-                binding.fabAddToFavorites.setImageResource(R.drawable.ic_heart_line);
-                Toast.makeText(this, currentCityName + " removed from favorites", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            // Add to favorites
-            String country = "";
-            if (currentWeatherData != null && currentWeatherData.getSys() != null) {
-                country = currentWeatherData.getSys().getCountry();
-            }
-
-            FavoriteCity favoriteCity = new FavoriteCity(
-                    currentCityName,
-                    country,
-                    currentLat,
-                    currentLon
-            );
-
-            // Set weather information if available
-            if (currentWeatherData != null) {
-                favoriteCity.setCurrentTemp(currentWeatherData.getMain().getTemp());
-                if (!currentWeatherData.getWeather().isEmpty()) {
-                    favoriteCity.setWeatherCondition(currentWeatherData.getWeather().get(0).getMain());
-                    favoriteCity.setWeatherDescription(currentWeatherData.getWeather().get(0).getDescription());
-                }
-            }
-
-            boolean added = favoritesManager.addFavoriteCity(favoriteCity);
-            if (added) {
-                binding.fabAddToFavorites.setImageResource(R.drawable.ic_heart_filled);
-                Toast.makeText(this, currentCityName + " added to favorites", Toast.LENGTH_SHORT).show();
-
-                // Show dialog to open favorites
-                new android.app.AlertDialog.Builder(this)
-                        .setTitle("Added to Favorites")
-                        .setMessage(currentCityName + " has been added to your favorite cities. Would you like to view your favorites list?")
-                        .setPositiveButton("View Favorites", (dialog, which) -> {
-                            openFavoriteCitiesActivity();
-                        })
-                        .setNegativeButton("Continue", null)
-                        .show();
-            } else {
-                // Check if it's because of max limit
-                if (favoritesManager.getFavoriteCitiesCount() >= 10) {
-                    Toast.makeText(this, "Maximum 10 favorite cities allowed", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "City already in favorites", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
-
-    /**
-     * Update FAB icon based on favorite status
-     */
-    private void updateFavoriteIcon() {
-        if (binding.fabAddToFavorites != null && currentCityName != null) {
-            boolean isFavorite = favoritesManager.isFavorite(currentCityName);
-            binding.fabAddToFavorites.setImageResource(
-                    isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_heart_line
-            );
-        }
     }
 }
