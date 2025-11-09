@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.weatherapp.R;
 import com.example.weatherapp.data.responses.HourlyForecastResponse;
 import com.example.weatherapp.data.responses.WeatherResponse;
+import com.example.weatherapp.ui.helpers.ChartHelper;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -23,13 +24,6 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 
 
 public class ChartsActivity extends AppCompatActivity {
@@ -82,95 +76,30 @@ public class ChartsActivity extends AppCompatActivity {
 
 
     private void setupTemperatureChart() {
-        // Kiểm tra dữ liệu có tồn tại không
-        if (hourlyForecastData == null || hourlyForecastData.getList() == null) {
-            return;
-        }
+        if (hourlyForecastData == null || hourlyForecastData.getList() == null) return;
 
-        // Tìm biểu đồ trong layout
         LineChart chart = findViewById(R.id.temperatureChart);
         if (chart == null) return;
 
-        // Danh sách các điểm dữ liệu (Entry) để vẽ biểu đồ
-        List<Entry> entries = new ArrayList<>();
-
-        // Lấy tối đa 12 điểm dữ liệu (tương đương 36 giờ, vì mỗi điểm cách 3h)
         int count = Math.min(9, hourlyForecastData.getList().size());
-        for (int i = 0; i < count; i++) {
-            HourlyForecastResponse.HourlyItem item = hourlyForecastData.getList().get(i);
-            float temp = (float) item.getMain().getTemp();
+        
+        // Prepare data
+        List<Entry> entries = ChartHelper.prepareChartEntries(
+            hourlyForecastData, 
+            count, 
+            item -> (float) item.getMain().getTemp()
+        );
 
-            // Thêm điểm vào biểu đồ: Entry(vị trí trên trục X, giá trị trên trục Y)
-            // Entry(thời gian index, nhiệt độ)
-            //
-            // VÍ DỤ CỤ THỂ:
-            // - Entry(0, 25) = Thời điểm 0 (Now), Nhiệt độ 25°C
-            // - Entry(1, 27) = Thời điểm 1 (3h sau), Nhiệt độ 27°C
-            // - Entry(2, 28) = Thời điểm 2 (6h sau), Nhiệt độ 28°C
-            entries.add(new Entry(i, temp));
-        }
-
-        // Tạo DataSet (bộ dữ liệu) cho biểu đồ
+        // Create and style dataset
         LineDataSet dataSet = new LineDataSet(entries, "Temperature");
+        ChartHelper.styleTemperatureDataSet(dataSet, ChartHelper.ChartColors.TEMPERATURE);
 
-        // === CÀI ĐẶT MÀU SẮC VÀ KIỂU DÁNG ===
-        dataSet.setColor(0xFF9B6FFF);              // Màu đường - Tím nhạt
-        dataSet.setCircleColor(0xFFE2DDFD);        // Màu điểm dữ liệu - Tím rất nhạt
-        dataSet.setLineWidth(3.5f);                // Độ dày đường line
-        dataSet.setCircleRadius(6f);               // Bán kính của điểm tròn
-        dataSet.setDrawCircleHole(true);           // Vẽ lỗ giữa điểm tròn
-        dataSet.setCircleHoleColor(0xFF5B3E9E);    // Màu lỗ giữa điểm
-        dataSet.setCircleHoleRadius(3f);           // Bán kính lỗ
-        dataSet.setValueTextSize(11f);             // Kích thước chữ hiển thị giá trị
-        dataSet.setValueTextColor(0xFFFFFFFF);     // Màu chữ giá trị - Trắng
+        // Setup chart
+        chart.setData(new LineData(dataSet));
+        ChartHelper.setupLineChart(chart);
+        ChartHelper.applyTimeFormatter(chart, hourlyForecastData, count);
 
-        // === TÔ MÀU DƯỚI ĐƯỜNG LINE ===
-        dataSet.setDrawFilled(true);               // Bật tô màu vùng dưới đường
-        dataSet.setFillColor(0xFF7B5EC6);          // Màu tô - Tím đậm
-        dataSet.setFillAlpha(100);                 // Độ trong suốt (0-255)
-
-        // === LÀM ĐƯỜNG CONG MƯỢT ===
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);  // Dùng đường cong Bezier
-        dataSet.setCubicIntensity(0.15f);                // Độ cong (0-1)
-
-        // Gán dữ liệu vào biểu đồ
-        LineData lineData = new LineData(dataSet);
-        chart.setData(lineData);
-
-        // Áp dụng cài đặt chung cho biểu đồ
-        setupChart(chart);
-
-        // === THÊM LABELS THỜI GIAN CHO TRỤC X ===
-        // Custom formatter để hiển thị giờ thực tế thay vì số 0,1,2,3...
-        chart.getXAxis().setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                int index = (int) value;
-                if (index >= 0 && index < hourlyForecastData.getList().size()) {
-                    // Lấy timestamp từ API
-                    HourlyForecastResponse.HourlyItem item = hourlyForecastData.getList().get(index);
-                    long timestamp = item.getDt() * 1000L;  // Chuyển từ seconds sang milliseconds
-
-                    // Format thành giờ: 14h, 17h, 20h...
-                    java.util.Calendar calendar = java.util.Calendar.getInstance();
-                    calendar.setTimeInMillis(timestamp);
-                    int hour = calendar.get(java.util.Calendar.HOUR_OF_DAY);
-
-                    // Hiển thị "Now" cho điểm đầu tiên, còn lại hiển thị giờ
-                    if (index == 0) {
-                        return hour + "h";
-                    } else {
-                        return hour + "h";
-                    }
-                }
-                return "";
-            }
-        });
-
-        // Animation khi hiển thị: X và Y cùng animate trong 1.2 giây
         chart.animateXY(1200, 1200);
-
-        // Vẽ lại biểu đồ
         chart.invalidate();
     }
 
@@ -267,15 +196,14 @@ public class ChartsActivity extends AppCompatActivity {
 
         // Gán dữ liệu vào biểu đồ
         BarData barData = new BarData(dataSet);
-        barData.setBarWidth(0.7f);  // Độ rộng của cột (0-1)
+        barData.setBarWidth(0.7f);
         chart.setData(barData);
 
-        // Áp dụng cài đặt chung cho biểu đồ cột
-        setupBarChart(chart);
+        // Setup chart with labels
+        String[] labels = {"Humidity", "Wind", "Pressure", "UV Index"};
+        ChartHelper.setupBarChart(chart, labels);
 
-        // Animation: Cột mọc lên từ dưới trong 1.2 giây
         chart.animateY(1200);
-
         chart.invalidate();
     }
 
@@ -292,64 +220,24 @@ public class ChartsActivity extends AppCompatActivity {
         LineChart chart = findViewById(R.id.rainProbabilityChart);
         if (chart == null) return;
 
-        List<HourlyForecastResponse.HourlyItem> list = hourlyForecastData.getList();
+        int count = Math.min(9, hourlyForecastData.getList().size());
+        
+        // Prepare data: convert probability to percentage
+        List<Entry> entries = ChartHelper.prepareChartEntries(
+            hourlyForecastData,
+            count,
+            item -> (float) (item.getPop() * 100f)
+        );
 
-        // 24h tới = 8 điểm (mỗi điểm cách 3h)
-        int count = Math.min(9, list.size());
-
-        // Entries: X = index (0..7), Y = % mưa
-        List<Entry> entries = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            double pop0to1 = list.get(i).getPop();
-            entries.add(new Entry(i, (float) (pop0to1 * 100f)));
-        }
-
+        // Create and style dataset
         LineDataSet dataSet = new LineDataSet(entries, "Rain Probability");
-        dataSet.setColor(0xFF4FC3F7);
-        dataSet.setCircleColor(0xFF81D4FA);
-        dataSet.setLineWidth(3.5f);
-        dataSet.setCircleRadius(5f);
-        dataSet.setDrawCircleHole(true);
-        dataSet.setCircleHoleColor(0xFF29B6F6);
-        dataSet.setCircleHoleRadius(2.5f);
-        dataSet.setDrawFilled(true);
-        dataSet.setFillColor(0xFF4FC3F7);
-        dataSet.setFillAlpha(100);
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        dataSet.setCubicIntensity(0.15f);
-        dataSet.setDrawValues(true);
+        ChartHelper.styleLineDataSet(dataSet, ChartHelper.ChartColors.RAIN);
 
+        // Setup chart
         chart.setData(new LineData(dataSet));
-        setupChart(chart); // nếu bạn đã có hàm này để style chung
-
-        // Y: 0–100%
-        chart.getAxisLeft().setAxisMinimum(0f);
-        chart.getAxisLeft().setAxisMaximum(100f);
-        chart.getAxisRight().setEnabled(false);
-
-        // X: hiển thị giờ thực (HHh) theo timezone city
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setGranularity(1f);          // mỗi 1 index là 1 nhãn
-        xAxis.setLabelCount(count, true);  // đúng 8 nhãn cho 24h tới
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                int idx = Math.round(value);
-                if (idx < 0 || idx >= count) return "";
-                HourlyForecastResponse.HourlyItem it = list.get(idx);
-
-                long tsMs = it.getDt() * 1000L;
-                // cộng timezone offset (giây) nếu API có
-                int tzSec = hourlyForecastData.getCity() != null ? hourlyForecastData.getCity().getTimezone() : 0;
-                long localMs = tsMs + tzSec * 1000L;
-
-                java.util.Calendar cal = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
-                cal.setTimeInMillis(localMs);
-                int h = cal.get(java.util.Calendar.HOUR_OF_DAY);
-                return (h < 10 ? "0" + h : String.valueOf(h)) + "h";
-            }
-        });
+        ChartHelper.setupLineChart(chart);
+        ChartHelper.setYAxisRange(chart, 0f, 100f);
+        ChartHelper.applyTimeFormatter(chart, hourlyForecastData, count);
 
         chart.animateXY(800, 800);
         chart.invalidate();
@@ -362,88 +250,27 @@ public class ChartsActivity extends AppCompatActivity {
         LineChart chart = findViewById(R.id.windSpeedChart);
         if (chart == null) return;
 
-        List<HourlyForecastResponse.HourlyItem> list = hourlyForecastData.getList();
-        int count = Math.min(9, list.size()); // 24h tới (8 mốc × 3h)
-
-        // ==== DỮ LIỆU ====
-        List<Entry> entries = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            float speed = (float) list.get(i).getWind().getSpeed(); // m/s
-            if ("kmh".equalsIgnoreCase(windSpeedUnit)) speed *= 3.6f; // đổi km/h nếu cần
-            entries.add(new Entry(i, speed)); // X=index, Y=tốc độ gió
-        }
-
-        LineDataSet ds = new LineDataSet(entries, "Wind Speed");
-        ds.setColor(0xFF66BB6A);
-        ds.setCircleColor(0xFF81C784);
-        ds.setLineWidth(3.5f);
-        ds.setCircleRadius(5f);
-        ds.setDrawCircleHole(true);
-        ds.setCircleHoleColor(0xFF4CAF50);
-        ds.setCircleHoleRadius(2.5f);
-        ds.setDrawFilled(true);
-        ds.setFillColor(0xFF66BB6A);
-        ds.setFillAlpha(100);
-        ds.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        ds.setCubicIntensity(0.15f);
-        ds.setDrawValues(true);
-
-        chart.setData(new LineData(ds));
-
-
-        // ==== TRỤC Y ====
-        chart.getAxisRight().setEnabled(false);
-        YAxis yLeft = chart.getAxisLeft();
-        yLeft.setAxisMinimum(0f); // tốc độ gió không âm
-        // *** THÊM CÀI ĐẶT MÀU SẮC TRỤC Y ***
-        yLeft.setTextColor(0xCCFFFFFF);
-        yLeft.setTextSize(11f);
-        yLeft.setDrawGridLines(true);
-        yLeft.setGridColor(0x30FFFFFF);
-        yLeft.setGridLineWidth(1f);
-        yLeft.setDrawAxisLine(false);
-
-
-        // ==== TRỤC X: HIỂN THỊ GIỜ (HHh) ====
-        XAxis x = chart.getXAxis();
-        x.setPosition(XAxis.XAxisPosition.BOTTOM);
-        x.setGranularity(1f);             // mỗi index = 1 nhãn
-        x.setLabelCount(count, true);     // đúng 8 nhãn
-        x.setDrawGridLines(false);
-        x.setAvoidFirstLastClipping(true);
-        // *** THÊM CÀI ĐẶT MÀU SẮC TRỤC X ***
-        x.setTextColor(0xCCFFFFFF);
-        x.setTextSize(11f);
-        x.setDrawAxisLine(true);
-        x.setAxisLineColor(0x40FFFFFF);
-        x.setAxisLineWidth(1.5f);
-
-
-        final int tzSec = (hourlyForecastData.getCity() != null)
-                ? hourlyForecastData.getCity().getTimezone() : 0;
-
-        x.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                int index = Math.round(value);                  // tránh 2.7, 3.2 khi zoom/pan
-                if (index < 0 || index >= count) return "";
-                long tsMs = list.get(index).getDt() * 1000L;    // giây → mili-giây
-                long localMs = tsMs + tzSec * 1000L;            // cộng offset timezone
-
-                java.util.Calendar cal = java.util.Calendar.getInstance(
-                        java.util.TimeZone.getTimeZone("UTC"));
-                cal.setTimeInMillis(localMs);
-                int h = cal.get(java.util.Calendar.HOUR_OF_DAY);
-                return (h < 10 ? "0" + h : String.valueOf(h)) + "h";
+        int count = Math.min(9, hourlyForecastData.getList().size());
+        
+        // Prepare data with unit conversion
+        List<Entry> entries = ChartHelper.prepareChartEntries(
+            hourlyForecastData,
+            count,
+            item -> {
+                float speed = (float) item.getWind().getSpeed();
+                return "kmh".equalsIgnoreCase(windSpeedUnit) ? speed * 3.6f : speed;
             }
-        });
+        );
 
-        chart.getDescription().setEnabled(false);
-        chart.getLegend().setEnabled(false);
-        chart.setTouchEnabled(true);
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(true);
-        chart.setPinchZoom(true);
+        // Create and style dataset
+        LineDataSet dataSet = new LineDataSet(entries, "Wind Speed");
+        ChartHelper.styleLineDataSet(dataSet, ChartHelper.ChartColors.WIND);
+
+        // Setup chart
+        chart.setData(new LineData(dataSet));
+        ChartHelper.setupLineChart(chart);
+        ChartHelper.setYAxisRange(chart, 0f, chart.getAxisLeft().getAxisMaximum());
+        ChartHelper.applyTimeFormatter(chart, hourlyForecastData, count);
 
         chart.animateXY(1000, 1000);
         chart.invalidate();
@@ -457,85 +284,24 @@ public class ChartsActivity extends AppCompatActivity {
         LineChart chart = findViewById(R.id.humidityChart);
         if (chart == null) return;
 
-        List<HourlyForecastResponse.HourlyItem> list = hourlyForecastData.getList();
-        int count = Math.min(9, list.size()); // 24h tới (8 mốc × 3h)
+        int count = Math.min(9, hourlyForecastData.getList().size());
+        
+        // Prepare data
+        List<Entry> entries = ChartHelper.prepareChartEntries(
+            hourlyForecastData,
+            count,
+            item -> (float) item.getMain().getHumidity()
+        );
 
-        // ==== DỮ LIỆU ====
-        List<Entry> entries = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            float humidity = (float) list.get(i).getMain().getHumidity(); // 0..100
-            entries.add(new Entry(i, humidity)); // X=index, Y=độ ẩm %
-        }
+        // Create and style dataset
+        LineDataSet dataSet = new LineDataSet(entries, "Humidity");
+        ChartHelper.styleLineDataSet(dataSet, ChartHelper.ChartColors.HUMIDITY);
 
-        LineDataSet ds = new LineDataSet(entries, "Humidity");
-        ds.setColor(0xFF26C6DA);
-        ds.setCircleColor(0xFF4DD0E1);
-        ds.setLineWidth(3.5f);
-        ds.setCircleRadius(5f);
-        ds.setDrawCircleHole(true);
-        ds.setCircleHoleColor(0xFF00BCD4);
-        ds.setCircleHoleRadius(2.5f);
-        ds.setDrawFilled(true);
-        ds.setFillColor(0xFF26C6DA);
-        ds.setFillAlpha(100);
-        ds.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        ds.setCubicIntensity(0.15f);
-        ds.setDrawValues(true);
-
-        chart.setData(new LineData(ds));
-
-        // ==== TRỤC Y: 0–100% ====
-        chart.getAxisRight().setEnabled(false);
-        YAxis yLeft = chart.getAxisLeft();
-        yLeft.setAxisMinimum(0f);
-        yLeft.setAxisMaximum(100f);
-        // *** THÊM CÀI ĐẶT MÀU SẮC TRỤC Y ***
-        yLeft.setTextColor(0xCCFFFFFF);
-        yLeft.setTextSize(11f);
-        yLeft.setDrawGridLines(true);
-        yLeft.setGridColor(0x30FFFFFF);
-        yLeft.setGridLineWidth(1f);
-        yLeft.setDrawAxisLine(false);
-
-        // ==== TRỤC X: HIỂN THỊ GIỜ (HHh) ====
-        XAxis x = chart.getXAxis();
-        x.setPosition(XAxis.XAxisPosition.BOTTOM);
-        x.setGranularity(1f);
-        x.setLabelCount(count, true);
-        x.setDrawGridLines(false);
-        x.setAvoidFirstLastClipping(true);
-        // *** THÊM CÀI ĐẶT MÀU SẮC TRỤC X ***
-        x.setTextColor(0xCCFFFFFF);
-        x.setTextSize(11f);
-        x.setDrawAxisLine(true);
-        x.setAxisLineColor(0x40FFFFFF);
-        x.setAxisLineWidth(1.5f);
-
-        final int tzSec = (hourlyForecastData.getCity() != null)
-                ? hourlyForecastData.getCity().getTimezone() : 0;
-
-        x.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                int index = Math.round(value);
-                if (index < 0 || index >= count) return "";
-                long tsMs = list.get(index).getDt() * 1000L;   // giây → mili-giây
-                long localMs = tsMs + tzSec * 1000L;           // cộng offset timezone
-
-                java.util.Calendar cal = java.util.Calendar.getInstance(
-                        java.util.TimeZone.getTimeZone("UTC"));
-                cal.setTimeInMillis(localMs);
-                int h = cal.get(java.util.Calendar.HOUR_OF_DAY);
-                return (h < 10 ? "0" + h : String.valueOf(h)) + "h";
-            }
-        });
-
-        chart.getDescription().setEnabled(false);
-        chart.getLegend().setEnabled(false);
-        chart.setTouchEnabled(true);
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(true);
-        chart.setPinchZoom(true);
+        // Setup chart
+        chart.setData(new LineData(dataSet));
+        ChartHelper.setupLineChart(chart);
+        ChartHelper.setYAxisRange(chart, 0f, 100f);
+        ChartHelper.applyTimeFormatter(chart, hourlyForecastData, count);
 
         chart.animateXY(1000, 1000);
         chart.invalidate();
@@ -543,88 +309,5 @@ public class ChartsActivity extends AppCompatActivity {
 
 
 
-    private void setupChart(LineChart chart) {
-        // Tắt mô tả biểu đồ
-        chart.getDescription().setEnabled(false);
 
-        // Tắt chú thích (legend)
-        chart.getLegend().setEnabled(false);
-
-        // Tắt nền lưới
-        chart.setDrawGridBackground(false);
-
-        // Tắt trục Y bên phải (chỉ dùng trục Y bên trái)
-        chart.getAxisRight().setEnabled(false);
-
-        // === CÀI ĐẶT TRỤC X (Thời gian) ===
-        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);  // Đặt trục X ở dưới
-        chart.getXAxis().setTextColor(0xCCFFFFFF);    // Màu chữ trắng hơi trong suốt
-        chart.getXAxis().setTextSize(11f);            // Kích thước chữ
-        chart.getXAxis().setDrawGridLines(false);     // Không vẽ đường lưới dọc
-        chart.getXAxis().setDrawAxisLine(true);       // Vẽ trục X
-        chart.getXAxis().setAxisLineColor(0x40FFFFFF);// Màu trục X
-        chart.getXAxis().setAxisLineWidth(1.5f);      // Độ dày trục X
-
-        // === CÀI ĐẶT TRỤC Y (Giá trị) ===
-        chart.getAxisLeft().setTextColor(0xCCFFFFFF);
-        chart.getAxisLeft().setTextSize(11f);
-        chart.getAxisLeft().setDrawGridLines(true);   // Vẽ đường lưới ngang
-        chart.getAxisLeft().setGridColor(0x30FFFFFF); // Màu lưới (rất mờ)
-        chart.getAxisLeft().setGridLineWidth(1f);
-        chart.getAxisLeft().setDrawAxisLine(false);   // Không vẽ trục Y
-
-        // === TƯƠNG TÁC ===
-        chart.setTouchEnabled(true);    // Bật chạm
-        chart.setDragEnabled(true);     // Cho phép kéo biểu đồ
-        chart.setScaleEnabled(false);   // Không cho zoom
-        chart.setPinchZoom(false);      // Không cho pinch zoom
-
-        // Khoảng cách lề (left, top, right, bottom)
-        chart.setExtraOffsets(8, 16, 8, 8);
-    }
-
-
-    private void setupBarChart(BarChart chart) {
-        chart.getDescription().setEnabled(false);
-        chart.getLegend().setEnabled(false);
-        chart.setDrawGridBackground(false);
-        chart.getAxisRight().setEnabled(false);
-
-        // === TRỤC X: HIỂN THỊ TÊN CÁC CỘT ===
-        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        chart.getXAxis().setTextColor(0xCCFFFFFF);
-        chart.getXAxis().setTextSize(11f);
-        chart.getXAxis().setDrawGridLines(false);
-        chart.getXAxis().setDrawAxisLine(true);
-        chart.getXAxis().setAxisLineColor(0x40FFFFFF);
-        chart.getXAxis().setAxisLineWidth(1.5f);
-        chart.getXAxis().setGranularity(1f);  // Khoảng cách giữa các giá trị
-
-        // Custom formatter để hiển thị tên cột
-        chart.getXAxis().setValueFormatter(new ValueFormatter() {
-            // Tên của 4 cột
-            private final String[] labels = {"Humidity", "Wind", "Pressure", "UV Index"};
-
-            @Override
-            public String getFormattedValue(float value) {
-                int index = (int) value;
-                return index >= 0 && index < labels.length ? labels[index] : "";
-            }
-        });
-
-        chart.getAxisLeft().setTextColor(0xCCFFFFFF);
-        chart.getAxisLeft().setTextSize(11f);
-        chart.getAxisLeft().setDrawGridLines(true);
-        chart.getAxisLeft().setGridColor(0x30FFFFFF);
-        chart.getAxisLeft().setGridLineWidth(1f);
-        chart.getAxisLeft().setDrawAxisLine(false);
-
-        // Tắt tương tác với biểu đồ cột
-        chart.setTouchEnabled(false);
-
-        // Tự động fit các cột vào khung
-        chart.setFitBars(true);
-
-        chart.setExtraOffsets(8, 16, 8, 8);
-    }
 }
