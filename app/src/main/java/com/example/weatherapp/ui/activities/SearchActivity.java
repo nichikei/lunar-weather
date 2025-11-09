@@ -5,22 +5,19 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weatherapp.R;
 import com.example.weatherapp.data.models.CityWeather;
 import com.example.weatherapp.databinding.ActivitySearchBinding;
 import com.example.weatherapp.ui.adapters.CityWeatherAdapter;
-import com.google.android.gms.location.FusedLocationProviderClient;
+import com.example.weatherapp.ui.helpers.LocationHelper;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
@@ -30,13 +27,13 @@ public class SearchActivity extends AppCompatActivity {
 
     private ActivitySearchBinding binding;
     private List<CityWeather> cityList;
+    private LocationHelper locationHelper;
+    
     public static final String EXTRA_CITY_NAME = "city_name";
     public static final String EXTRA_USE_GPS = "use_gps";
     public static final String EXTRA_LATITUDE = "latitude";
     public static final String EXTRA_LONGITUDE = "longitude";
-
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
-    private FusedLocationProviderClient fusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +41,7 @@ public class SearchActivity extends AppCompatActivity {
         binding = ActivitySearchBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        locationHelper = new LocationHelper(this, LocationServices.getFusedLocationProviderClient(this));
 
         setupListeners();
         setupCityList();
@@ -88,8 +85,7 @@ public class SearchActivity extends AppCompatActivity {
 
     private void requestCurrentLocation() {
         // Check if location permission is granted
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (!locationHelper.hasLocationPermission()) {
             // Request permission
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -101,62 +97,17 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void getCurrentLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
+        locationHelper.getCurrentLocation(new LocationHelper.OnLocationResultListener() {
+            @Override
+            public void onLocationReceived(double latitude, double longitude) {
+                returnLocationToMain(latitude, longitude);
+            }
 
-        Toast.makeText(this, "Getting your location...", Toast.LENGTH_SHORT).show();
-
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, location -> {
-                    if (location != null) {
-                        // Got location, return to MainActivity with coordinates
-                        returnLocationToMain(location.getLatitude(), location.getLongitude());
-                    } else {
-                        // Last location not available, request fresh location
-                        requestFreshLocation();
-                    }
-                })
-                .addOnFailureListener(this, e -> {
-                    Toast.makeText(this, "Failed to get location: " + e.getMessage(),
-                            Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    // Request fresh location when last location is not available
-    private void requestFreshLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        Toast.makeText(this, "Requesting fresh location...", Toast.LENGTH_SHORT).show();
-
-        com.google.android.gms.location.LocationRequest locationRequest =
-                new com.google.android.gms.location.LocationRequest.Builder(
-                        com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, 10000)
-                        .setMinUpdateIntervalMillis(5000)
-                        .setMaxUpdates(1)
-                        .build();
-
-        fusedLocationClient.requestLocationUpdates(locationRequest,
-                new com.google.android.gms.location.LocationCallback() {
-                    @Override
-                    public void onLocationResult(@NonNull com.google.android.gms.location.LocationResult locationResult) {
-                        super.onLocationResult(locationResult);
-                        if (locationResult != null && locationResult.getLastLocation() != null) {
-                            android.location.Location location = locationResult.getLastLocation();
-                            returnLocationToMain(location.getLatitude(), location.getLongitude());
-                            // Stop location updates after getting location
-                            fusedLocationClient.removeLocationUpdates(this);
-                        } else {
-                            Toast.makeText(SearchActivity.this,
-                                    "Unable to get your location. Please enable location services and try again.",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                }, getMainLooper());
+            @Override
+            public void onLocationError(String message) {
+                Toast.makeText(SearchActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
