@@ -77,6 +77,7 @@
             android:layout_height="44dp"
             android:layout_gravity="end|center_vertical"
             android:layout_marginEnd="56dp"
+
             android:background="@drawable/icon_button_background"
             android:clickable="true"
             android:focusable="true"
@@ -175,7 +176,7 @@
                     android:letterSpacing="0.005"
                     android:text="Mostly Clear"
                     android:textColor="#FFFFFF"
-                    android:textSize="16sp"
+                    android:textSize="24sp"
                     tools:ignore="HardcodedText" />
 
                 <!-- Temp Range - Light 14sp, 50% opacity -->
@@ -184,7 +185,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:fontFamily="sans-serif"
+                    android:fontFamily="sans-serif-bold"
                     android:letterSpacing="0.01"
                     android:text="H:24°   L:18°"
                     android:textColor="#80FFFFFF"
@@ -682,12 +683,16 @@
         android:id="@+id/fabAddToFavorites"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+
+        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="24dp"
+
+        android:layout_marginStart="24dp"
         android:layout_marginBottom="24dp"
-        android:contentDescription="Add to favorites"
-        android:src="@drawable/ic_heart_line"
+
+        android:contentDescription="Settings"
+
+        android:src="@drawable/ic_settings_line"
         app:tint="@android:color/white"
         app:backgroundTint="#9B6FFF"
         app:elevation="8dp"

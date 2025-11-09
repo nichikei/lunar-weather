@@ -32,234 +32,6 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
 
-/**
- * ════════════════════════════════════════════════════════════════════════════════════════════════
- * ACTIVITY HIỂN THỊ BIỂU ĐỒ THỐNG KÊ THỜI TIẾT
- * ════════════════════════════════════════════════════════════════════════════════════════════════
- *
- * Activity này hiển thị 5 loại biểu đồ thống kê thời tiết chi tiết:
- *
- * ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
- * │  1. BIỂU ĐỒ ĐƯỜNG - NHIỆT ĐỘ THEO GIỜ (Temperature Chart)                                  │
- * │     • Hiển thị xu hướng thay đổi nhiệt độ trong 12 giờ tới                                 │
- * │     • Đường cong màu tím với hiệu ứng gradient fill                                         │
- * │     • Trục X: Thời gian (Now, 3h, 6h, 9h, 12h...)                                          │
- * │     • Trục Y: Nhiệt độ (°C hoặc °F)                                                         │
- * │                                                                                              │
- * │  2. BIỂU ĐỒ CỘT - CÁC CHỈ SỐ THỜI TIẾT HIỆN TẠI (Weather Stats Chart)                     │
- * │     • 4 cột với màu sắc khác nhau đại diện cho 4 chỉ số:                                   │
- * │       - Cột Xanh dương: Độ ẩm (%)                                                           │
- * │       - Cột Xanh lá: Tốc độ gió (km/h hoặc m/s)                                            │
- * │       - Cột Cam: Áp suất khí quyển (hPa)                                                    │
- * │       - Cột Hồng: Chỉ số UV                                                                 │
- * │                                                                                              │
- * │  3. BIỂU ĐỒ ĐƯỜNG - XÁC SUẤT MƯA THEO GIỜ (Rain Probability Chart)                         │
- * │     • Hiển thị khả năng có mưa (0-100%) trong 12 giờ tới                                   │
- * │     • Đường cong màu xanh nước biển                                                          │
- * │     • Trục X: Thời gian                                                                      │
- * │     • Trục Y: Xác suất mưa (%)                                                              │
- * │                                                                                              │
- * │  4. BIỂU ĐỒ ĐƯỜNG - TỐC ĐỘ GIÓ THEO GIỜ (Wind Speed Chart)                                 │
- * │     • Hiển thị sự thay đổi của tốc độ gió                                                   │
- * │     • Đường cong màu xanh lá                                                                 │
- * │     • Trục X: Thời gian                                                                      │
- * │     • Trục Y: Tốc độ gió (km/h hoặc m/s)                                                    │
- * │                                                                                              │
- * │  5. BIỂU ĐỒ ĐƯỜNG - ĐỘ ẨM THEO GIỜ (Humidity Chart)                                        │
- * │     • Hiển thị sự thay đổi độ ẩm không khí                                                  │
- * │     • Đường cong màu xanh cyan                                                               │
- * │     • Trục X: Thời gian                                                                      │
- * │     • Trục Y: Độ ẩm (0-100%)                                                                │
- * └─────────────────────────────────────────────────────────────────────────────────────────────┘
- *
- * ════════════════════════════════════════════════════════════════════════════════════════════════
- * 📊 LUỒNG HOẠT ĐỘNG TỔNG THỂ 📊
- * ════════════════════════════════════════════════════════════════════════════════════════════════
- *
- * BƯỚC 1: KHỞI ĐỘNG TỪ MAINACTIVITY
- * ──────────────────────────────────────────────────────────────────────────────────────────────
- * [MainActivity] → Người dùng nhấn nút "View Charts" (btnViewCharts)
- * ↓
- * [MainActivity.openChartsActivity()]
- * ↓ Kiểm tra dữ liệu có sẵn không?
- * ├─→ Nếu KHÔNG có dữ liệu: Hiển thị Toast "Weather data not available yet"
- * └─→ Nếu CÓ dữ liệu: Tạo Intent và truyền 3 loại dữ liệu:
- * • hourly_data: Dữ liệu dự báo theo giờ (HourlyForecastResponse)
- * • current_data: Dữ liệu thời tiết hiện tại (WeatherResponse)
- * • uv_index: Chỉ số UV hiện tại (int)
- * ↓
- * startActivity(intent) → Mở ChartsActivity
- *
- *
- * BƯỚC 2: NHẬN DỮ LIỆU VÀ KHỞI TẠO (onCreate)
- * ──────────────────────────────────────────────────────────────────────────────────────────────
- * [ChartsActivity.onCreate()]
- * ↓
- * ① Nhận dữ liệu từ Intent:
- * • hourlyForecastData = getIntent().getSerializableExtra("hourly_data")
- * • currentWeatherData = getIntent().getSerializableExtra("current_data")
- * • currentUVIndex = getIntent().getIntExtra("uv_index", 0)
- * ↓
- * ② Load cài đặt người dùng từ SharedPreferences:
- * • windSpeedUnit = "ms" hoặc "kmh" (đơn vị tốc độ gió)
- * ↓
- * ③ Setup UI Components:
- * • Nút Back (btnBack) → finish() khi nhấn
- * • Tiêu đề (tvChartTitle) → Hiển thị: "Tên thành phố - Weather Statistics"
- * ↓
- * ④ Khởi tạo tất cả 5 biểu đồ:
- * • setupTemperatureChart()      → Biểu đồ nhiệt độ
- * • setupWeatherStatsChart()     → Biểu đồ các chỉ số thời tiết
- * • setupRainProbabilityChart()  → Biểu đồ xác suất mưa
- * • setupWindSpeedChart()        → Biểu đồ tốc độ gió
- * • setupHumidityChart()         → Biểu đồ độ ẩm
- *
- *
- * BƯỚC 3: THIẾT LẬP TỪNG BIỂU ĐỒ (Quy trình chung cho mỗi biểu đồ)
- * ──────────────────────────────────────────────────────────────────────────────────────────────
- * [setupXXXChart()]
- * ↓
- * ① Kiểm tra dữ liệu:
- * if (dữ liệu == null) return; → Thoát nếu không có dữ liệu
- * ↓
- * ② Tìm view biểu đồ trong layout:
- * Chart chart = findViewById(R.id.xxxChart);
- * if (chart == null) return; → Thoát nếu không tìm thấy view
- * ↓
- * ③ Tạo danh sách điểm dữ liệu (Entries):
- * List<Entry> entries = new ArrayList<>();
- * for (dữ liệu từ API) {
- * entries.add(new Entry(index, value));
- * // Entry(vị trí trục X, giá trị trục Y)
- * }
- * ↓
- * ④ Tạo DataSet và cấu hình màu sắc/kiểu dáng:
- * • Màu đường/cột (setColor)
- * • Màu điểm dữ liệu (setCircleColor)
- * • Độ dày đường (setLineWidth)
- * • Hiệu ứng fill gradient (setDrawFilled, setFillColor)
- * • Làm mượt đường cong (setMode: CUBIC_BEZIER)
- * • Formatter giá trị (setValueFormatter)
- * ↓
- * ⑤ Gán dữ liệu vào biểu đồ:
- * chart.setData(lineData hoặc barData);
- * ↓
- * ⑥ Áp dụng cấu hình chung:
- * • setupChart(chart) hoặc setupBarChart(chart)
- * • Cấu hình trục X, Y
- * • Cấu hình lưới (grid)
- * • Cấu hình tương tác (touch, drag, zoom)
- * ↓
- * ⑦ Custom formatter cho trục X (nếu cần):
- * • Chuyển đổi index → giờ thực tế (14h, 17h, 20h...)
- * • Hoặc tên cột cho biểu đồ cột
- * ↓
- * ⑧ Animation và render:
- * • chart.animateXY(1200, 1200) → Animation 1.2 giây
- * • chart.invalidate() → Vẽ lại biểu đồ
- *
- *
- * BƯỚC 4: XỬ LÝ DỮ LIỆU API CHO BIỂU ĐỒ
- * ──────────────────────────────────────────────────────────────────────────────────────────────
- * Biểu đồ 1, 3, 4, 5: SỬ DỤNG hourlyForecastData (Dự báo theo giờ)
- * ├─→ API Endpoint: api.openweathermap.org/data/2.5/forecast
- * ├─→ Dữ liệu trả về: List<HourlyItem> (mỗi 3 giờ một điểm)
- * ├─→ Mỗi HourlyItem chứa:
- * │    • dt: Timestamp (Unix time)
- * │    • main.temp: Nhiệt độ
- * │    • main.humidity: Độ ẩm
- * │    • wind.speed: Tốc độ gió
- * │    • pop: Xác suất mưa (0-1)
- * └─→ Lấy tối đa 12 điểm = 36 giờ dự báo
- *
- * Biểu đồ 2: SỬ DỤNG currentWeatherData (Thời tiết hiện tại)
- * ├─→ API Endpoint: api.openweathermap.org/data/2.5/weather
- * ├─→ Dữ liệu trả về: WeatherResponse
- * ├─→ Chứa:
- * │    • main.humidity: Độ ẩm hiện tại
- * │    • main.pressure: Áp suất khí quyển
- * │    • wind.speed: Tốc độ gió hiện tại
- * │    • (UV từ biến currentUVIndex riêng)
- * └─→ Hiển thị 4 cột với 4 giá trị này
- *
- *
- * BƯỚC 5: CHUYỂN ĐỔI GIÁ TRỊ VÀ ĐƠN VỊ
- * ──────────────────────────────────────────────────────────────────────────────────────────────
- * • Nhiệt độ: Sử dụng trực tiếp từ API (đã được MainActivity xử lý theo Celsius/Fahrenheit)
- * • Tốc độ gió:
- * if (windSpeedUnit == "kmh") → windSpeed * 3.6 (m/s → km/h)
- * • Xác suất mưa:
- * API trả về 0-1 → Nhân 100 để có % (0-100%)
- * • Áp suất:
- * Chia 10 để cột không quá cao → Nhân lại 10 khi hiển thị label
- * • UV:
- * Nhân 10 để cột không quá thấp → Chia lại 10 khi hiển thị label
- *
- *
- * BƯỚC 6: TƯƠNG TÁC NGƯỜI DÙNG
- * ──────────────────────────────────────────────────────────────────────────────────────────────
- * [Người dùng xem biểu đồ]
- * ↓
- * • Scroll lên/xuống: ScrollView cho phép cuộn xem tất cả 5 biểu đồ
- * • Chạm vào điểm: Hiển thị giá trị chính xác của điểm đó
- * • Kéo biểu đồ: Drag ngang để xem các điểm khác (nếu có nhiều dữ liệu)
- * • Nhấn nút Back: Quay lại MainActivity
- * ↓
- * [finish()] → Đóng ChartsActivity, quay về MainActivity
- *
- *
- * ════════════════════════════════════════════════════════════════════════════════════════════════
- * 🎨 THƯ VIỆN SỬ DỤNG 🎨
- * ════════════════════════════════════════════════════════════════════════════════════════════════
- *
- * MPAndroidChart v3.1.0
- * ├─→ Repository: https://github.com/PhilJay/MPAndroidChart
- * ├─→ Gradle: implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
- * ├─→ Các component sử dụng:
- * │    • LineChart: Biểu đồ đường (nhiệt độ, mưa, gió, độ ẩm)
- * │    • BarChart: Biểu đồ cột (các chỉ số thời tiết)
- * │    • Entry: Điểm dữ liệu cho biểu đồ đường
- * │    • BarEntry: Điểm dữ liệu cho biểu đồ cột
- * │    • LineDataSet: Bộ dữ liệu cho biểu đồ đường
- * │    • BarDataSet: Bộ dữ liệu cho biểu đồ cột
- * │    • ValueFormatter: Format giá trị hiển thị
- * │    • XAxis: Cấu hình trục X
- * └─→ Tính năng:
- * • Animation mượt mà
- * • Touch interaction
- * • Custom màu sắc và gradient
- * • Zoom và pan
- *
- *
- * ════════════════════════════════════════════════════════════════════════════════════════════════
- * 📁 CẤU TRÚC FILE LIÊN QUAN 📁
- * ════════════════════════════════════════════════════════════════════════════════════════════════
- *
- * Java Files:
- * ├─ ChartsActivity.java (file này)
- * │   └─ Xử lý logic và hiển thị tất cả biểu đồ
- * │
- * ├─ MainActivity.java
- * │   ├─ openChartsActivity() → Phương thức mở ChartsActivity
- * │   └─ btnViewCharts.setOnClickListener() → Sự kiện nhấn nút
- * │
- * └─ Data Models:
- * ├─ HourlyForecastResponse.java → Dữ liệu dự báo theo giờ
- * └─ WeatherResponse.java → Dữ liệu thời tiết hiện tại
- *
- * Layout Files:
- * ├─ activity_charts.xml
- * │   └─ Layout chính của ChartsActivity (ScrollView chứa 5 biểu đồ)
- * │
- * └─ Card Layouts (được include vào activity_charts.xml):
- * ├─ card_temperature_chart.xml → Layout biểu đồ nhiệt độ
- * ├─ card_weather_stats_chart.xml → Layout biểu đồ các chỉ số
- * ├─ card_rain_probability_chart.xml → Layout biểu đồ xác suất mưa
- * ├─ card_wind_speed_chart.xml → Layout biểu đồ tốc độ gió
- * └─ card_humidity_chart.xml → Layout biểu đồ độ ẩm
- *
- * ════════════════════════════════════════════════════════════════════════════════════════════════
- */
 public class ChartsActivity extends AppCompatActivity {
 
     // Dữ liệu dự báo theo giờ (từ API OpenWeatherMap)
@@ -308,37 +80,7 @@ public class ChartsActivity extends AppCompatActivity {
         setupHumidityChart();         // Biểu đồ độ ẩm
     }
 
-    /**
-     * THIẾT LẬP BIỂU ĐỒ NHIỆT ĐỘ (Temperature Chart)
-     *
-     * Hiển thị nhiệt độ thay đổi theo giờ trong 12 giờ tới
-     *
-     * === TRỤC X (NGANG): THỜI GIAN ===
-     * - Trục X hiển thị thời gian: 0h, 3h, 6h, 9h, 12h...
-     * - API trả về dữ liệu mỗi 3 giờ một lần
-     * - Ví dụ: Nếu bây giờ là 14h (2PM), các điểm sẽ là:
-     * • Điểm 0: 14h (Now)
-     * • Điểm 1: 17h (3h sau)
-     * • Điểm 2: 20h (6h sau)
-     * • Điểm 3: 23h (9h sau)
-     * • Điểm 4: 02h (12h sau - ngày hôm sau)
-     *
-     * === TRỤC Y (DỌC): NHIỆT ĐỘ ===
-     * - Trục Y hiển thị nhiệt độ: 20°C, 22°C, 25°C, 28°C...
-     * - Tự động scale theo nhiệt độ min/max
-     *
-     * VÍ DỤ BIỂU ĐỒ:
-     *
-     * Nhiệt độ (°C)
-     * 30│                    ●
-     * 28│              ●         ●
-     * 26│        ●
-     * 24│  ●
-     * 22│
-     * └─────────────────────────────> Thời gian
-     * Now  3h   6h   9h   12h
-     * 14h  17h  20h  23h  02h
-     */
+
     private void setupTemperatureChart() {
         // Kiểm tra dữ liệu có tồn tại không
         if (hourlyForecastData == null || hourlyForecastData.getList() == null) {
@@ -432,18 +174,7 @@ public class ChartsActivity extends AppCompatActivity {
         chart.invalidate();
     }
 
-    /**
-     * THIẾT LẬP BIỂU ĐỒ CỘT - CÁC CHỈ SỐ THỜI TIẾT (Weather Stats Chart)
-     *
-     * Hiển thị 4 chỉ số thời tiết hiện tại dưới dạng cột:
-     * - Cột 1 (Xanh dương): Độ ẩm (%) - VD: 75%
-     * - Cột 2 (Xanh lá):    Tốc độ gió (km/h hoặc m/s) - VD: 12.5 km/h
-     * - Cột 3 (Cam):        Áp suất khí quyển (hPa) - VD: 1013 hPa
-     * - Cột 4 (Hồng):       Chỉ số UV - VD: UV 5
-     *
-     * LƯU Ý: Trục dọc không phải là GIỜ, mà là GIÁ TRỊ của từng chỉ số
-     * Các giá trị được chia/nhân để cân bằng chiều cao cột cho đẹp
-     */
+
     private void setupWeatherStatsChart() {
         if (currentWeatherData == null) return;
 
@@ -625,13 +356,6 @@ public class ChartsActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * THIẾT LẬP BIỂU ĐỒ TỐC ĐỘ GIÓ (Wind Speed Chart)
-     *
-     * Hiển thị tốc độ gió thay đổi theo giờ
-     * - Trục X: Thời gian (giờ)
-     * - Trục Y: Tốc độ gió (km/h hoặc m/s)
-     */
     private void setupWindSpeedChart() {
         if (hourlyForecastData == null || hourlyForecastData.getList() == null) return;
 
@@ -726,13 +450,7 @@ public class ChartsActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * THIẾT LẬP BIỂU ĐỒ ĐỘ ẨM (Humidity Chart)
-     *
-     * Hiển thị độ ẩm không khí thay đổi theo giờ
-     * - Trục X: Thời gian (giờ)
-     * - Trục Y: Độ ẩm (0-100%)
-     */
+
     private void setupHumidityChart() {
         if (hourlyForecastData == null || hourlyForecastData.getList() == null) return;
 
@@ -824,15 +542,7 @@ public class ChartsActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * CÀI ĐẶT CHUNG CHO TẤT CẢ BIỂU ĐỒ ĐƯỜNG (Line Chart)
-     *
-     * Thiết lập:
-     * - Màu chữ, kích thước chữ
-     * - Lưới (grid lines)
-     * - Trục tọa độ (axis)
-     * - Khả năng tương tác (touch, drag)
-     */
+
     private void setupChart(LineChart chart) {
         // Tắt mô tả biểu đồ
         chart.getDescription().setEnabled(false);
@@ -873,11 +583,7 @@ public class ChartsActivity extends AppCompatActivity {
         chart.setExtraOffsets(8, 16, 8, 8);
     }
 
-    /**
-     * CÀI ĐẶT CHO BIỂU ĐỒ CỘT (Bar Chart)
-     *
-     * Tương tự như setupChart() nhưng dành riêng cho biểu đồ cột
-     */
+
     private void setupBarChart(BarChart chart) {
         chart.getDescription().setEnabled(false);
         chart.getLegend().setEnabled(false);

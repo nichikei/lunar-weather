@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
     app:cardBackgroundColor="#40FFFFFF"
     app:cardCornerRadius="16dp"
-    app:cardElevation="0dp">
+    app:cardElevation="0dp"
+    app:contentPadding="5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,11 +39,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
+                android:alpha="0.9"
                 android:fontFamily="@font/poppins_bold"
                 android:text="Upper Body"
                 android:textColor="@color/white"
-                android:textSize="16sp"
-                android:alpha="0.9" />
+                android:textSize="16sp" />
 
             <!-- Suggestion -->
             <TextView
@@ -61,11 +61,11 @@
                 android:id="@+id/tvReasoning"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:alpha="0.7"
                 android:fontFamily="@font/poppins"
                 android:text="Mild temperature, a light layer is perfect"
                 android:textColor="@color/white"
-                android:textSize="13sp"
-                android:alpha="0.7" />
+                android:textSize="13sp" />
 
         </LinearLayout>
 

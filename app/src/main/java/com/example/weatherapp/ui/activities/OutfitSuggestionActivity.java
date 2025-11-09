@@ -21,21 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * ACTIVITY GỢI Ý TRANG PHỤC DỰA VÀO THỜI TIẾT (Outfit Suggestion)
- *
- * Activity này sử dụng AI (Gemini API) để gợi ý trang phục phù hợp
- * dựa trên điều kiện thời tiết hiện tại:
- * - Nhiệt độ (nóng/lạnh/ấm)
- * - Điều kiện thời tiết (mưa/nắng/tuyết)
- * - Độ ẩm
- *
- * Quy trình:
- * 1. Nhận dữ liệu thời tiết từ MainActivity
- * 2. Gửi request đến Gemini AI với thông tin thời tiết
- * 3. AI phân tích và trả về danh sách gợi ý trang phục
- * 4. Hiển thị danh sách gợi ý trong RecyclerView
- */
+
 public class OutfitSuggestionActivity extends AppCompatActivity {
 
     // Progress bar hiển thị khi đang load gợi ý từ AI
