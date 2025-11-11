@@ -1,14 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Premium glassmorphic top bar background with rounded corners -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <!-- Frosted glass effect -->
-    <solid android:color="#4D2A1B6B" />
-    <!-- Fully rounded corners -->
-    <corners android:radius="28dp" />
-    <!-- Soft border -->
-    <stroke
-        android:width="1.5dp"
-        android:color="#40FFFFFF" />
-</shape>
+<!-- Flagship glassmorphic top bar with premium aesthetics -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Base glass layer -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#4D2A1B6B" />
+            <corners android:radius="28dp" />
+        </shape>
+    </item>
+    <!-- Top highlight for depth -->
+    <item android:top="0dp" android:bottom="54dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="90"
+                android:startColor="#20FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:type="linear"/>
+            <corners android:radius="28dp" />
+        </shape>
+    </item>
+    <!-- Refined border -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="1dp"
+                android:color="#50FFFFFF" />
+            <corners android:radius="28dp" />
+        </shape>
+    </item>
+</layer-list>
 

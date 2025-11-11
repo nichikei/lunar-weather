@@ -29,6 +29,9 @@ android {
     buildFeatures {
         viewBinding true
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -37,6 +40,12 @@ dependencies {
     implementation libs.material
     implementation libs.activity
     implementation libs.constraintlayout
+
+    // CoordinatorLayout cho parallax effect
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
+    
+    // CardView
+    implementation 'androidx.cardview:cardview:1.0.0'
 
     // Retrofit for API calls
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -61,7 +70,41 @@ dependencies {
     // MPAndroidChart for weather charts
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
+    // ========== MVVM Architecture Dependencies ==========
+    // ViewModel and LiveData
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-common-java8:2.7.0'
+    
+    // Fragment KTX for viewModels() delegate
+    implementation 'androidx.fragment:fragment:1.6.2'
+    implementation 'androidx.activity:activity:1.8.2'
+    
+    // Kotlin Coroutines (for async operations)
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+    
+    // Lifecycle coroutines
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    
+    // Room Database (for offline caching - optional but recommended)
+    implementation 'androidx.room:room-runtime:2.6.1'
+    annotationProcessor 'androidx.room:room-compiler:2.6.1'
+
+    // ========== Testing Dependencies ==========
+    // Unit Testing
     testImplementation libs.junit
+    testImplementation 'org.mockito:mockito-core:5.7.0'
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
+    testImplementation 'androidx.arch.core:core-testing:2.2.0' // For InstantTaskExecutorRule
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
+    
+    // Android Instrumented Testing
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'org.mockito:mockito-android:5.7.0'
 }

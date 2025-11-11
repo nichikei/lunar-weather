@@ -1,0 +1,214 @@
+ANDROID RESOURCES NAMING CONVENTIONS
+=====================================
+
+Android KHÔNG hỗ trợ subfolders trong res/drawable và res/layout.
+Giải pháp: Sử dụng NAMING CONVENTION để phân loại.
+
+
+DRAWABLE NAMING CONVENTION
+===========================
+
+Prefix Pattern: <WHAT>_<WHERE>_<DESCRIPTION>_<SIZE/STATE>
+
+1. ICONS (ic_)
+   - ic_<name>.xml                    # Vector icons
+   - ic_<name>_line.xml               # Line style icons
+   - ic_<name>_filled.xml             # Filled icons
+   
+   Examples:
+   ✅ ic_heart.xml
+   ✅ ic_heart_line.xml
+   ✅ ic_heart_filled.xml
+   ✅ ic_location_glow.xml
+   ✅ ic_notification.xml
+
+2. BACKGROUNDS (bg_)
+   - bg_<where>_<style>.xml           # Background shapes
+   
+   Examples:
+   ✅ bg_alert_badge.xml
+   ✅ bg_cosmic.xml
+   ✅ bg_weather_solid_1.xml
+   ❌ bottom_dock_background.xml     → Should be: bg_bottom_dock.xml
+   ❌ search_background.xml          → Should be: bg_search.xml
+
+3. WEATHER ICONS (weather_)
+   - weather_<condition>.png          # Weather condition icons
+   
+   Examples:
+   ✅ weather_sun_cloud_rain.png
+   ❌ sun_cloud_angled_rain.png      → Should be: weather_sun_cloud_angled_rain.png
+   ❌ moon_cloud_mid_rain.png        → Should be: weather_moon_cloud_mid_rain.png
+   ❌ big_rain_drops.png             → Should be: weather_rain_drops_big.png
+
+4. GRADIENTS (gradient_)
+   - gradient_<name>_<number>.xml     # Gradient backgrounds
+   
+   Examples:
+   ✅ gradient_weather_1.xml
+   ✅ gradient_weather_2.xml
+   ❌ sunrise_arc_gradient.xml       → Should be: gradient_sunrise_arc.xml
+
+5. SELECTORS/STATES (selector_)
+   - selector_<name>.xml              # State list drawables
+   
+   Examples:
+   ✅ selector_button.xml
+   ❌ hourly_pill_selector.xml       → Should be: selector_hourly_pill.xml
+
+6. SHAPES (shape_)
+   - shape_<description>.xml          # Basic shapes
+   
+   Examples:
+   ✅ shape_circle.xml
+   ✅ shape_rounded_rect.xml
+   ❌ blur_circle.xml                → Should be: shape_circle_blur.xml
+   ❌ circle_background.xml          → Should be: shape_circle.xml or bg_circle.xml
+
+
+CURRENT ISSUES IN PROJECT
+===========================
+
+❌ Weather icons without prefix (44 files):
+   - big_rain_drops.png, big_snow.png
+   - sun_cloud_*.png
+   - moon_cloud_*.png
+   → Should have 'weather_' prefix
+
+❌ Background files without 'bg_' prefix:
+   - bottom_dock_background.xml
+   - search_background.xml
+   - settings_button_background.xml
+   → Should start with 'bg_'
+
+❌ Generic image files:
+   - ad2.jpg, avatar.png, okch.jpg
+   → Consider: img_<name>.jpg or move to assets/
+
+
+LAYOUT NAMING CONVENTION
+==========================
+
+Prefix Pattern: <WHAT>_<SCREEN/COMPONENT>_<DESCRIPTION>
+
+1. ACTIVITIES (activity_)
+   - activity_<name>.xml
+   
+   Examples:
+   ✅ activity_main.xml
+   ✅ activity_charts.xml
+   ✅ activity_settings.xml
+
+2. FRAGMENTS (fragment_)
+   - fragment_<name>.xml
+   
+   Examples:
+   ✅ fragment_weather_details.xml
+   ✅ fragment_forecast.xml
+
+3. CARDS (card_)
+   - card_<content>.xml               # Reusable card components
+   
+   Examples:
+   ✅ card_air_quality.xml
+   ✅ card_humidity.xml
+   ✅ card_temperature_chart.xml
+   ✅ card_weather_stats_chart.xml
+
+4. LIST ITEMS (item_)
+   - item_<list_name>.xml             # RecyclerView items
+   
+   Examples:
+   ✅ item_city_weather.xml
+   ✅ item_favorite_city.xml
+   ✅ item_hourly_forecast.xml
+   ✅ item_outfit_suggestion.xml
+
+5. DIALOGS (dialog_)
+   - dialog_<name>.xml
+   
+   Examples:
+   ✅ dialog_confirm.xml
+   ✅ dialog_city_picker.xml
+
+6. WIDGETS (widget_)
+   - widget_<name>.xml                # App widgets
+   
+   Examples:
+   ✅ widget_weather.xml
+
+
+CURRENT PROJECT STATUS
+========================
+
+✅ Layouts are well organized:
+   - 7 activity_*.xml
+   - 15 card_*.xml
+   - 9 item_*.xml
+   - 1 widget_*.xml
+
+✅ Icons are well prefixed:
+   - 22 ic_*.xml files
+
+❌ Need improvement:
+   - 44 drawable files without proper prefix
+   - Weather icons mixed with other assets
+
+
+RECOMMENDATIONS
+================
+
+1. **DO NOT rename existing files** without careful planning
+   - Risk breaking R.drawable references
+   - Need to update all XML and Java/Kotlin files
+   - Can cause build failures
+
+2. **For NEW files**, follow naming convention:
+   - Always use prefix (ic_, bg_, weather_, etc.)
+   - Use lowercase with underscores
+   - Be descriptive but concise
+
+3. **Document exceptions**:
+   - Some legacy files may keep old names
+   - Add comments in code when using non-standard names
+
+4. **Future refactoring** (if needed):
+   - Use Android Studio refactor tool
+   - Rename one category at a time
+   - Test thoroughly after each rename
+   - Commit frequently
+
+
+RESOURCE QUALIFIERS (Android Standard)
+========================================
+
+Android supports resource qualifiers for different configurations:
+
+drawable/                 # Default drawables
+drawable-hdpi/           # High density (~240dpi)
+drawable-xhdpi/          # Extra high density (~320dpi)
+drawable-xxhdpi/         # Extra extra high density (~480dpi)
+drawable-xxxhdpi/        # Extra extra extra high density (~640dpi)
+drawable-night/          # Night mode
+drawable-v24/            # API 24+
+
+layout/                  # Default layouts
+layout-land/             # Landscape orientation
+layout-sw600dp/          # Tablets (smallest width 600dp)
+layout-v21/              # API 21+
+
+values/                  # Default values
+values-night/            # Dark theme
+values-vi/               # Vietnamese language
+values-en/               # English language
+
+
+SUMMARY
+========
+
+✅ Keep current structure (no subfolders possible)
+✅ Use naming conventions for organization
+✅ Group by prefix in file explorer
+✅ Document naming rules (this file)
+❌ Avoid mass renaming (too risky)
+✅ Apply conventions to new files only

@@ -21,6 +21,8 @@ import com.example.weatherapp.data.api.WeatherApiService;
 import com.example.weatherapp.data.models.FavoriteCity;
 import com.example.weatherapp.data.responses.WeatherResponse;
 import com.example.weatherapp.domain.repository.FavoriteCitiesManager;
+import com.example.weatherapp.ui.helpers.RecyclerViewScrollAnimator;
+import com.example.weatherapp.ui.helpers.SlideInItemAnimator;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -51,6 +53,11 @@ public class FavoriteCitiesActivity extends AppCompatActivity {
         ImageButton btnBack = findViewById(R.id.btnBack);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        
+        // Add smooth slide-in animation
+        recyclerView.setItemAnimator(new SlideInItemAnimator());
+        RecyclerViewScrollAnimator scrollAnimator = new RecyclerViewScrollAnimator();
+        recyclerView.addOnScrollListener(scrollAnimator);
 
         loadFavoriteCities();
 

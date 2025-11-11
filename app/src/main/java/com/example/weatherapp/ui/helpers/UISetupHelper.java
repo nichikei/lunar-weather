@@ -210,4 +210,34 @@ public class UISetupHelper {
         binding.tvError.setText(message);
         Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
     }
+    
+    /**
+     * Add press animation to a view (scale down on press)
+     */
+    public static void addPressAnimation(View view) {
+        view.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    // Scale down with bounce
+                    v.animate()
+                            .scaleX(0.92f)
+                            .scaleY(0.92f)
+                            .setDuration(100)
+                            .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                            .start();
+                    break;
+                case android.view.MotionEvent.ACTION_UP:
+                case android.view.MotionEvent.ACTION_CANCEL:
+                    // Scale back to normal with overshoot
+                    v.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(200)
+                            .setInterpolator(new android.view.animation.OvershootInterpolator(2f))
+                            .start();
+                    break;
+            }
+            return false; // Allow click to proceed
+        });
+    }
 }

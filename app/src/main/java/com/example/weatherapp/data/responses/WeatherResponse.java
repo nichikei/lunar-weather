@@ -23,6 +23,12 @@ public class WeatherResponse implements Serializable {
     @SerializedName("rain")
     private Rain rain;
 
+    @SerializedName("clouds")
+    private Clouds clouds;
+
+    @SerializedName("dt")
+    private long dt;
+
     @SerializedName("sys")
     private Sys sys;
 
@@ -51,6 +57,14 @@ public class WeatherResponse implements Serializable {
 
     public Rain getRain() {
         return rain;
+    }
+
+    public Clouds getClouds() {
+        return clouds;
+    }
+
+    public long getDt() {
+        return dt;
     }
 
     public Sys getSys() {
@@ -180,6 +194,15 @@ public class WeatherResponse implements Serializable {
 
         public Double get3h() {
             return threeHours;
+        }
+    }
+
+    public static class Clouds implements Serializable {
+        @SerializedName("all")
+        private int all;
+
+        public int getAll() {
+            return all;
         }
     }
 

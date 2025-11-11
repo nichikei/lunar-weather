@@ -27,6 +27,9 @@
     <dimen name="spacing_large">16dp</dimen>
     <dimen name="spacing_xl">24dp</dimen>
     <dimen name="spacing_xxl">32dp</dimen>
+    
+    <!-- Hourly Forecast -->
+    <dimen name="hourly_forecast_width">90dp</dimen>
 
     <!-- ========== CORNER RADIUS ========== -->
     <!-- Large Container/Tab -->

@@ -8,6 +8,10 @@
     <color name="primary_900">#1B1247</color> <!-- Deep purple background -->
     <color name="primary_800">#251B6A</color>
     <color name="primary_700">#33248F</color>
+    
+    <!-- Collapsing Toolbar Colors -->
+    <color name="purple_dark">#2D1B6A</color>
+    <color name="purple_medium">#4D4D8A</color>
 
     <!-- ========== ACCENT COLORS ========== -->
     <color name="accent_600">#7B5CFF</color>
@@ -16,8 +20,16 @@
 
     <!-- ========== SURFACE/GLASS COLORS ========== -->
     <color name="surface_glass">#14FFFFFF</color> <!-- 8% white -->
+    <color name="surface_glass_premium">#1AFFFFFF</color> <!-- 10% white - flagship -->
     <color name="stroke_on_glass">#33FFFFFF</color> <!-- 20% white -->
     <color name="stroke_on_glass_refined">#40FFFFFF</color> <!-- 25% white - softer refined border -->
+    <color name="stroke_on_glass_flagship">#50FFFFFF</color> <!-- 31% white - premium border -->
+    
+    <!-- Flagship Shadow & Glow Colors -->
+    <color name="shadow_soft">#30000000</color> <!-- Soft ambient shadow -->
+    <color name="shadow_hard">#50000000</color> <!-- Spot shadow -->
+    <color name="glow_accent">#509E4CFF</color> <!-- Accent glow -->
+    <color name="glow_white">#40FFFFFF</color> <!-- White glow -->
 
     <!-- ========== ICON TINT COLORS ========== -->
     <color name="icon_tint_subtle">#CCFFFFFF</color> <!-- 80% white - refined icon transparency -->

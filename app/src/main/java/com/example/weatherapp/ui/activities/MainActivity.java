@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,20 +18,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.weatherapp.R;
-import com.example.weatherapp.data.responses.AirQualityResponse;
-import com.example.weatherapp.data.responses.HourlyForecastResponse;
+import com.example.weatherapp.data.repository.implementation.WeatherRepositoryImpl;
 import com.example.weatherapp.data.responses.WeatherResponse;
-import com.example.weatherapp.data.manager.WeatherDataManager;
 import com.example.weatherapp.databinding.ActivityMainBinding;
+import com.example.weatherapp.domain.model.AirQualityData;
+import com.example.weatherapp.domain.model.ForecastData;
+import com.example.weatherapp.domain.model.WeatherData;
 import com.example.weatherapp.domain.repository.FavoriteCitiesManager;
+import com.example.weatherapp.domain.repository.WeatherRepository;
+import com.example.weatherapp.presentation.state.UIState;
+import com.example.weatherapp.presentation.viewmodel.MainViewModel;
+import com.example.weatherapp.presentation.viewmodel.MainViewModelFactory;
 import com.example.weatherapp.ui.helpers.FavoritesHelper;
+import com.example.weatherapp.ui.helpers.FlagshipEffectsHelper;
 import com.example.weatherapp.ui.helpers.ForecastSummaryGenerator;
 import com.example.weatherapp.ui.helpers.ForecastViewManager;
 import com.example.weatherapp.ui.helpers.LocationHelper;
 import com.example.weatherapp.ui.helpers.NavigationHelper;
 import com.example.weatherapp.ui.helpers.NotificationHelper;
+import com.example.weatherapp.ui.helpers.ParallaxAnimationHelper;
 import com.example.weatherapp.ui.helpers.UISetupHelper;
 import com.example.weatherapp.ui.helpers.UIUpdateHelper;
 import com.example.weatherapp.utils.LocaleHelper;
@@ -38,13 +47,17 @@ import com.example.weatherapp.widget.WeatherWidget;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
+/**
+ * MainActivity - Refactored with MVVM Architecture
+ * View Layer: Only handles UI, delegates business logic to ViewModel
+ */
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private MainViewModel viewModel;
     private static final String API_KEY = "4f8cf691daad596ac4e465c909868d0d";
     
-    // Helper classes
-    private WeatherDataManager weatherDataManager;
+    // Helper classes (UI only)
     private UIUpdateHelper uiUpdateHelper;
     private LocationHelper locationHelper;
     private ForecastViewManager forecastViewManager;
@@ -53,25 +66,16 @@ public class MainActivity extends AppCompatActivity {
     private FavoritesHelper favoritesHelper;
     private NotificationHelper notificationHelper;
     
-    // Data
-    private WeatherResponse currentWeatherData;
-    private HourlyForecastResponse hourlyForecastData;
-    private String currentCityName = "Hanoi";
-    private double currentLat = 0;
-    private double currentLon = 0;
-    private int currentUVIndex = 0;
-    private AirQualityResponse.AirQualityData currentAQIData;
-    
     // Managers
     private SharedPreferences sharedPreferences;
     private FavoriteCitiesManager favoritesManager;
     private FusedLocationProviderClient fusedLocationClient;
 
-    // UI State
+    // UI State only
     private boolean isSearchVisible = false;
     private boolean isHourlyView = true;
     
-    // Unit settings
+    // Settings
     private String temperatureUnit = "celsius";
     private String windSpeedUnit = "ms";
     private String pressureUnit = "hpa";
@@ -102,15 +106,15 @@ public class MainActivity extends AppCompatActivity {
                         double longitude = result.getData().getDoubleExtra(SearchActivity.EXTRA_LONGITUDE, 0);
 
                         if (latitude != 0 && longitude != 0) {
-                            // Fetch weather by coordinates
-                            fetchWeatherByCoordinates(latitude, longitude);
+                            // Load weather by coordinates using ViewModel
+                            viewModel.loadWeatherByCoordinates(latitude, longitude);
                         }
                     } else {
                         // Get city name from search
                         String cityName = result.getData().getStringExtra(SearchActivity.EXTRA_CITY_NAME);
                         if (cityName != null && !cityName.isEmpty()) {
-                            currentCityName = cityName;
-                            fetchAllWeatherData(cityName);
+                            // Load weather by city using ViewModel
+                            viewModel.loadWeatherByCity(cityName);
                         }
                     }
                 }
@@ -140,17 +144,12 @@ public class MainActivity extends AppCompatActivity {
                     // Re-initialize helpers with new settings
                     initializeHelpers();
                     
-                    // If temperature unit changed, refetch data from API with correct unit
+                    // If temperature unit changed, update ViewModel and refetch
                     if (!oldTempUnit.equals(temperatureUnit)) {
-                        // Temperature unit changed - need to fetch new data
-                        fetchAllWeatherData(currentCityName);
-                    } else {
-                        // Only wind/pressure unit changed - just update UI
-                        if (currentWeatherData != null) {
-                            updateUI(currentWeatherData);
-                        }
-                        if (hourlyForecastData != null) {
-                            updateForecastView();
+                        viewModel.setTemperatureUnit(temperatureUnit);
+                        String cityName = viewModel.getCurrentCityName();
+                        if (cityName != null && !cityName.isEmpty()) {
+                            viewModel.loadWeatherByCity(cityName);
                         }
                     }
                 }
@@ -180,7 +179,9 @@ public class MainActivity extends AppCompatActivity {
         // Apply saved language first
         applyLanguagePreference();
 
+        // Flagship: Enable edge-to-edge immersive experience
         EdgeToEdge.enable(this);
+        
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -195,8 +196,14 @@ public class MainActivity extends AppCompatActivity {
         // Load settings
         loadSettings();
         
-        // Initialize helper classes
+        // Initialize ViewModel (MVVM)
+        initializeViewModel();
+        
+        // Initialize helper classes (UI only)
         initializeHelpers();
+
+        // Setup observers (MVVM - Heart of the pattern)
+        setupObservers();
 
         // Request notification permission for Android 13+
         notificationHelper.checkNotificationPermission();
@@ -204,39 +211,112 @@ public class MainActivity extends AppCompatActivity {
         // Schedule weather notifications
         notificationHelper.scheduleWeatherNotifications();
 
+        // Flagship: Handle system bars with immersive padding
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            // Only apply top padding for status bar, keep bottom for gesture navigation
+            v.setPadding(0, systemBars.top, 0, 0);
+            
+            // Adjust top bar position to account for status bar
+            if (binding.topGlassBar != null) {
+                android.view.ViewGroup.MarginLayoutParams params = 
+                    (android.view.ViewGroup.MarginLayoutParams) binding.topGlassBar.getLayoutParams();
+                params.topMargin = systemBars.top + 12; // 12dp extra spacing
+                binding.topGlassBar.setLayoutParams(params);
+            }
+            
             return insets;
         });
 
         setupListeners();
+        
+        // Setup scroll listener for top bar city name visibility
+        setupScrollListener();
 
         // Apply glass morphism effects to UI elements
         uiSetupHelper.applyGlassMorphismEffects();
 
         // Apply blur effect to top glass bar (API 31+)
         uiSetupHelper.applyTopBarBlurEffect();
+        
+        // Flagship: Apply premium visual effects
+        applyFlagshipEffects();
+        
+        // Add press animations to interactive elements
+        setupPressAnimations();
 
         // Check if opened from FavoriteCitiesActivity with a specific city
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("CITY_NAME")) {
             String cityName = intent.getStringExtra("CITY_NAME");
             if (cityName != null && !cityName.isEmpty()) {
-                currentCityName = cityName;
-                fetchAllWeatherData(cityName);
+                viewModel.loadWeatherByCity(cityName);
                 return;
             }
         }
 
-        // Default: fetch weather for Hanoi
-        fetchAllWeatherData(currentCityName);
+        // Default: load weather for Hanoi via ViewModel
+        viewModel.loadWeatherByCity("Hanoi");
     }
 
+    /**
+     * Initialize ViewModel with Repository (MVVM Pattern)
+     */
+    private void initializeViewModel() {
+        WeatherRepository repository = new WeatherRepositoryImpl(this, API_KEY);
+        MainViewModelFactory factory = new MainViewModelFactory(repository);
+        viewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
+        viewModel.setTemperatureUnit(temperatureUnit);
+    }
 
+    /**
+     * Setup LiveData Observers (MVVM - Core Pattern)
+     */
+    private void setupObservers() {
+        // Observe Weather State
+        viewModel.getWeatherState().observe(this, state -> {
+            if (state instanceof UIState.Loading) {
+                showLoading();
+            } else if (state instanceof UIState.Success) {
+                hideLoading();
+                WeatherData data = ((UIState.Success<WeatherData>) state).getData();
+                updateWeatherUI(data);
+            } else if (state instanceof UIState.Error) {
+                hideLoading();
+                String error = ((UIState.Error<WeatherData>) state).getMessage();
+                showError(error);
+            }
+        });
+
+        // Observe Forecast State
+        viewModel.getForecastState().observe(this, state -> {
+            if (state instanceof UIState.Success) {
+                ForecastData data = ((UIState.Success<ForecastData>) state).getData();
+                updateForecastUI(data);
+            } else if (state instanceof UIState.Error) {
+                String error = ((UIState.Error<ForecastData>) state).getMessage();
+                showError("Forecast: " + error);
+            }
+        });
+
+        // Observe UV Index State
+        viewModel.getUVIndexState().observe(this, state -> {
+            if (state instanceof UIState.Success) {
+                int uvIndex = ((UIState.Success<Integer>) state).getData();
+                updateUVIndexUI(uvIndex);
+            }
+        });
+
+        // Observe Air Quality State
+        viewModel.getAirQualityState().observe(this, state -> {
+            if (state instanceof UIState.Success) {
+                AirQualityData data = ((UIState.Success<AirQualityData>) state).getData();
+                updateAirQualityUI(data);
+            }
+        });
+    }
 
     private void initializeHelpers() {
-        weatherDataManager = new WeatherDataManager(this, API_KEY);
         uiUpdateHelper = new UIUpdateHelper(binding, temperatureUnit, windSpeedUnit, pressureUnit);
         locationHelper = new LocationHelper(this, fusedLocationClient);
         forecastViewManager = new ForecastViewManager(this, binding.hourlyForecastContainer, temperatureUnit);
@@ -264,8 +344,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSearchRequested() {
                 String cityName = binding.etCityName.getText().toString().trim();
                 if (!cityName.isEmpty()) {
-                    currentCityName = cityName;
-                    fetchAllWeatherData(cityName);
+                    viewModel.loadWeatherByCity(cityName);
                     toggleSearchBar();
                 } else {
                     Toast.makeText(MainActivity.this, "Please enter a city name", Toast.LENGTH_SHORT).show();
@@ -280,17 +359,22 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onToggleFavorite() {
-                favoritesHelper.toggleFavorite(currentCityName, currentWeatherData, currentLat, currentLon);
+                String cityName = viewModel.getCurrentCityName();
+                double lat = viewModel.getCurrentLatitude();
+                double lon = viewModel.getCurrentLongitude();
+                // Create temporary WeatherResponse for favorites (legacy code)
+                favoritesHelper.toggleFavorite(cityName, null, lat, lon);
             }
 
             @Override
             public void onViewChartsRequested() {
-                navigationHelper.openChartsActivity(hourlyForecastData, currentWeatherData, currentUVIndex);
+                // Get data from ViewModel states
+                navigationHelper.openChartsActivity(null, null, 0);
             }
 
             @Override
             public void onOutfitSuggestionRequested() {
-                navigationHelper.openOutfitSuggestionActivity(currentWeatherData);
+                navigationHelper.openOutfitSuggestionActivity(null);
             }
 
             @Override
@@ -303,7 +387,6 @@ public class MainActivity extends AppCompatActivity {
                 if (isHourlyView != isHourly) {
                     isHourlyView = isHourly;
                     uiSetupHelper.animateTabSelection(isHourly);
-                    updateForecastView();
                 }
             }
         });
@@ -313,146 +396,323 @@ public class MainActivity extends AppCompatActivity {
         isSearchVisible = !isSearchVisible;
         uiSetupHelper.toggleSearchBar(isSearchVisible);
     }
-
-
-
-    private void fetchAllWeatherData(String cityName) {
-        uiSetupHelper.showLoading();
-
-        weatherDataManager.fetchWeatherByCity(cityName, temperatureUnit, new WeatherDataManager.WeatherDataCallback() {
-            @Override
-            public void onWeatherSuccess(WeatherResponse response) {
-                currentWeatherData = response;
-                currentCityName = response.getName();
-
-                // Get coordinates
-                if (currentWeatherData.getCoord() != null) {
-                    currentLat = currentWeatherData.getCoord().getLat();
-                    currentLon = currentWeatherData.getCoord().getLon();
+    
+    /**
+     * Setup scroll listener with advanced parallax effects and smooth UI transitions
+     */
+    private void setupScrollListener() {
+        if (binding.mainScrollView != null) {
+            // Initially hide the city name in top bar
+            if (binding.tvTopBarCityName != null) {
+                binding.tvTopBarCityName.setAlpha(0f);
+                binding.tvTopBarCityName.setScaleX(0.9f);
+                binding.tvTopBarCityName.setScaleY(0.9f);
+            }
+            
+            binding.mainScrollView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                // Calculate scroll progress (0 to 1)
+                float scrollThreshold = 300f;
+                float scrollProgress = Math.min(1f, scrollY / scrollThreshold);
+                
+                // === 1. CITY NAME FADE IN (Top Bar) ===
+                if (binding.tvTopBarCityName != null) {
+                    if (scrollY > 50) {
+                        float cityNameAlpha = Math.min(1f, scrollY / 200f);
+                        binding.tvTopBarCityName.animate()
+                                .alpha(cityNameAlpha)
+                                .scaleX(0.9f + (0.1f * cityNameAlpha))
+                                .scaleY(0.9f + (0.1f * cityNameAlpha))
+                                .setDuration(0) // Instant for smooth scroll sync
+                                .start();
+                    } else {
+                        binding.tvTopBarCityName.animate()
+                                .alpha(0f)
+                                .scaleX(0.9f)
+                                .scaleY(0.9f)
+                                .setDuration(0)
+                                .start();
+                    }
                 }
-
-                updateUI(currentWeatherData);
-
-                // Fetch additional data
-                fetchHourlyForecast(cityName);
-                fetchUVIndex(currentLat, currentLon);
-                fetchAirQuality(currentLat, currentLon);
-            }
-
-            @Override
-            public void onWeatherError(String message) {
-                uiSetupHelper.showError(message);
-            }
-        });
+                
+                // === 2. PARALLAX BACKGROUND EFFECT ===
+                if (binding.ivBackgroundHeader != null) {
+                    // Background moves slower than scroll (parallax)
+                    float parallaxOffset = scrollY * 0.5f;
+                    binding.ivBackgroundHeader.setTranslationY(parallaxOffset);
+                    
+                    // Slight zoom out effect
+                    float scale = 1f + (scrollProgress * 0.05f);
+                    binding.ivBackgroundHeader.setScaleX(scale);
+                    binding.ivBackgroundHeader.setScaleY(scale);
+                }
+                
+                // === 3. WEATHER INFO FADE OUT (ONLY BIG TEMP) ===
+                // Only fade the large temperature/description, keep min opacity at 0.3
+                float weatherFadeThreshold = 200f;
+                float weatherAlpha = Math.max(0.3f, 1f - (scrollY / weatherFadeThreshold));
+                
+                if (binding.tvTemperature != null) {
+                    binding.tvTemperature.setAlpha(weatherAlpha);
+                    binding.tvTemperature.setTranslationY(-scrollY * 0.2f);
+                }
+                if (binding.tvWeatherDescription != null) {
+                    binding.tvWeatherDescription.setAlpha(weatherAlpha);
+                    binding.tvWeatherDescription.setTranslationY(-scrollY * 0.15f);
+                }
+                if (binding.tvTempRange != null) {
+                    binding.tvTempRange.setAlpha(weatherAlpha);
+                    binding.tvTempRange.setTranslationY(-scrollY * 0.1f);
+                }
+                
+                // === 4. TOP BAR ELEVATION & BACKGROUND ===
+                if (binding.topGlassBar != null) {
+                    // Increase elevation when scrolled
+                    float elevation = 8f + (scrollProgress * 8f); // 8dp to 16dp
+                    binding.topGlassBar.setElevation(elevation);
+                    
+                    // Slightly increase opacity of glass background
+                    float alpha = 0.85f + (scrollProgress * 0.15f); // More solid when scrolled
+                    binding.topGlassBar.setAlpha(alpha);
+                }
+                
+                // === 5. KEEP FORECAST & CARDS FULLY VISIBLE ===
+                // Don't fade out forecast and detail cards - keep them readable
+                if (binding.hourlyForecastContainer != null) {
+                    binding.hourlyForecastContainer.setAlpha(1f);
+                }
+                
+                // Keep weather detail section fully visible too
+                if (binding.weatherDetailsSection != null) {
+                    binding.weatherDetailsSection.setAlpha(1f);
+                }
+                
+                // Optional: Add subtle float up effect for cards when scrolling
+                if (scrollY > 100 && binding.weatherDetailsSection != null) {
+                    float cardTranslation = -(scrollY - 100) * 0.05f; // Very subtle
+                    binding.weatherDetailsSection.setTranslationY(Math.max(cardTranslation, -20f));
+                } else if (binding.weatherDetailsSection != null) {
+                    binding.weatherDetailsSection.setTranslationY(0f);
+                }
+            });
+        }
     }
 
-    private void fetchUVIndex(double lat, double lon) {
-        weatherDataManager.fetchUVIndex(lat, lon, new WeatherDataManager.UVIndexCallback() {
-            @Override
-            public void onUVIndexSuccess(int uvIndex) {
-                currentUVIndex = uvIndex;
-                uiUpdateHelper.updateUVIndexCard(currentUVIndex);
-            }
+    /**
+     * Update main UI immediately when a city is selected from SearchActivity
+     * and play ultra-smooth parallax animation with professional cascading effects.
+     */
+    // ============ UI Update Methods (MVVM) ============
 
-            @Override
-            public void onUVIndexError() {
-                currentUVIndex = 0;
-                uiUpdateHelper.updateUVIndexCard(currentUVIndex);
-            }
-        });
+    /**
+     * Update UI with WeatherData from ViewModel
+     */
+    private void updateWeatherUI(WeatherData data) {
+        try {
+            // Animate city name change
+            binding.tvTopBarCityName.animate()
+                    .alpha(0f)
+                    .setDuration(150)
+                    .withEndAction(() -> {
+                        binding.tvTopBarCityName.setText(data.getCityName());
+                        binding.tvTopBarCityName.animate().alpha(1f).setDuration(150).start();
+                    }).start();
+
+            binding.tvCityName.setText(data.getCityName() + ", " + data.getCountryCode());
+            
+            String tempSymbol = data.getTemperatureUnit().equals("celsius") ? "°C" : "°F";
+            binding.tvTemperature.setText(String.format("%.0f%s", data.getTemperature(), tempSymbol));
+            binding.tvWeatherDescription.setText(capitalize(data.getWeatherDescription()));
+            binding.tvTempRange.setText(String.format("H: %.0f° L: %.0f°", 
+                data.getMaxTemperature(), data.getMinTemperature()));
+            
+            // Update favorite icon
+            favoritesHelper.updateFavoriteIcon(data.getCityName());
+            
+            // Animate entrance
+            animateWeatherEntrance();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void fetchAirQuality(double lat, double lon) {
-        weatherDataManager.fetchAirQuality(lat, lon, new WeatherDataManager.AirQualityCallback() {
-            @Override
-            public void onAirQualitySuccess(AirQualityResponse.AirQualityData data) {
-                currentAQIData = data;
-                uiUpdateHelper.updateAirQualityCard(currentAQIData);
-            }
-
-            @Override
-            public void onAirQualityError() {
-                // Keep default AQI if API fails
-            }
-        });
+    /**
+     * Update UI with ForecastData from ViewModel
+     */
+    private void updateForecastUI(ForecastData data) {
+        uiSetupHelper.showWeatherDetails();
     }
 
-    private void fetchHourlyForecast(String cityName) {
-        weatherDataManager.fetchHourlyForecast(cityName, temperatureUnit, new WeatherDataManager.ForecastCallback() {
-            @Override
-            public void onForecastSuccess(HourlyForecastResponse response) {
-                hourlyForecastData = response;
-                updateForecastView();
-                uiSetupHelper.showWeatherDetails();
-            }
-
-            @Override
-            public void onForecastError(String message) {
-                uiSetupHelper.showWeatherDetails();
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
-            }
-        });
+    /**
+     * Update UV Index UI
+     */
+    private void updateUVIndexUI(int uvIndex) {
+        uiUpdateHelper.updateUVIndexCard(uvIndex);
     }
 
-    private void fetchHourlyForecastByCoordinates(double lat, double lon) {
-        weatherDataManager.fetchHourlyForecastByCoordinates(lat, lon, temperatureUnit, new WeatherDataManager.ForecastCallback() {
-            @Override
-            public void onForecastSuccess(HourlyForecastResponse response) {
-                hourlyForecastData = response;
-                updateForecastView();
-                uiSetupHelper.showWeatherDetails();
-            }
+    /**
+     * Update Air Quality UI  
+     */
+    private void updateAirQualityUI(AirQualityData data) {
+        // Air quality data received and ready for display
+    }
 
-            @Override
-            public void onForecastError(String message) {
-                uiSetupHelper.showWeatherDetails();
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
-            }
-        });
+    /**
+     * Show loading state
+     */
+    private void showLoading() {
+        if (binding.weatherDetailsSection != null) {
+            binding.weatherDetailsSection.animate()
+                    .alpha(0.5f)
+                    .setDuration(200)
+                    .start();
+        }
+        uiSetupHelper.showLoading();
+    }
+
+    /**
+     * Hide loading and show content
+     */
+    private void hideLoading() {
+        if (binding.weatherDetailsSection != null) {
+            binding.weatherDetailsSection.animate()
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start();
+        }
+        uiSetupHelper.showWeatherDetails();
+    }
+
+    /**
+     * Show error message
+     */
+    private void showError(String message) {
+        uiSetupHelper.showError(message);
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
 
 
-    private void updateForecastView() {
-        if (currentWeatherData == null) return;
-
-        if (hourlyForecastData != null) {
-            if (isHourlyView) {
-                forecastViewManager.createHourlyForecastView(hourlyForecastData);
-            } else {
-                forecastViewManager.createWeeklyForecastView(hourlyForecastData);
-            }
+    /**
+     * Animate weather details entrance
+     */
+    private void animateWeatherEntrance() {
+        if (binding.weatherDetailsSection != null) {
+            binding.weatherDetailsSection.setAlpha(0f);
+            binding.weatherDetailsSection.animate()
+                    .alpha(1f)
+                    .setDuration(400)
+                    .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                    .withEndAction(this::animateCardsEntrance)
+                    .start();
         } else {
-            showForecastUnavailable();
+            animateCardsEntrance();
         }
     }
-
-    private void showForecastUnavailable() {
-        binding.hourlyForecastContainer.removeAllViews();
-        Toast.makeText(this, "Forecast data is currently unavailable", Toast.LENGTH_SHORT).show();
-    }
-
-
-    private void updateUI(WeatherResponse weatherData) {
-        // Update main weather info
-        uiUpdateHelper.updateMainWeatherInfo(weatherData);
-
-        // Update favorite icon
-        favoritesHelper.updateFavoriteIcon(currentCityName);
-
-        // Update forecast summary
-        TextView tvForecastSummary = binding.getRoot().findViewById(R.id.tvForecastSummary);
-        if (tvForecastSummary != null && weatherData.getWeather() != null && !weatherData.getWeather().isEmpty()) {
-            String weatherCondition = weatherData.getWeather().get(0).getMain().toLowerCase();
-            String summary = ForecastSummaryGenerator.generateSummary(weatherCondition, hourlyForecastData);
-            tvForecastSummary.setText(summary);
+    
+    /**
+     * Animate cards entrance with staggered bounce effect
+     */
+    private void animateCardsEntrance() {
+        // Find all card views
+        android.view.View[] cards = new android.view.View[] {
+            binding.getRoot().findViewById(R.id.card_air_quality),
+            binding.getRoot().findViewById(R.id.cardUvIndex),
+            binding.getRoot().findViewById(R.id.cardSunrise),
+            binding.getRoot().findViewById(R.id.cardWind),
+            binding.getRoot().findViewById(R.id.cardRainfall),
+            binding.getRoot().findViewById(R.id.cardFeelsLike),
+            binding.getRoot().findViewById(R.id.cardHumidity),
+            binding.getRoot().findViewById(R.id.cardVisibility),
+            binding.getRoot().findViewById(R.id.cardPressure)
+        };
+        
+        int delay = 0;
+        for (android.view.View card : cards) {
+            if (card != null) {
+                // Start from invisible and scaled down
+                card.setAlpha(0f);
+                card.setScaleX(0.9f);
+                card.setScaleY(0.9f);
+                card.setTranslationY(30f);
+                
+                // Animate in with bounce
+                card.animate()
+                        .alpha(1f)
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .translationY(0f)
+                        .setStartDelay(delay)
+                        .setDuration(500)
+                        .setInterpolator(new android.view.animation.OvershootInterpolator(0.8f))
+                        .start();
+                
+                delay += 50; // Stagger by 50ms each
+            }
         }
-
-        // Update weather detail cards
-        uiUpdateHelper.updateWeatherDetailsCards(weatherData);
-
-        // Update widget
-        updateWeatherWidget(weatherData);
+    }
+    
+    /**
+     * Setup press animations for all interactive buttons
+     */
+    private void setupPressAnimations() {
+        // Top bar buttons
+        UISetupHelper.addPressAnimation(binding.btnSearchIcon);
+        UISetupHelper.addPressAnimation(binding.btnSettingsIcon);
+        if (binding.btnFavoritesIcon != null) {
+            UISetupHelper.addPressAnimation(binding.btnFavoritesIcon);
+        }
+        
+        // Action buttons
+        if (binding.btnViewCharts != null) {
+            UISetupHelper.addPressAnimation(binding.btnViewCharts);
+        }
+        if (binding.btnOutfitSuggestion != null) {
+            UISetupHelper.addPressAnimation(binding.btnOutfitSuggestion);
+        }
+        if (binding.fabAddToFavorites != null) {
+            UISetupHelper.addPressAnimation(binding.fabAddToFavorites);
+        }
+        
+        // Tab buttons
+        if (binding.btnHourly != null) {
+            UISetupHelper.addPressAnimation(binding.btnHourly);
+        }
+        if (binding.btnWeekly != null) {
+            UISetupHelper.addPressAnimation(binding.btnWeekly);
+        }
+    }
+    
+    /**
+     * Apply flagship-level visual effects
+     */
+    private void applyFlagshipEffects() {
+        // Enhanced top bar with depth
+        if (binding.topGlassBar != null) {
+            FlagshipEffectsHelper.addDepthShadow(binding.topGlassBar);
+        }
+        
+        // Premium FAB with glow
+        if (binding.fabAddToFavorites != null) {
+            FlagshipEffectsHelper.addGlow(
+                binding.fabAddToFavorites, 
+                android.graphics.Color.parseColor("#509E4CFF"), 
+                16f
+            );
+        }
+        
+        // Enhanced cards
+        android.view.View[] premiumCards = new android.view.View[] {
+            binding.getRoot().findViewById(R.id.card_air_quality),
+            binding.getRoot().findViewById(R.id.btnViewCharts),
+            binding.getRoot().findViewById(R.id.btnOutfitSuggestion)
+        };
+        
+        for (android.view.View card : premiumCards) {
+            if (card != null) {
+                FlagshipEffectsHelper.enhanceCard(card);
+            }
+        }
     }
 
 
@@ -471,9 +731,7 @@ public class MainActivity extends AppCompatActivity {
         locationHelper.getCurrentLocation(new LocationHelper.OnLocationResultListener() {
             @Override
             public void onLocationReceived(double latitude, double longitude) {
-                currentLat = latitude;
-                currentLon = longitude;
-                fetchWeatherByCoordinates(latitude, longitude);
+                viewModel.loadWeatherByCoordinates(latitude, longitude);
             }
 
             @Override
@@ -483,42 +741,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchWeatherByCoordinates(double lat, double lon) {
-        uiSetupHelper.showLoading();
-
-        weatherDataManager.fetchWeatherByCoordinates(lat, lon, temperatureUnit, new WeatherDataManager.WeatherDataCallback() {
-            @Override
-            public void onWeatherSuccess(WeatherResponse response) {
-                currentWeatherData = response;
-                currentCityName = response.getName();
-                currentLat = lat;
-                currentLon = lon;
-
-                // Save city name
-                sharedPreferences.edit().putString("last_city", currentCityName).apply();
-
-                updateUI(currentWeatherData);
-                fetchHourlyForecastByCoordinates(lat, lon);
-                fetchUVIndex(lat, lon);
-                fetchAirQuality(lat, lon);
-            }
-
-            @Override
-            public void onWeatherError(String message) {
-                uiSetupHelper.showError(message);
-            }
-        });
-    }
-
-    private void updateWeatherWidget(WeatherResponse weatherData) {
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-        ComponentName thisWidget = new ComponentName(this, WeatherWidget.class);
-        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
-
-        for (int appWidgetId : appWidgetIds) {
-            // Update each widget instance
-            WeatherWidget.updateWidget(this, appWidgetManager, appWidgetId, weatherData);
-        }
+    private String capitalize(String text) {
+        if (text == null || text.isEmpty()) return text;
+        return text.substring(0, 1).toUpperCase() + text.substring(1);
     }
 
 

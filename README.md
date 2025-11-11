@@ -1,6 +1,6 @@
 # Weather App 🌤️
 
-Ứng dụng thời tiết Android với thiết kế glassmorphism phong cách iOS, dữ liệu thời tiết real-time và gợi ý trang phục thông minh bằng AI.
+Ứng dụng thời tiết Android với kiến trúc MVVM + Clean Architecture, thiết kế glassmorphism phong cách iOS, offline caching với Room Database, và dữ liệu thời tiết real-time.
 
 ## ✨ Tính Năng
 
@@ -12,6 +12,7 @@
 - 🌅 **Thời Gian Mặt Trời Mọc/Lặn** - Hiển thị sunrise/sunset đẹp mắt
 - 💨 **Chỉ Số Chất Lượng Không Khí** - Theo dõi AQI khu vực của bạn
 - ⚠️ **Cảnh Báo Thời Tiết** - Thông báo về các cảnh báo thời tiết nguy hiểm
+- 📶 **Offline Mode** - Cache thời tiết với Room Database, hoạt động không cần internet
 
 ### Tính Năng Premium
 - 👔 **Gợi Ý Trang Phục AI** - Đề xuất quần áo thông minh dựa trên thời tiết
@@ -36,60 +37,152 @@
 - Chỉ báo thời tiết dựa trên icon
 - Layout responsive cho mọi kích thước màn hình
 
-## 🏗️ Kiến Trúc Dự Án
+## 🏗️ Kiến Trúc: MVVM + Clean Architecture
 
+### Architecture Overview
+```
+┌─────────────────────────────────────────────────────────┐
+│                  PRESENTATION LAYER                      │
+│  ┌──────────────┐         ┌────────────────────┐       │
+│  │   Activity   │◄────────│     ViewModel      │       │
+│  │  (UI/View)   │ observe │  (Business Logic)  │       │
+│  └──────────────┘         └────────────────────┘       │
+└────────────────────────┬────────────────────────────────┘
+                         │ uses
+┌────────────────────────▼────────────────────────────────┐
+│                    DOMAIN LAYER                          │
+│  ┌──────────────┐    ┌─────────────┐   ┌────────────┐ │
+│  │   UseCase    │───►│ Repository  │   │   Models   │ │
+│  │  (Business   │    │ (Interface) │   │  (Entities)│ │
+│  │    Logic)    │    └─────────────┘   └────────────┘ │
+└────────────────────────┬────────────────────────────────┘
+                         │ implements
+┌────────────────────────▼────────────────────────────────┐
+│                     DATA LAYER                           │
+│  ┌─────────────────┐  ┌──────────┐  ┌──────────────┐  │
+│  │  Repository     │──│  Mapper  │  │ API Service  │  │
+│  │ Implementation  │  └──────────┘  └──────────────┘  │
+│  └────────┬────────┘                                    │
+│           │                                              │
+│  ┌────────▼─────────┐         ┌──────────────────┐    │
+│  │  Room Database   │         │  Network (API)   │    │
+│  │  (Local Cache)   │         │   (Retrofit)     │    │
+│  └──────────────────┘         └──────────────────┘    │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Project Structure
 ```
 app/src/main/java/com/example/weatherapp/
-├── ui/
-│   ├── activities/          # Các Activity
-│   │   ├── MainActivity.java
-│   │   ├── SettingsActivity.java
-│   │   ├── SearchActivity.java
-│   │   ├── OutfitSuggestionActivity.java
-│   │   ├── WeatherDetailsActivity.java
-│   │   ├── ChartsActivity.java
-│   │   └── FavoriteCitiesActivity.java
-│   └── adapters/           # Các Adapter
-│       ├── OutfitSuggestionAdapter.java
-│       └── CityWeatherAdapter.java
-├── data/
-│   ├── models/             # Data Models
-│   │   ├── HourlyForecast.java
-│   │   ├── WeeklyForecast.java
-│   │   ├── WeatherAlert.java
-│   │   ├── OutfitSuggestion.java
-│   │   ├── FavoriteCity.java
-│   │   └── CityWeather.java
-│   ├── api/                # API Services
+├── presentation/               # Presentation Layer (MVVM)
+│   ├── viewmodel/
+│   │   ├── MainViewModel.java
+│   │   └── MainViewModelFactory.java
+│   └── state/
+│       └── UIState.java       # Sealed class for UI states
+│
+├── domain/                    # Domain Layer (Business Logic)
+│   ├── model/
+│   │   ├── WeatherData.java
+│   │   ├── ForecastData.java
+│   │   └── AirQualityData.java
+│   ├── repository/
+│   │   └── WeatherRepository.java  # Interface
+│   └── usecase/
+│       ├── GetWeatherByCityUseCase.java
+│       ├── GetWeatherByCoordinatesUseCase.java
+│       ├── GetForecastUseCase.java
+│       ├── GetUVIndexUseCase.java
+│       └── GetAirQualityUseCase.java
+│
+├── data/                      # Data Layer (Implementation)
+│   ├── repository/
+│   │   └── implementation/
+│   │       └── WeatherRepositoryImpl.java
+│   ├── local/                 # Room Database
+│   │   ├── database/
+│   │   │   └── WeatherDatabase.java
+│   │   ├── dao/
+│   │   │   └── WeatherDao.java
+│   │   ├── entity/
+│   │   │   └── WeatherCacheEntity.java
+│   │   └── mapper/
+│   │       └── CacheMapper.java
+│   ├── api/                   # Network Layer
 │   │   ├── WeatherApiService.java
-│   │   ├── OpenAIService.java
 │   │   └── RetrofitClient.java
-│   └── responses/          # API Response Models
-│       ├── WeatherResponse.java
-│       ├── HourlyForecastResponse.java
-│       ├── WeatherAlertsResponse.java
-│       ├── UVIndexResponse.java
-│       ├── AirQualityResponse.java
-│       ├── OpenAIResponse.java
-│       └── OpenAIRequest.java
-├── utils/                  # Utility Classes
-│   ├── LocaleHelper.java
-│   ├── BlurHelper.java
-│   ├── FavoriteCitiesManager.java
-│   └── OutfitSuggestionService.java
-├── notification/           # Notification System
-│   ├── WeatherNotificationManager.java
-│   ├── WeatherNotificationWorker.java
-│   └── NotificationReceiver.java
-└── widget/                 # Home Screen Widget
-    └── WeatherWidget.java
+│   ├── responses/             # API Response Models
+│   │   ├── WeatherResponse.java
+│   │   ├── ForecastResponse.java
+│   │   └── AirQualityResponse.java
+│   └── mapper/
+│       └── DomainMapper.java  # API → Domain conversion
+│
+└── ui/                        # UI Components
+    ├── activities/
+    │   ├── MainActivity.java
+    │   ├── SettingsActivity.java
+    │   ├── SearchActivity.java
+    │   ├── OutfitSuggestionActivity.java
+    │   ├── WeatherDetailsActivity.java
+    │   ├── ChartsActivity.java
+    │   └── FavoriteCitiesActivity.java
+    ├── adapters/
+    │   ├── OutfitSuggestionAdapter.java
+    │   └── CityWeatherAdapter.java
+    └── helpers/
+        ├── UIUpdateHelper.java
+        ├── UISetupHelper.java
+        └── ForecastViewManager.java
 ```
 
-## 🛠️ Công Nghệ
+### Key Architecture Components
 
-- **Ngôn Ngữ**: Java
-- **Nền Tảng**: Android (API 24+)
-- **Kiến Trúc**: Clean Architecture với package structure chuẩn
+#### 1. Presentation Layer (MVVM)
+- **ViewModel**: Quản lý UI state và business logic
+- **LiveData**: Observable data holder cho reactive UI
+- **UIState**: Sealed class cho type-safe state management (Loading, Success, Error)
+
+#### 2. Domain Layer (Pure Business Logic)
+- **Models**: Domain entities không phụ thuộc framework
+- **Repository Interface**: Contract cho data operations
+- **UseCases**: Encapsulate business rules
+
+#### 3. Data Layer (Implementation Details)
+- **Repository Implementation**: Implement domain repository
+- **Room Database**: Local caching với cache-first strategy
+- **Retrofit**: Network API calls
+- **Mappers**: Convert giữa layers (API → Domain, Entity → Domain)
+
+### Cache Strategy
+- ✅ **Cache-first**: Check cache trước, network sau
+- ✅ **Auto-invalidation**: Cache expire sau 10 phút
+- ✅ **Offline fallback**: Trả về expired cache khi network fail
+- ✅ **Background operations**: Tất cả DB ops chạy background thread
+
+## 📚 Tech Stack
+
+### Architecture & Patterns
+- **Architecture**: MVVM + Clean Architecture (3 layers)
+- **Language**: Java 11
+- **Min SDK**: API 24 (Android 7.0)
+- **Target SDK**: API 36
+
+### Core Libraries
+- **Lifecycle**: AndroidX Lifecycle 2.7.0 (ViewModel, LiveData)
+- **Room**: 2.6.1 (Local database caching)
+- **Coroutines**: Kotlin Coroutines 1.7.3 (Async operations)
+- **Retrofit**: 2.9.0 (Network calls)
+- **Gson**: 2.10.1 (JSON parsing)
+
+### Testing
+- **JUnit**: Unit testing framework
+- **Mockito**: 5.7.0 (Mocking for tests)
+- **AndroidX Arch Core Testing**: 2.2.0 (LiveData testing)
+- **Coroutines Test**: 1.7.3 (Async testing)
+
+### APIs
+- **OpenWeatherMap API**: Weather, Forecast, UV, Air Quality data
 - **UI Framework**: Native Android XML layouts
 - **Weather API**: OpenWeatherMap API
 - **AI API**: OpenAI GPT cho gợi ý trang phục

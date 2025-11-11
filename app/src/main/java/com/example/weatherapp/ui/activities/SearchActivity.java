@@ -18,6 +18,8 @@ import com.example.weatherapp.data.models.CityWeather;
 import com.example.weatherapp.databinding.ActivitySearchBinding;
 import com.example.weatherapp.ui.adapters.CityWeatherAdapter;
 import com.example.weatherapp.ui.helpers.LocationHelper;
+import com.example.weatherapp.ui.helpers.RecyclerViewScrollAnimator;
+import com.example.weatherapp.ui.helpers.SlideInItemAnimator;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
@@ -174,6 +176,18 @@ public class SearchActivity extends AppCompatActivity {
         CityWeatherAdapter adapter = new CityWeatherAdapter(cityList, this::onCityClick);
         binding.recyclerViewCities.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerViewCities.setAdapter(adapter);
+        
+        // Add slide-in animation for items
+        binding.recyclerViewCities.setItemAnimator(new SlideInItemAnimator());
+        
+        // Add scroll animator for smooth entrance
+        RecyclerViewScrollAnimator scrollAnimator = new RecyclerViewScrollAnimator();
+        binding.recyclerViewCities.addOnScrollListener(scrollAnimator);
+        
+        // Trigger initial animation after layout
+        binding.recyclerViewCities.post(() -> {
+            scrollAnimator.onInitialLoadComplete();
+        });
     }
 
     private void onCityClick(CityWeather city) {

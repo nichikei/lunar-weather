@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Expanded title style (large, when AppBar is expanded) -->
+    <style name="TextAppearance.App.CollapsingToolbar.Expanded" parent="TextAppearance.AppCompat.Display1">
+        <item name="android:textSize">48sp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <!-- Collapsed title style (small, when AppBar is collapsed) -->
+    <style name="TextAppearance.App.CollapsingToolbar.Collapsed" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

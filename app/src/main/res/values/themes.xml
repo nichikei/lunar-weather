@@ -42,7 +42,21 @@
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>
     </style>
 
-    <style name="Theme.WeatherApp" parent="Base.Theme.WeatherApp" />
+    <style name="Theme.WeatherApp" parent="Base.Theme.WeatherApp">
+        <!-- Flagship: Edge-to-edge immersive experience -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+    </style>
+    
+    <!-- Theme for WeatherDetailActivity without ActionBar -->
+    <style name="Theme.WeatherApp.NoActionBar" parent="Theme.WeatherApp">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
 
     <!-- ========== LUXURY THEME (Transparent System Bars) ========== -->
 

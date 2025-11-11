@@ -20,6 +20,7 @@ import com.example.weatherapp.data.models.CityWeather;
 import com.example.weatherapp.data.models.FavoriteCity;
 import com.example.weatherapp.domain.repository.FavoriteCitiesManager;
 import com.example.weatherapp.ui.activities.FavoriteCitiesActivity;
+import com.example.weatherapp.ui.helpers.RecyclerViewItemAnimator;
 
 import java.util.List;
 import java.util.Locale;
@@ -30,6 +31,8 @@ public class CityWeatherAdapter extends RecyclerView.Adapter<CityWeatherAdapter.
     private final List<CityWeather> cityList;
     private final OnCityClickListener listener;
     private FavoriteCitiesManager favoriteCitiesManager;
+    private RecyclerViewItemAnimator itemAnimator;
+    private int lastPosition = -1;
 
     public interface OnCityClickListener {
         void onCityClick(CityWeather city);
@@ -38,6 +41,7 @@ public class CityWeatherAdapter extends RecyclerView.Adapter<CityWeatherAdapter.
     public CityWeatherAdapter(List<CityWeather> cityList, OnCityClickListener listener) {
         this.cityList = cityList;
         this.listener = listener;
+        this.itemAnimator = new RecyclerViewItemAnimator();
     }
 
     @NonNull
@@ -148,7 +152,36 @@ public class CityWeatherAdapter extends RecyclerView.Adapter<CityWeatherAdapter.
             }
         });
 
-        holder.itemView.setOnClickListener(v -> listener.onCityClick(city));
+        // Khi click vào card: gọi listener để hiển thị trên MainActivity
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onCityClick(city);
+            }
+        });
+
+        // Apply smooth slide-in and fade-in animation
+        animateItem(holder.itemView, position);
+    }
+
+    /**
+     * Animate item with smooth slide and fade effect
+     */
+    private void animateItem(View view, int position) {
+        if (position > lastPosition) {
+            lastPosition = position;
+            itemAnimator.animateSlideAndScale(view, position);
+        } else {
+            // Clear animation for recycled views
+            RecyclerViewItemAnimator.clearAnimation(view);
+        }
+    }
+
+    /**
+     * Reset animation state (call when data changes)
+     */
+    public void resetAnimation() {
+        lastPosition = -1;
+        itemAnimator.reset();
     }
 
     @Override
