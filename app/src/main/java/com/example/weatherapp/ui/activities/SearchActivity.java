@@ -11,11 +11,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.weatherapp.R;
 import com.example.weatherapp.data.models.CityWeather;
 import com.example.weatherapp.databinding.ActivitySearchBinding;
+import com.example.weatherapp.presentation.state.UIState;
+import com.example.weatherapp.presentation.viewmodel.SearchViewModel;
 import com.example.weatherapp.ui.adapters.CityWeatherAdapter;
 import com.example.weatherapp.ui.helpers.LocationHelper;
 import com.example.weatherapp.ui.helpers.RecyclerViewScrollAnimator;
@@ -25,10 +28,15 @@ import com.google.android.gms.location.LocationServices;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * SearchActivity with MVVM pattern
+ * Allows users to search for cities or use current location
+ */
 public class SearchActivity extends AppCompatActivity {
 
     private ActivitySearchBinding binding;
-    private List<CityWeather> cityList;
+    private SearchViewModel viewModel;
+    private CityWeatherAdapter adapter;
     private LocationHelper locationHelper;
     
     public static final String EXTRA_CITY_NAME = "city_name";
@@ -43,10 +51,68 @@ public class SearchActivity extends AppCompatActivity {
         binding = ActivitySearchBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+        
         locationHelper = new LocationHelper(this, LocationServices.getFusedLocationProviderClient(this));
 
+        setupObservers();
         setupListeners();
-        setupCityList();
+        setupRecyclerView();
+        
+        // Load popular cities
+        viewModel.loadPopularCities();
+    }
+    
+    /**
+     * Setup LiveData observers (MVVM pattern)
+     */
+    private void setupObservers() {
+        // Observe cities state
+        viewModel.getCitiesState().observe(this, state -> {
+            if (state instanceof UIState.Loading) {
+                // Show loading if needed
+            } else if (state instanceof UIState.Success) {
+                List<CityWeather> cities = ((UIState.Success<List<CityWeather>>) state).getData();
+                updateCitiesList(cities);
+            } else if (state instanceof UIState.Error) {
+                String error = ((UIState.Error<List<CityWeather>>) state).getMessage();
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        // Observe location state
+        viewModel.getLocationState().observe(this, state -> {
+            if (state instanceof UIState.Success) {
+                SearchViewModel.LocationData location = ((UIState.Success<SearchViewModel.LocationData>) state).getData();
+                returnLocationToMain(location.getLatitude(), location.getLongitude());
+            } else if (state instanceof UIState.Error) {
+                String error = ((UIState.Error<SearchViewModel.LocationData>) state).getMessage();
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    
+    /**
+     * Setup RecyclerView with adapter
+     */
+    private void setupRecyclerView() {
+        adapter = new CityWeatherAdapter(new ArrayList<>(), this::onCitySelected);
+        binding.recyclerViewCities.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerViewCities.setAdapter(adapter);
+        binding.recyclerViewCities.setItemAnimator(new SlideInItemAnimator());
+        
+        // Add scroll animator
+        RecyclerViewScrollAnimator scrollAnimator = new RecyclerViewScrollAnimator();
+        binding.recyclerViewCities.addOnScrollListener(scrollAnimator);
+    }
+    
+    /**
+     * Update cities list in adapter
+     */
+    private void updateCitiesList(List<CityWeather> cities) {
+        adapter = new CityWeatherAdapter(cities, this::onCitySelected);
+        binding.recyclerViewCities.setAdapter(adapter);
     }
 
     private void setupListeners() {
@@ -56,7 +122,7 @@ public class SearchActivity extends AppCompatActivity {
         // Search button click
         binding.btnSearchIcon.setOnClickListener(v -> {
             String query = binding.etSearch.getText().toString().trim();
-            if (!query.isEmpty()) {
+            if (viewModel.validateCitySearch(query)) {
                 searchCity(query);
             } else {
                 Toast.makeText(this, "Please enter a city name", Toast.LENGTH_SHORT).show();
@@ -74,7 +140,7 @@ public class SearchActivity extends AppCompatActivity {
                     actionId == EditorInfo.IME_ACTION_DONE ||
                     (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
                 String query = binding.etSearch.getText().toString().trim();
-                if (!query.isEmpty()) {
+                if (viewModel.validateCitySearch(query)) {
                     searchCity(query);
                     return true;
                 } else {
@@ -102,12 +168,12 @@ public class SearchActivity extends AppCompatActivity {
         locationHelper.getCurrentLocation(new LocationHelper.OnLocationResultListener() {
             @Override
             public void onLocationReceived(double latitude, double longitude) {
-                returnLocationToMain(latitude, longitude);
+                viewModel.setLocation(latitude, longitude);
             }
 
             @Override
             public void onLocationError(String message) {
-                Toast.makeText(SearchActivity.this, message, Toast.LENGTH_SHORT).show();
+                viewModel.setLocationError(message);
             }
         });
     }
@@ -127,71 +193,10 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
-    private void setupCityList() {
-        // Popular cities with consistent gradient matching Figma design
-        cityList = new ArrayList<>();
-
-        // All cities use the same radial gradient for consistency
-        cityList.add(new CityWeather("Montreal", "Canada", "Mid Rain",
-                19, 24, 18,
-                R.drawable.moon_cloud_mid_rain,
-                R.drawable.weather_detail_card_background));
-
-        cityList.add(new CityWeather("Toronto", "Canada", "Fast Wind",
-                20, 21, 15,
-                R.drawable.moon_cloud_fast_wind,
-                R.drawable.weather_detail_card_background));
-
-        cityList.add(new CityWeather("Tokyo", "Japan", "Showers",
-                13, 16, 8,
-                R.drawable.sun_cloud_angled_rain,
-                R.drawable.weather_detail_card_background));
-
-        cityList.add(new CityWeather("Singapore", "Singapore", "Partly Cloudy",
-                31, 36, 26,
-                R.drawable.sun_cloud_mid_rain,
-                R.drawable.weather_detail_card_background));
-
-        cityList.add(new CityWeather("Paris", "France", "Clear Sky",
-                18, 22, 14,
-                R.drawable.sun_cloud_little_rain,
-                R.drawable.weather_detail_card_background));
-
-        cityList.add(new CityWeather("New York", "United States", "Cloudy",
-                16, 19, 12,
-                R.drawable.moon_cloud_mid_rain,
-                R.drawable.weather_detail_card_background));
-
-        cityList.add(new CityWeather("London", "United Kingdom", "Rainy",
-                12, 15, 9,
-                R.drawable.big_rain_drops,
-                R.drawable.weather_detail_card_background));
-
-        cityList.add(new CityWeather("Hanoi", "Vietnam", "Hot & Sunny",
-                32, 35, 28,
-                R.drawable.sun_cloud_little_rain,
-                R.drawable.weather_detail_card_background));
-
-        // Setup RecyclerView
-        CityWeatherAdapter adapter = new CityWeatherAdapter(cityList, this::onCityClick);
-        binding.recyclerViewCities.setLayoutManager(new LinearLayoutManager(this));
-        binding.recyclerViewCities.setAdapter(adapter);
-        
-        // Add slide-in animation for items
-        binding.recyclerViewCities.setItemAnimator(new SlideInItemAnimator());
-        
-        // Add scroll animator for smooth entrance
-        RecyclerViewScrollAnimator scrollAnimator = new RecyclerViewScrollAnimator();
-        binding.recyclerViewCities.addOnScrollListener(scrollAnimator);
-        
-        // Trigger initial animation after layout
-        binding.recyclerViewCities.post(() -> {
-            scrollAnimator.onInitialLoadComplete();
-        });
-    }
-
-    private void onCityClick(CityWeather city) {
-        // Return selected city to MainActivity
+    /**
+     * Handle city selection from list
+     */
+    private void onCitySelected(CityWeather city) {
         returnCityToMain(city.getCityName());
     }
 

@@ -6,17 +6,24 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.work.WorkManager;
 
 import com.example.weatherapp.databinding.ActivitySettingsBinding;
 import com.example.weatherapp.notification.WeatherNotificationManager;
 import com.example.weatherapp.notification.WeatherNotificationWorker;
+import com.example.weatherapp.presentation.viewmodel.SettingsViewModel;
 import com.example.weatherapp.ui.helpers.PreferenceHelper;
 import com.example.weatherapp.utils.LocaleHelper;
 
+/**
+ * SettingsActivity with MVVM pattern
+ * Manages app settings with reactive updates
+ */
 public class SettingsActivity extends AppCompatActivity {
 
     private ActivitySettingsBinding binding;
+    private SettingsViewModel viewModel;
     private SharedPreferences sharedPreferences;
     private PreferenceHelper preferenceHelper;
     
@@ -39,11 +46,39 @@ public class SettingsActivity extends AppCompatActivity {
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
+        
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        viewModel.init(sharedPreferences);
+        
         preferenceHelper = new PreferenceHelper(sharedPreferences, this::onPreferenceChanged);
 
         setupToolbar();
+        setupObservers();
         setupListeners();
+    }
+    
+    /**
+     * Setup LiveData observers (MVVM pattern)
+     */
+    private void setupObservers() {
+        // Observe settings changes
+        viewModel.getSettingsChanged().observe(this, changed -> {
+            if (changed) {
+                onPreferenceChanged();
+            }
+        });
+        
+        // Observe temperature unit changes
+        viewModel.getTemperatureUnit().observe(this, unit -> {
+            // UI already updated by PreferenceHelper
+        });
+        
+        // Observe other settings if needed
+        viewModel.getNotificationsEnabled().observe(this, enabled -> {
+            // Handle notification state changes
+        });
     }
 
     private void setupToolbar() {
