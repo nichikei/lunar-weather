@@ -248,6 +248,18 @@ public class MainViewModel extends ViewModel {
         return currentLongitude;
     }
     
+    /**
+     * Get current WeatherData from state
+     * @return Current WeatherData or null if not available
+     */
+    public WeatherData getCurrentWeatherData() {
+        UIState<WeatherData> state = weatherState.getValue();
+        if (state instanceof UIState.Success) {
+            return ((UIState.Success<WeatherData>) state).getData();
+        }
+        return null;
+    }
+    
     @Override
     protected void onCleared() {
         super.onCleared();

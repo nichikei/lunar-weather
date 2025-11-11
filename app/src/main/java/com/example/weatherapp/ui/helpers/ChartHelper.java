@@ -1,6 +1,6 @@
 package com.example.weatherapp.ui.helpers;
 
-import com.example.weatherapp.data.responses.HourlyForecastResponse;
+import com.example.weatherapp.domain.model.ForecastData;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -18,6 +18,7 @@ import java.util.TimeZone;
 /**
  * Helper class for chart configuration and data preparation
  * Reduces code duplication in chart setup
+ * REFACTORED: Now uses domain model ForecastData instead of data layer HourlyForecastResponse
  */
 public class ChartHelper {
     
@@ -45,24 +46,60 @@ public class ChartHelper {
     }
     
     /**
-     * Interface for extracting values from hourly forecast items
+     * Interface for extracting values from hourly forecast items (domain model)
      */
     public interface ValueExtractor {
-        float getValue(HourlyForecastResponse.HourlyItem item);
+        float getValue(ForecastData.HourlyForecast item);
     }
     
     /**
-     * Prepare chart entries from hourly forecast data
+     * Legacy interface for backward compatibility with HourlyForecastResponse
+     * @deprecated Use ValueExtractor with ForecastData.HourlyForecast instead
      */
-    public static List<Entry> prepareChartEntries(HourlyForecastResponse forecastData, 
+    @Deprecated
+    public interface LegacyValueExtractor {
+        float getValue(com.example.weatherapp.data.responses.HourlyForecastResponse.HourlyItem item);
+    }
+    
+    /**
+     * Prepare chart entries from forecast data
+     * @param hourlyForecasts List of HourlyForecast from domain layer
+     * @param maxCount Maximum number of entries to include
+     * @param extractor Function to extract value from each HourlyForecast item
+     * @return List of chart entries
+     */
+    public static List<Entry> prepareChartEntries(List<ForecastData.HourlyForecast> hourlyForecasts, 
                                                    int maxCount,
                                                    ValueExtractor extractor) {
+        List<Entry> entries = new ArrayList<>();
+        if (hourlyForecasts == null || hourlyForecasts.isEmpty()) {
+            return entries;
+        }
+        
+        int count = Math.min(maxCount, hourlyForecasts.size());
+        
+        for (int i = 0; i < count; i++) {
+            float value = extractor.getValue(hourlyForecasts.get(i));
+            entries.add(new Entry(i, value));
+        }
+        
+        return entries;
+    }
+    
+    /**
+     * LEGACY: Prepare chart entries from HourlyForecastResponse
+     * @deprecated Migrate to domain model version using ForecastData.HourlyForecast
+     */
+    @Deprecated
+    public static List<Entry> prepareChartEntries(com.example.weatherapp.data.responses.HourlyForecastResponse forecastData,
+                                                   int maxCount,
+                                                   LegacyValueExtractor extractor) {
         List<Entry> entries = new ArrayList<>();
         if (forecastData == null || forecastData.getList() == null) {
             return entries;
         }
         
-        List<HourlyForecastResponse.HourlyItem> list = forecastData.getList();
+        List<com.example.weatherapp.data.responses.HourlyForecastResponse.HourlyItem> list = forecastData.getList();
         int count = Math.min(maxCount, list.size());
         
         for (int i = 0; i < count; i++) {
@@ -188,13 +225,55 @@ public class ChartHelper {
     
     /**
      * Create time formatter for X axis
+     * @param hourlyForecasts List of HourlyForecast from domain layer
+     * @param count Number of data points
+     * @param timezoneOffsetSeconds Timezone offset in seconds (default: 0 for UTC)
+     * @return ValueFormatter for time labels
      */
-    public static ValueFormatter createTimeFormatter(HourlyForecastResponse forecastData, int count) {
-        final List<HourlyForecastResponse.HourlyItem> list = forecastData.getList();
-        final int tzSec = (forecastData.getCity() != null) 
-                ? forecastData.getCity().getTimezone() : 0;
-        
+    public static ValueFormatter createTimeFormatter(List<ForecastData.HourlyForecast> hourlyForecasts, int count, int timezoneOffsetSeconds) {
         return new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int index = Math.round(value);
+                if (index < 0 || index >= count || index >= hourlyForecasts.size()) {
+                    return "";
+                }
+                
+                long tsMs = hourlyForecasts.get(index).getTimestamp() * 1000L;
+                long localMs = tsMs + timezoneOffsetSeconds * 1000L;
+                
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                cal.setTimeInMillis(localMs);
+                int hour = cal.get(Calendar.HOUR_OF_DAY);
+                
+                return (hour < 10 ? "0" + hour : String.valueOf(hour)) + "h";
+            }
+        };
+    }
+    
+    /**
+     * Apply time formatter to chart
+     * @param chart LineChart to apply formatter to
+     * @param hourlyForecasts List of HourlyForecast from domain layer
+     * @param count Number of data points
+     * @param timezoneOffsetSeconds Timezone offset in seconds (default: 0 for UTC)
+     */
+    public static void applyTimeFormatter(LineChart chart, List<ForecastData.HourlyForecast> hourlyForecasts, int count, int timezoneOffsetSeconds) {
+        chart.getXAxis().setLabelCount(count, true);
+        chart.getXAxis().setValueFormatter(createTimeFormatter(hourlyForecasts, count, timezoneOffsetSeconds));
+    }
+    
+    /**
+     * LEGACY: Apply time formatter to chart using HourlyForecastResponse
+     * @deprecated Migrate to domain model version using ForecastData.HourlyForecast
+     */
+    @Deprecated
+    public static void applyTimeFormatter(LineChart chart, com.example.weatherapp.data.responses.HourlyForecastResponse forecastData, int count) {
+        final List<com.example.weatherapp.data.responses.HourlyForecastResponse.HourlyItem> list = forecastData.getList();
+        final int tzSec = (forecastData.getCity() != null) ? forecastData.getCity().getTimezone() : 0;
+        
+        chart.getXAxis().setLabelCount(count, true);
+        chart.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 int index = Math.round(value);
@@ -211,15 +290,7 @@ public class ChartHelper {
                 
                 return (hour < 10 ? "0" + hour : String.valueOf(hour)) + "h";
             }
-        };
-    }
-    
-    /**
-     * Apply time formatter to chart
-     */
-    public static void applyTimeFormatter(LineChart chart, HourlyForecastResponse forecastData, int count) {
-        chart.getXAxis().setLabelCount(count, true);
-        chart.getXAxis().setValueFormatter(createTimeFormatter(forecastData, count));
+        });
     }
     
     /**

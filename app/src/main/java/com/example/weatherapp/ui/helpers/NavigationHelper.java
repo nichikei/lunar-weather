@@ -13,6 +13,10 @@ import com.example.weatherapp.ui.activities.OutfitSuggestionActivity;
 /**
  * Helper class for navigation between activities
  * Handles opening charts, outfit suggestions, and other screens
+ * 
+ * NOTE: This helper still uses data layer models (WeatherResponse, HourlyForecastResponse)
+ * because it only passes data through Intent extras.
+ * The receiving Activities handle conversion to domain models via their ViewModels.
  */
 public class NavigationHelper {
     private final MainActivity activity;

@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import com.example.weatherapp.data.models.FavoriteCity;
-import com.example.weatherapp.data.responses.WeatherResponse;
+import com.example.weatherapp.domain.model.WeatherData;
 import com.example.weatherapp.R;
 import com.example.weatherapp.domain.repository.FavoriteCitiesManager;
 import com.example.weatherapp.ui.activities.MainActivity;
@@ -14,6 +14,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 /**
  * Helper class for managing favorite cities
  * Handles adding, removing, and updating favorite status
+ * REFACTORED: Now uses domain model WeatherData instead of data layer WeatherResponse
  */
 public class FavoritesHelper {
     private final MainActivity activity;
@@ -29,8 +30,12 @@ public class FavoritesHelper {
     
     /**
      * Toggle favorite status of a city
+     * @param cityName City name
+     * @param weatherData WeatherData from domain layer
+     * @param lat Latitude
+     * @param lon Longitude
      */
-    public void toggleFavorite(String cityName, WeatherResponse weatherData, 
+    public void toggleFavorite(String cityName, WeatherData weatherData, 
                                double lat, double lon) {
         if (cityName == null || cityName.isEmpty()) {
             Toast.makeText(activity, "No city loaded", Toast.LENGTH_SHORT).show();
@@ -49,22 +54,20 @@ public class FavoritesHelper {
     /**
      * Add city to favorites
      */
-    private void addFavorite(String cityName, WeatherResponse weatherData, 
+    private void addFavorite(String cityName, WeatherData weatherData, 
                             double lat, double lon) {
         String country = "";
-        if (weatherData != null && weatherData.getSys() != null) {
-            country = weatherData.getSys().getCountry();
+        if (weatherData != null) {
+            country = weatherData.getCountryCode();
         }
 
         FavoriteCity favoriteCity = new FavoriteCity(cityName, country, lat, lon);
 
         // Set weather information if available
         if (weatherData != null) {
-            favoriteCity.setCurrentTemp(weatherData.getMain().getTemp());
-            if (!weatherData.getWeather().isEmpty()) {
-                favoriteCity.setWeatherCondition(weatherData.getWeather().get(0).getMain());
-                favoriteCity.setWeatherDescription(weatherData.getWeather().get(0).getDescription());
-            }
+            favoriteCity.setCurrentTemp(weatherData.getTemperature());
+            favoriteCity.setWeatherCondition(weatherData.getWeatherMain());
+            favoriteCity.setWeatherDescription(weatherData.getWeatherDescription());
         }
 
         boolean added = favoritesManager.addFavoriteCity(favoriteCity);

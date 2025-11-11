@@ -361,8 +361,8 @@ public class MainActivity extends AppCompatActivity {
                 String cityName = viewModel.getCurrentCityName();
                 double lat = viewModel.getCurrentLatitude();
                 double lon = viewModel.getCurrentLongitude();
-                // Create temporary WeatherResponse for favorites (legacy code)
-                favoritesHelper.toggleFavorite(cityName, null, lat, lon);
+                WeatherData weatherData = viewModel.getCurrentWeatherData();
+                favoritesHelper.toggleFavorite(cityName, weatherData, lat, lon);
             }
 
             @Override
