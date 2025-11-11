@@ -5,9 +5,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.weatherapp.R;
-import com.example.weatherapp.data.responses.AirQualityResponse;
-import com.example.weatherapp.data.responses.WeatherResponse;
 import com.example.weatherapp.databinding.ActivityMainBinding;
+import com.example.weatherapp.domain.model.AirQualityData;
+import com.example.weatherapp.domain.model.WeatherData;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -34,25 +34,25 @@ public class UIUpdateHelper {
     /**
      * Update main weather information (city, temp, description)
      */
-    public void updateMainWeatherInfo(WeatherResponse weatherData) {
+    public void updateMainWeatherInfo(WeatherData weatherData) {
         // Update city name
-        binding.tvCityName.setText(weatherData.getName());
-        binding.tvTopBarCityName.setText(weatherData.getName());
+        binding.tvCityName.setText(weatherData.getCityName());
+        binding.tvTopBarCityName.setText(weatherData.getCityName());
 
         // Update weather description
-        if (weatherData.getWeather() != null && !weatherData.getWeather().isEmpty()) {
-            String description = weatherData.getWeather().get(0).getDescription();
+        String description = weatherData.getWeatherDescription();
+        if (description != null && !description.isEmpty()) {
             binding.tvWeatherDescription.setText(capitalizeWords(description));
         }
 
         // Update main temperature
-        double temp = weatherData.getMain().getTemp();
+        double temp = weatherData.getTemperature();
         String tempSymbol = temperatureUnit.equals("celsius") ? "°" : "°F";
         binding.tvTemperature.setText(String.format(Locale.getDefault(), "%.0f%s", temp, tempSymbol));
 
         // Update temperature range
-        double tempMax = weatherData.getMain().getTempMax();
-        double tempMin = weatherData.getMain().getTempMin();
+        double tempMax = weatherData.getMaxTemperature();
+        double tempMin = weatherData.getMinTemperature();
         binding.tvTempRange.setText(String.format(Locale.getDefault(),
                 "H:%.0f%s   L:%.0f%s", tempMax, tempSymbol, tempMin, tempSymbol));
     }
@@ -60,45 +60,42 @@ public class UIUpdateHelper {
     /**
      * Update all weather detail cards
      */
-    public void updateWeatherDetailsCards(WeatherResponse weatherData) {
+    public void updateWeatherDetailsCards(WeatherData weatherData) {
         String tempSymbol = temperatureUnit.equals("celsius") ? "°" : "°F";
 
         // Feels Like
         updateCard(R.id.cardFeelsLike, "🌡️", "FEELS LIKE",
-                String.format(Locale.getDefault(), "%.0f%s", weatherData.getMain().getFeelsLike(), tempSymbol),
+                String.format(Locale.getDefault(), "%.0f%s", weatherData.getFeelsLike(), tempSymbol),
                 "Similar to actual temp");
 
         // Humidity
-        int humidity = weatherData.getMain().getHumidity();
+        int humidity = weatherData.getHumidity();
         String humidityDesc = humidity > 70 ? "High level" : humidity > 40 ? "Comfortable" : "Low level";
         updateCard(R.id.cardHumidity, "💧", "HUMIDITY",
                 String.format(Locale.getDefault(), "%d%%", humidity), humidityDesc);
 
         // Wind
-        updateWindCard(weatherData.getWind().getSpeed());
+        updateWindCard(weatherData.getWindSpeed());
 
         // Pressure
-        int pressure = weatherData.getMain().getPressure();
+        int pressure = (int) weatherData.getPressure();
         String pressureUnitText = pressureUnit.equals("mbar") ? "mbar" : "hPa";
         updateCard(R.id.cardPressure, "📊", "PRESSURE",
                 String.format(Locale.getDefault(), "%d", pressure), pressureUnitText);
 
         // Sunrise/Sunset
-        long sunrise = weatherData.getSys() != null ? weatherData.getSys().getSunrise() : 0;
-        long sunset = weatherData.getSys() != null ? weatherData.getSys().getSunset() : 0;
+        long sunrise = weatherData.getSunrise();
+        long sunset = weatherData.getSunset();
         String sunriseTime = formatTime(sunrise);
         String sunsetTime = formatTime(sunset);
         updateCard(R.id.cardSunrise, "🌅", "SUNRISE", sunriseTime, "Sunset: " + sunsetTime);
 
         // Visibility
-        int visibility = weatherData.getVisibility() != null ? weatherData.getVisibility() / 1000 : 10;
+        int visibility = (int) (weatherData.getVisibility() / 1000);
         updateCard(R.id.cardVisibility, "👁️", "VISIBILITY", String.valueOf(visibility), "km");
 
-        // Rainfall
-        double rainfall = 0;
-        if (weatherData.getRain() != null && weatherData.getRain().get1h() != null) {
-            rainfall = weatherData.getRain().get1h();
-        }
+        // Rainfall - WeatherData doesn't have rainfall field, default to 0
+        double rainfall = 0.0;
         updateCard(R.id.cardRainfall, "🌧️", "RAINFALL",
                 String.format(Locale.getDefault(), "%.1f", rainfall), "mm last hour");
     }
@@ -152,11 +149,11 @@ public class UIUpdateHelper {
     /**
      * Update Air Quality card
      */
-    public void updateAirQualityCard(AirQualityResponse.AirQualityData aqiData) {
+    public void updateAirQualityCard(AirQualityData aqiData) {
         View aqiCard = binding.getRoot().findViewById(R.id.card_air_quality);
         if (aqiCard == null) return;
 
-        int aqi = aqiData.getMain().getAqi();
+        int aqi = aqiData.getAqi();
         String status, description;
 
         switch (aqi) {
@@ -196,11 +193,10 @@ public class UIUpdateHelper {
         if (tvAqiStatus != null) tvAqiStatus.setText(status);
         if (tvAqiDescription != null) tvAqiDescription.setText(description);
 
-        if (aqiData.getComponents() != null) {
-            if (tvPm25 != null) tvPm25.setText(String.format(Locale.getDefault(), "%.1f", aqiData.getComponents().getPm2_5()));
-            if (tvPm10 != null) tvPm10.setText(String.format(Locale.getDefault(), "%.1f", aqiData.getComponents().getPm10()));
-            if (tvO3 != null) tvO3.setText(String.format(Locale.getDefault(), "%.1f", aqiData.getComponents().getO3()));
-        }
+        // AirQualityData already has components flattened
+        if (tvPm25 != null) tvPm25.setText(String.format(Locale.getDefault(), "%.1f", aqiData.getPm2_5()));
+        if (tvPm10 != null) tvPm10.setText(String.format(Locale.getDefault(), "%.1f", aqiData.getPm10()));
+        if (tvO3 != null) tvO3.setText(String.format(Locale.getDefault(), "%.1f", aqiData.getO3()));
     }
 
     /**

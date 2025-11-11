@@ -8,9 +8,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.weatherapp.R;
-import com.example.weatherapp.data.responses.HourlyForecastResponse;
+import com.example.weatherapp.domain.model.ForecastData;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -32,12 +31,12 @@ public class ForecastViewManager {
     }
 
     /**
-     * Create hourly forecast view from API data
+     * Create hourly forecast view from domain model
      */
-    public void createHourlyForecastView(HourlyForecastResponse forecastData) {
+    public void createHourlyForecastView(ForecastData forecastData) {
         forecastContainer.removeAllViews();
 
-        List<HourlyForecastResponse.HourlyItem> hourlyItems = forecastData.getList();
+        List<ForecastData.HourlyForecast> hourlyItems = forecastData.getHourlyForecasts();
         if (hourlyItems == null || hourlyItems.isEmpty()) {
             return;
         }
@@ -46,7 +45,7 @@ public class ForecastViewManager {
         int itemsToShow = Math.min(8, hourlyItems.size());
 
         for (int i = 0; i < itemsToShow; i++) {
-            HourlyForecastResponse.HourlyItem item = hourlyItems.get(i);
+            ForecastData.HourlyForecast item = hourlyItems.get(i);
 
             View itemView;
             if (isFirst) {
@@ -62,21 +61,20 @@ public class ForecastViewManager {
     }
 
     /**
-     * Create weekly forecast view from API data
+     * Create weekly forecast view from domain model
      */
-    public void createWeeklyForecastView(HourlyForecastResponse forecastData) {
+    public void createWeeklyForecastView(ForecastData forecastData) {
         forecastContainer.removeAllViews();
 
-        List<HourlyForecastResponse.HourlyItem> hourlyItems = forecastData.getList();
-        if (hourlyItems == null || hourlyItems.isEmpty()) {
+        List<ForecastData.DailyForecast> dailyItems = forecastData.getDailyForecasts();
+        if (dailyItems == null || dailyItems.isEmpty()) {
             return;
         }
 
-        List<DailyData> dailyDataList = groupByDay(hourlyItems);
         boolean isFirst = true;
         String tempSymbol = temperatureUnit.equals("celsius") ? "°" : "°F";
 
-        for (DailyData dailyData : dailyDataList) {
+        for (ForecastData.DailyForecast dailyForecast : dailyItems) {
             View itemView;
 
             if (isFirst) {
@@ -86,14 +84,14 @@ public class ForecastViewManager {
                 itemView = LayoutInflater.from(context).inflate(R.layout.item_weekly_forecast, forecastContainer, false);
             }
 
-            populateWeeklyItem(itemView, dailyData, tempSymbol);
+            populateWeeklyItem(itemView, dailyForecast, tempSymbol);
             forecastContainer.addView(itemView);
         }
     }
 
     // ============ Private Helper Methods ============
 
-    private void populateHourlyItem(View itemView, HourlyForecastResponse.HourlyItem item, int position) {
+    private void populateHourlyItem(View itemView, ForecastData.HourlyForecast item, int position) {
         TextView txtHour = itemView.findViewById(R.id.tvHour);
         ImageView ivHourlyIcon = itemView.findViewById(R.id.ivHourlyIcon);
         TextView tvHourlyTemp = itemView.findViewById(R.id.tvHourlyTemp);
@@ -101,7 +99,7 @@ public class ForecastViewManager {
 
         // Format time
         Calendar itemTime = Calendar.getInstance();
-        itemTime.setTimeInMillis(item.getDt() * 1000);
+        itemTime.setTimeInMillis(item.getTimestamp() * 1000);
 
         if (position == 0) {
             txtHour.setText("Now");
@@ -113,17 +111,17 @@ public class ForecastViewManager {
         }
 
         // Set weather icon
-        String weatherCondition = item.getWeather().get(0).getMain().toLowerCase();
-        ivHourlyIcon.setImageResource(getWeatherIconResource(weatherCondition));
+        String weatherIcon = item.getWeatherIcon().toLowerCase();
+        ivHourlyIcon.setImageResource(getWeatherIconResource(weatherIcon));
 
         // Set temperature
-        int temp = (int) Math.round(item.getMain().getTemp());
+        int temp = (int) Math.round(item.getTemperature());
         String tempSymbol = temperatureUnit.equals("celsius") ? "°" : "°F";
         tvHourlyTemp.setText(String.format(Locale.getDefault(), "%d%s", temp, tempSymbol));
 
         // Set rain probability
         if (tvRainProbability != null) {
-            int rainProb = (int) (item.getPop() * 100);
+            int rainProb = item.getRainProbability();
             if (rainProb > 0 && position > 0) {
                 tvRainProbability.setText(String.format(Locale.getDefault(), "%d%%", rainProb));
                 tvRainProbability.setVisibility(View.VISIBLE);
@@ -133,55 +131,31 @@ public class ForecastViewManager {
         }
     }
 
-    private void populateWeeklyItem(View itemView, DailyData dailyData, String tempSymbol) {
+    private void populateWeeklyItem(View itemView, ForecastData.DailyForecast dailyForecast, String tempSymbol) {
         TextView tvDay = itemView.findViewById(R.id.tvDay);
         ImageView ivWeeklyIcon = itemView.findViewById(R.id.ivWeeklyIcon);
         TextView tvWeeklyTemp = itemView.findViewById(R.id.tvWeeklyTemp);
         TextView tvWeeklyRainProbability = itemView.findViewById(R.id.tvWeeklyRainProbability);
 
-        tvDay.setText(dailyData.dayName);
-        ivWeeklyIcon.setImageResource(getWeatherIconResource(dailyData.mainWeatherCondition));
-        tvWeeklyTemp.setText(String.format(Locale.getDefault(), "%d%s", dailyData.maxTemp, tempSymbol));
+        // Format day name
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(dailyForecast.getTimestamp() * 1000);
+        String[] days = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
+        String dayName = days[calendar.get(Calendar.DAY_OF_WEEK) - 1];
+
+        tvDay.setText(dayName);
+        ivWeeklyIcon.setImageResource(getWeatherIconResource(dailyForecast.getWeatherIcon().toLowerCase()));
+        tvWeeklyTemp.setText(String.format(Locale.getDefault(), "%.0f%s", dailyForecast.getTempMax(), tempSymbol));
 
         if (tvWeeklyRainProbability != null) {
-            if (dailyData.maxRainProbability > 0) {
-                tvWeeklyRainProbability.setText(String.format(Locale.getDefault(), "%d%%", dailyData.maxRainProbability));
+            int rainProb = dailyForecast.getRainProbability();
+            if (rainProb > 0) {
+                tvWeeklyRainProbability.setText(String.format(Locale.getDefault(), "%d%%", rainProb));
                 tvWeeklyRainProbability.setVisibility(View.VISIBLE);
             } else {
                 tvWeeklyRainProbability.setVisibility(View.INVISIBLE);
             }
         }
-    }
-
-    private List<DailyData> groupByDay(List<HourlyForecastResponse.HourlyItem> hourlyItems) {
-        String[] days = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
-        Calendar calendar = Calendar.getInstance();
-        List<DailyData> dailyDataList = new ArrayList<>();
-        String currentDay = "";
-        DailyData currentDailyData = null;
-
-        for (HourlyForecastResponse.HourlyItem item : hourlyItems) {
-            calendar.setTimeInMillis(item.getDt() * 1000);
-            String dayKey = days[calendar.get(Calendar.DAY_OF_WEEK) - 1];
-
-            if (!dayKey.equals(currentDay)) {
-                if (currentDailyData != null) {
-                    dailyDataList.add(currentDailyData);
-                }
-                currentDailyData = new DailyData(dayKey);
-                currentDay = dayKey;
-            }
-
-            currentDailyData.addItem(item);
-
-            if (dailyDataList.size() >= 7) break;
-        }
-
-        if (currentDailyData != null && dailyDataList.size() < 7) {
-            dailyDataList.add(currentDailyData);
-        }
-
-        return dailyDataList;
     }
 
     private int getWeatherIconResource(String weatherCondition) {
@@ -206,32 +180,6 @@ public class ForecastViewManager {
                 return R.drawable.moon_fast_wind;
             default:
                 return R.drawable.sun_cloud_angled_rain;
-        }
-    }
-
-    // ============ Inner Class ============
-
-    private static class DailyData {
-        String dayName;
-        int maxTemp = Integer.MIN_VALUE;
-        int maxRainProbability = 0;
-        String mainWeatherCondition = "clear";
-
-        DailyData(String dayName) {
-            this.dayName = dayName;
-        }
-
-        void addItem(HourlyForecastResponse.HourlyItem item) {
-            int temp = (int) Math.round(item.getMain().getTemp());
-            if (temp > maxTemp) {
-                maxTemp = temp;
-                mainWeatherCondition = item.getWeather().get(0).getMain().toLowerCase();
-            }
-
-            int rainProb = (int) (item.getPop() * 100);
-            if (rainProb > maxRainProbability) {
-                maxRainProbability = rainProb;
-            }
         }
     }
 }
