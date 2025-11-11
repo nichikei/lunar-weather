@@ -2,6 +2,7 @@ package com.example.weatherapp.data.database.entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -36,6 +37,7 @@ public class UVIndexCacheEntity {
     public UVIndexCacheEntity() {
     }
     
+    @Ignore
     public UVIndexCacheEntity(double latitude, double longitude, double uvIndex,
                              String uvLevel, long timestamp, long cachedAt) {
         this.latitude = latitude;

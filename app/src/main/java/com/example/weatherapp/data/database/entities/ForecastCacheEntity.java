@@ -2,6 +2,7 @@ package com.example.weatherapp.data.database.entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -63,6 +64,7 @@ public class ForecastCacheEntity {
     public ForecastCacheEntity() {
     }
     
+    @Ignore
     public ForecastCacheEntity(String cityName, double latitude, double longitude,
                               String forecastType, long timestamp, double temperature,
                               Double tempMin, Double tempMax, String weatherMain,
