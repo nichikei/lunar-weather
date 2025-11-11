@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.weatherapp.R;
 import com.example.weatherapp.data.repository.implementation.WeatherRepositoryImpl;
-import com.example.weatherapp.data.responses.WeatherResponse;
 import com.example.weatherapp.databinding.ActivityMainBinding;
 import com.example.weatherapp.domain.model.AirQualityData;
 import com.example.weatherapp.domain.model.ForecastData;
