@@ -6,10 +6,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.weatherapp.R;
 import com.example.weatherapp.data.responses.HourlyForecastResponse;
 import com.example.weatherapp.data.responses.WeatherResponse;
+import com.example.weatherapp.presentation.viewmodel.ChartsViewModel;
 import com.example.weatherapp.ui.helpers.ChartHelper;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
@@ -28,6 +30,9 @@ import java.util.List;
 
 public class ChartsActivity extends AppCompatActivity {
 
+    // ViewModel manages chart data state
+    private ChartsViewModel viewModel;
+
     // Dữ liệu dự báo theo giờ (từ API OpenWeatherMap)
     private HourlyForecastResponse hourlyForecastData;
 
@@ -45,6 +50,9 @@ public class ChartsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_charts);
 
+        // === INITIALIZE VIEWMODEL ===
+        viewModel = new ViewModelProvider(this).get(ChartsViewModel.class);
+
         // Nhận dữ liệu từ MainActivity qua Intent
         hourlyForecastData = (HourlyForecastResponse) getIntent().getSerializableExtra("hourly_data");
         currentWeatherData = (WeatherResponse) getIntent().getSerializableExtra("current_data");
@@ -54,24 +62,46 @@ public class ChartsActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("WeatherAppPrefs", MODE_PRIVATE);
         windSpeedUnit = SettingsActivity.getWindSpeedUnit(prefs);
 
+        // Load data into ViewModel
+        viewModel.loadChartData(hourlyForecastData, currentWeatherData, currentUVIndex, windSpeedUnit);
+
         // Setup nút Back để quay lại màn hình trước
         ImageButton btnBack = findViewById(R.id.btnBack);
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> finish());
         }
 
-        // Cập nhật tiêu đề với tên thành phố
-        TextView tvTitle = findViewById(R.id.tvChartTitle);
-        if (tvTitle != null && currentWeatherData != null) {
-            tvTitle.setText(currentWeatherData.getName() + " - " + getString(R.string.weather_statistics));
-        }
+        // === SETUP OBSERVER ===
+        setupObserver();
+    }
 
-        // Khởi tạo tất cả các biểu đồ
-        setupTemperatureChart();      // Biểu đồ nhiệt độ
-        setupWeatherStatsChart();     // Biểu đồ các chỉ số thời tiết
-        setupRainProbabilityChart();  // Biểu đồ xác suất mưa
-        setupWindSpeedChart();        // Biểu đồ tốc độ gió
-        setupHumidityChart();         // Biểu đồ độ ẩm
+    /**
+     * SETUP LIVEDATA OBSERVER
+     * Updates UI when chart data changes
+     */
+    private void setupObserver() {
+        viewModel.getChartDataState().observe(this, state -> {
+            if (state != null) {
+                // Update title with city name
+                TextView tvTitle = findViewById(R.id.tvChartTitle);
+                if (tvTitle != null) {
+                    tvTitle.setText(state.cityName + " - " + getString(R.string.weather_statistics));
+                }
+
+                // Store state data for chart setup methods
+                hourlyForecastData = state.hourlyForecastData;
+                currentWeatherData = state.currentWeatherData;
+                currentUVIndex = state.currentUVIndex;
+                windSpeedUnit = state.windSpeedUnit;
+
+                // Setup all charts
+                setupTemperatureChart();      // Biểu đồ nhiệt độ
+                setupWeatherStatsChart();     // Biểu đồ các chỉ số thời tiết
+                setupRainProbabilityChart();  // Biểu đồ xác suất mưa
+                setupWindSpeedChart();        // Biểu đồ tốc độ gió
+                setupHumidityChart();         // Biểu đồ độ ẩm
+            }
+        });
     }
 
 

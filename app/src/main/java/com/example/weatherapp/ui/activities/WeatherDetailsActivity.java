@@ -7,15 +7,19 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weatherapp.R;
+import com.example.weatherapp.presentation.viewmodel.WeatherDetailsViewModel;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 public class WeatherDetailsActivity extends AppCompatActivity {
 
+    private WeatherDetailsViewModel viewModel;
+    
     private RecyclerView rvMetrics;
     private CollapsingToolbarLayout collapsingToolbar;
     private AppBarLayout appBarLayout;
@@ -26,6 +30,9 @@ public class WeatherDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather_details);
+
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(this).get(WeatherDetailsViewModel.class);
 
         // Initialize views
         initViews();
@@ -41,6 +48,9 @@ public class WeatherDetailsActivity extends AppCompatActivity {
 
         // Setup AppBar scroll listener for animations
         setupAppBarScrollListener();
+        
+        // Setup observers
+        setupObservers();
 
         // Load weather data from intent
         loadWeatherData();
@@ -113,18 +123,26 @@ public class WeatherDetailsActivity extends AppCompatActivity {
         tvTempRange.setAlpha(alpha);
     }
 
+    private void setupObservers() {
+        viewModel.getWeatherState().observe(this, state -> {
+            if (state != null) {
+                tvCityName.setText(state.cityName);
+                tvMainTemp.setText(state.temperature + "°");
+                tvWeatherCondition.setText(state.condition);
+                tvTempRange.setText(state.tempRange);
+            }
+        });
+    }
+    
     private void loadWeatherData() {
-        // Get data from intent if passed
+        // Get data from intent and pass to ViewModel
         if (getIntent() != null) {
             String cityName = getIntent().getStringExtra("city_name");
             String temp = getIntent().getStringExtra("temperature");
             String condition = getIntent().getStringExtra("condition");
             String tempRange = getIntent().getStringExtra("temp_range");
 
-            if (cityName != null) tvCityName.setText(cityName);
-            if (temp != null) tvMainTemp.setText(temp + "°");
-            if (condition != null) tvWeatherCondition.setText(condition);
-            if (tempRange != null) tvTempRange.setText(tempRange);
+            viewModel.loadWeatherDetails(cityName, temp, condition, tempRange);
         }
     }
 

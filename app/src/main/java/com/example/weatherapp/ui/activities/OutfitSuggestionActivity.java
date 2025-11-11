@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,6 +16,7 @@ import com.example.weatherapp.R;
 import com.example.weatherapp.data.models.OutfitSuggestion;
 import com.example.weatherapp.data.responses.WeatherResponse;
 import com.example.weatherapp.domain.services.OutfitSuggestionService;
+import com.example.weatherapp.presentation.viewmodel.OutfitSuggestionViewModel;
 import com.example.weatherapp.ui.adapters.OutfitSuggestionAdapter;
 
 import java.util.ArrayList;
@@ -42,10 +44,16 @@ public class OutfitSuggestionActivity extends AppCompatActivity {
     // Service xử lý logic gọi AI và phân tích kết quả
     private OutfitSuggestionService outfitService;
 
+    // ViewModel manages state and AI suggestions
+    private OutfitSuggestionViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_outfit_suggestion);
+
+        // === INITIALIZE VIEWMODEL ===
+        viewModel = new ViewModelProvider(this).get(OutfitSuggestionViewModel.class);
 
         // === KHỞI TẠO CÁC VIEW ===
         RecyclerView rvOutfitSuggestions = findViewById(R.id.rvOutfitSuggestions);
@@ -73,119 +81,72 @@ public class OutfitSuggestionActivity extends AppCompatActivity {
             return;
         }
 
+        // === SETUP OBSERVERS ===
+        setupObservers(adapter);
+
         // Setup nút Back để quay lại màn hình trước
         btnBack.setOnClickListener(v -> finish());
 
-        // Hiển thị thông tin thời tiết ở phần header
-        displayWeatherInfo();
-
-        // === KHỞI TẠO SERVICE VÀ GỌI AI ===
+        // === KHỞI TẠO SERVICE VÀ LOAD DATA ===
         // OutfitSuggestionService chứa logic:
         // - Tạo prompt (câu hỏi) gửi cho AI
         // - Gọi Gemini API
         // - Parse (phân tích) kết quả JSON trả về
         outfitService = new OutfitSuggestionService(this);
-        fetchOutfitSuggestions(adapter);
+        viewModel.initService(outfitService);
+
+        // Load weather info and fetch outfit suggestions
+        viewModel.loadWeatherInfo(weatherData);
+        viewModel.fetchOutfitSuggestions(weatherData);
     }
 
     /**
-     * HIỂN THỊ THÔNG TIN THỜI TIẾT Ở PHẦN HEADER
-     *
-     * Hiển thị:
-     * - Tên thành phố
-     * - Nhiệt độ hiện tại
-     * - Mô tả thời tiết (Partly cloudy, Rainy...)
-     * - Icon thời tiết tương ứng
+     * SETUP LIVEDATA OBSERVERS
+     * Observes ViewModel state changes and updates UI accordingly
      */
-    private void displayWeatherInfo() {
-        // Lấy thông tin từ weatherData
-        double temp = weatherData.getMain().getTemp();
-        String condition = weatherData.getWeather().get(0).getDescription();
-        String cityName = weatherData.getName();
+    private void setupObservers(OutfitSuggestionAdapter adapter) {
+        // Observe weather info state
+        viewModel.getWeatherInfoState().observe(this, weatherInfo -> {
+            if (weatherInfo != null) {
+                // Display: "Hanoi - 25°C, partly cloudy"
+                tvWeatherInfo.setText(String.format(Locale.getDefault(),
+                    "%s - %.0f°C, %s", 
+                    weatherInfo.cityName, 
+                    weatherInfo.temperature, 
+                    weatherInfo.condition));
 
-        // Hiển thị text: "Hanoi - 25°C, partly cloudy"
-        tvWeatherInfo.setText(String.format(Locale.getDefault(),
-            "%s - %.0f°C, %s", cityName, temp, condition));
-
-        // Lấy điều kiện thời tiết chính (Clear/Clouds/Rain...)
-        String weatherCondition = weatherData.getWeather().get(0).getMain().toLowerCase();
-
-        // Set icon tương ứng
-        ivWeatherIcon.setImageResource(getWeatherIconResource(weatherCondition));
-    }
-
-    /**
-     * GỌI AI ĐỂ LẤY GỢI Ý TRANG PHỤC
-     *
-     * Flow:
-     * 1. Hiển thị ProgressBar, ẩn nội dung
-     * 2. Service tạo prompt và gọi Gemini AI
-     * 3. AI phân tích thời tiết và trả về JSON gợi ý
-     * 4. Parse JSON thành List<OutfitSuggestion>
-     * 5. Cập nhật RecyclerView với danh sách gợi ý
-     *
-     * Ví dụ prompt gửi cho AI:
-     * "Nhiệt độ: 25°C, Thời tiết: Partly cloudy, Độ ẩm: 70%
-     *  Gợi ý 5-7 món đồ phù hợp để mặc. Format JSON:
-     *  [{name: 'T-shirt', description: 'Light cotton t-shirt', icon: 'shirt'}]"
-     */
-    private void fetchOutfitSuggestions(OutfitSuggestionAdapter adapter) {
-        // Hiển thị loading state
-        progressBar.setVisibility(View.VISIBLE);
-        layoutContent.setVisibility(View.GONE);
-
-        // Gọi service để lấy gợi ý
-        // Service sẽ:
-        // 1. Build prompt dựa vào weatherData
-        // 2. Gọi Gemini API (HTTP request)
-        // 3. Nhận response JSON
-        // 4. Parse JSON thành List<OutfitSuggestion>
-        outfitService.getOutfitSuggestions(weatherData, new OutfitSuggestionService.OutfitSuggestionCallback() {
-
-            /**
-             * CALLBACK KHI AI TRẢ VỀ KẾT QUẢ THÀNH CÔNG
-             *
-             * @param suggestions Danh sách gợi ý trang phục từ AI
-             *                    Mỗi item có: name, description, icon
-             */
-            @Override
-            public void onSuccess(List<OutfitSuggestion> suggestions, String source) {
-                // runOnUiThread vì callback này chạy trên background thread
-                // Phải chuyển về UI thread để update giao diện
-                runOnUiThread(() -> {
-                    // Ẩn ProgressBar, hiện nội dung
-                    progressBar.setVisibility(View.GONE);
-                    layoutContent.setVisibility(View.VISIBLE);
-
-                    // Cập nhật adapter với danh sách gợi ý mới
-                    // Adapter sẽ tự động refresh RecyclerView
-
-                    adapter.updateSuggestions(suggestions);
-                });
+                // Set weather icon
+                ivWeatherIcon.setImageResource(getWeatherIconResource(weatherInfo.weatherMain));
             }
+        });
 
-            /**
-             * CALLBACK KHI CÓ LỖI XẢY RA
-             *
-             * Lỗi có thể là:
-             * - Không có kết nối internet
-             * - API key không hợp lệ
-             * - AI trả về format không đúng
-             * - Rate limit (quá nhiều requests)
-             */
-            @Override
-            public void onError(String error) {
-                runOnUiThread(() -> {
-                    progressBar.setVisibility(View.GONE);
-                    layoutContent.setVisibility(View.VISIBLE);
-
-                    // Hiển thị thông báo lỗi cho user
-                    Toast.makeText(OutfitSuggestionActivity.this,
-                            "Error: " + error, Toast.LENGTH_SHORT).show();
-                });
+        // Observe outfit suggestions state (Loading/Success/Error)
+        viewModel.getOutfitSuggestionsState().observe(this, uiState -> {
+            if (uiState.isLoading()) {
+                // Show loading state
+                progressBar.setVisibility(View.VISIBLE);
+                layoutContent.setVisibility(View.GONE);
+            } else if (uiState.isSuccess()) {
+                // Show success state with data
+                progressBar.setVisibility(View.GONE);
+                layoutContent.setVisibility(View.VISIBLE);
+                
+                List<OutfitSuggestion> suggestions = uiState.getData();
+                if (suggestions != null && !suggestions.isEmpty()) {
+                    adapter.updateSuggestions(suggestions);
+                } else {
+                    Toast.makeText(this, "No outfit suggestions available", Toast.LENGTH_SHORT).show();
+                }
+            } else if (uiState.isError()) {
+                // Show error state
+                progressBar.setVisibility(View.GONE);
+                layoutContent.setVisibility(View.VISIBLE);
+                Toast.makeText(this, "Error: " + uiState.getErrorMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
+
+
 
     /**
      * LẤY ICON TƯƠNG ỨNG VỚI ĐIỀU KIỆN THỜI TIẾT

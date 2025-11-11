@@ -6,12 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,10 +23,12 @@ import com.example.weatherapp.data.api.WeatherApiService;
 import com.example.weatherapp.data.models.FavoriteCity;
 import com.example.weatherapp.data.responses.WeatherResponse;
 import com.example.weatherapp.domain.repository.FavoriteCitiesManager;
+import com.example.weatherapp.presentation.viewmodel.FavoriteCitiesViewModel;
 import com.example.weatherapp.ui.helpers.RecyclerViewScrollAnimator;
 import com.example.weatherapp.ui.helpers.SlideInItemAnimator;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,21 +38,26 @@ import retrofit2.Response;
 
 public class FavoriteCitiesActivity extends AppCompatActivity {
 
-    private static final String API_KEY = "bd5e378503939ddaee76f12ad7a97608";
+    // ViewModel manages favorite cities state
+    private FavoriteCitiesViewModel viewModel;
+    
     private RecyclerView recyclerView;
     private FavoriteCitiesAdapter adapter;
-    private FavoriteCitiesManager favoritesManager;
-    private View tvEmptyState; // Changed from TextView to View
+    private View tvEmptyState;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite_cities);
 
-        favoritesManager = new FavoriteCitiesManager(this);
+        // === INITIALIZE VIEWMODEL ===
+        viewModel = new ViewModelProvider(this).get(FavoriteCitiesViewModel.class);
+        viewModel.init(this);
 
         recyclerView = findViewById(R.id.recyclerViewFavorites);
-        tvEmptyState = findViewById(R.id.tvEmptyState); // Now correctly typed as View (LinearLayout)
+        tvEmptyState = findViewById(R.id.tvEmptyState);
+        progressBar = findViewById(R.id.progressBar);
         FloatingActionButton fabAddCity = findViewById(R.id.fabAddCity);
         ImageButton btnBack = findViewById(R.id.btnBack);
 
@@ -59,10 +68,19 @@ public class FavoriteCitiesActivity extends AppCompatActivity {
         RecyclerViewScrollAnimator scrollAnimator = new RecyclerViewScrollAnimator();
         recyclerView.addOnScrollListener(scrollAnimator);
 
-        loadFavoriteCities();
+        // Setup adapter
+        adapter = new FavoriteCitiesAdapter(new ArrayList<>());
+        recyclerView.setAdapter(adapter);
+
+        // === SETUP OBSERVERS ===
+        setupObservers();
+
+        // Load favorite cities
+        viewModel.loadFavoriteCities();
 
         fabAddCity.setOnClickListener(v -> {
-            if (favoritesManager.canAddMoreCities()) {
+            Boolean canAdd = viewModel.getCanAddMoreCities().getValue();
+            if (canAdd != null && canAdd) {
                 // Open search activity to add new city
                 Intent intent = new Intent(this, SearchActivity.class);
                 intent.putExtra("ADD_TO_FAVORITES", true);
@@ -78,67 +96,54 @@ public class FavoriteCitiesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadFavoriteCities();
+        viewModel.loadFavoriteCities();
     }
 
-    private void loadFavoriteCities() {
-        List<FavoriteCity> cities = favoritesManager.getFavoriteCities();
-
-        if (cities.isEmpty()) {
-            recyclerView.setVisibility(View.GONE);
-            tvEmptyState.setVisibility(View.VISIBLE);
-        } else {
-            recyclerView.setVisibility(View.VISIBLE);
-            tvEmptyState.setVisibility(View.GONE);
-
-            adapter = new FavoriteCitiesAdapter(cities);
-            recyclerView.setAdapter(adapter);
-
-            // Refresh weather data for all cities
-            refreshAllCitiesWeather();
-        }
-    }
-
-    private void refreshAllCitiesWeather() {
-        List<FavoriteCity> cities = favoritesManager.getFavoriteCities();
-        WeatherApiService apiService = RetrofitClient.getInstance().getWeatherApi();
-
-        for (int i = 0; i < cities.size(); i++) {
-            FavoriteCity city = cities.get(i);
-            final int position = i;
-
-            Call<WeatherResponse> call = apiService.getWeatherByCity(
-                    city.getCityName(), API_KEY, "metric");
-
-            call.enqueue(new Callback<WeatherResponse>() {
-                @Override
-                public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        WeatherResponse weather = response.body();
-                        city.setCurrentTemp(weather.getMain().getTemp());
-                        city.setWeatherCondition(weather.getWeather().get(0).getMain());
-                        city.setWeatherDescription(weather.getWeather().get(0).getDescription());
-
-                        favoritesManager.updateCityWeather(
-                                city.getCityName(),
-                                city.getCurrentTemp(),
-                                city.getWeatherCondition(),
-                                city.getWeatherDescription()
-                        );
-
-                        if (adapter != null) {
-                            adapter.notifyItemChanged(position);
-                        }
+    /**
+     * SETUP LIVEDATA OBSERVERS
+     * Observes ViewModel state changes and updates UI
+     */
+    private void setupObservers() {
+        // Observe favorite cities state (Loading/Success/Error)
+        viewModel.getFavoriteCitiesState().observe(this, uiState -> {
+            if (uiState.isLoading()) {
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.VISIBLE);
+                }
+                recyclerView.setVisibility(View.GONE);
+                tvEmptyState.setVisibility(View.GONE);
+            } else if (uiState.isSuccess()) {
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
+                
+                List<FavoriteCitiesViewModel.FavoriteCityWithWeather> citiesWithWeather = uiState.getData();
+                
+                if (citiesWithWeather == null || citiesWithWeather.isEmpty()) {
+                    recyclerView.setVisibility(View.GONE);
+                    tvEmptyState.setVisibility(View.VISIBLE);
+                } else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    tvEmptyState.setVisibility(View.GONE);
+                    
+                    // Convert to FavoriteCity list for adapter
+                    List<FavoriteCity> cities = new ArrayList<>();
+                    for (FavoriteCitiesViewModel.FavoriteCityWithWeather item : citiesWithWeather) {
+                        cities.add(item.city);
                     }
+                    adapter.updateCities(cities);
                 }
-
-                @Override
-                public void onFailure(Call<WeatherResponse> call, Throwable t) {
-                    // Silently fail - keep cached data
+            } else if (uiState.isError()) {
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
                 }
-            });
-        }
+                recyclerView.setVisibility(View.VISIBLE);
+                Toast.makeText(this, "Error: " + uiState.getErrorMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+
 
     private class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAdapter.ViewHolder> {
 
@@ -146,6 +151,15 @@ public class FavoriteCitiesActivity extends AppCompatActivity {
 
         FavoriteCitiesAdapter(List<FavoriteCity> cities) {
             this.cities = cities;
+        }
+
+        /**
+         * Update cities list and refresh adapter
+         */
+        public void updateCities(List<FavoriteCity> newCities) {
+            cities.clear();
+            cities.addAll(newCities);
+            notifyDataSetChanged();
         }
 
         @NonNull
@@ -205,17 +219,8 @@ public class FavoriteCitiesActivity extends AppCompatActivity {
                             .setTitle("Remove City")
                             .setMessage("Remove " + city.getCityName() + " from favorites?")
                             .setPositiveButton("Remove", (dialog, which) -> {
-                                int position = getBindingAdapterPosition();
-                                if (position != RecyclerView.NO_POSITION) {
-                                    favoritesManager.removeFavoriteCity(city.getCityName());
-                                    cities.remove(position);
-                                    notifyItemRemoved(position);
-
-                                    if (cities.isEmpty()) {
-                                        recyclerView.setVisibility(View.GONE);
-                                        tvEmptyState.setVisibility(View.VISIBLE);
-                                    }
-                                }
+                                // Use ViewModel to remove city
+                                viewModel.removeFavoriteCity(city);
                             })
                             .setNegativeButton("Cancel", null)
                             .show();
