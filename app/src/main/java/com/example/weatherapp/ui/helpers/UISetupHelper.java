@@ -30,6 +30,7 @@ public class UISetupHelper {
         void onToggleFavorite();
         void onViewChartsRequested();
         void onWeatherMapsRequested();
+        void onVoiceAssistantRequested(); // NEW - Voice Weather Assistant
         void onOutfitSuggestionRequested();
         void onActivitySuggestionsRequested(); // NEW
         void onMoreFeaturesRequested(); // NEW - Opens bottom sheet

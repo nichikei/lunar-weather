@@ -24,6 +24,8 @@ public class MoreFeaturesBottomSheet extends BottomSheetDialogFragment {
 
     public interface MoreFeaturesListener {
         void onWeatherMapsClicked();
+        void onVoiceAssistantClicked();
+        void onWeatherAlarmsClicked();
         void onOutfitSuggestionsClicked();
         void onActivitySuggestionsClicked();
     }
@@ -51,12 +53,28 @@ public class MoreFeaturesBottomSheet extends BottomSheetDialogFragment {
 
         // Set up click listeners
         MaterialCardView cardWeatherMaps = view.findViewById(R.id.cardWeatherMaps);
+        MaterialCardView cardVoiceAssistant = view.findViewById(R.id.cardVoiceAssistant);
+        MaterialCardView cardWeatherAlarms = view.findViewById(R.id.cardWeatherAlarms);
         MaterialCardView cardOutfitSuggestions = view.findViewById(R.id.cardOutfitSuggestions);
         MaterialCardView cardActivitySuggestions = view.findViewById(R.id.cardActivitySuggestions);
 
         cardWeatherMaps.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onWeatherMapsClicked();
+            }
+            dismiss();
+        });
+
+        cardVoiceAssistant.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onVoiceAssistantClicked();
+            }
+            dismiss();
+        });
+
+        cardWeatherAlarms.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onWeatherAlarmsClicked();
             }
             dismiss();
         });
@@ -82,6 +100,8 @@ public class MoreFeaturesBottomSheet extends BottomSheetDialogFragment {
     private void animateCards(View view) {
         MaterialCardView[] cards = {
                 view.findViewById(R.id.cardWeatherMaps),
+                view.findViewById(R.id.cardVoiceAssistant),
+                view.findViewById(R.id.cardWeatherAlarms),
                 view.findViewById(R.id.cardOutfitSuggestions),
                 view.findViewById(R.id.cardActivitySuggestions)
         };

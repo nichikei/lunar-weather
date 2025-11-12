@@ -70,6 +70,10 @@ public class MainActivity extends AppCompatActivity {
     private WeatherRepositoryImpl repository; // Keep reference to access cached responses
     private static final String API_KEY = "4f8cf691daad596ac4e465c909868d0d";
     
+    // Weather Background Views
+    private com.example.weatherapp.ui.views.WeatherBackgroundView weatherBackgroundView;
+    private com.example.weatherapp.ui.views.Ultra3DWeatherView ultra3DWeatherView;
+    
     // Helper classes (UI only)
     private UIUpdateHelper uiUpdateHelper;
     private LocationHelper locationHelper;
@@ -204,6 +208,10 @@ public class MainActivity extends AppCompatActivity {
         
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Initialize weather background views
+        weatherBackgroundView = findViewById(R.id.weatherBackgroundView);
+        ultra3DWeatherView = findViewById(R.id.ultra3DWeatherView);
 
         sharedPreferences = getSharedPreferences("WeatherAppPrefs", MODE_PRIVATE);
 
@@ -669,6 +677,21 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onVoiceAssistantRequested() {
+                // Get current weather data from ViewModel
+                WeatherData currentWeather = viewModel.getCurrentWeatherData();
+                if (currentWeather != null) {
+                    // Open Voice Weather Assistant with weather data
+                    Intent intent = new Intent(MainActivity.this, VoiceWeatherActivity.class);
+                    intent.putExtra("weather_data", currentWeather);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_up, R.anim.fade_scale_out);
+                } else {
+                    Toast.makeText(MainActivity.this, "Please wait for weather data to load", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
             public void onOutfitSuggestionRequested() {
                 // Get current weather data from ViewModel
                 WeatherData currentWeather = viewModel.getCurrentWeatherData();
@@ -730,6 +753,29 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(MainActivity.this, "Loading location...", Toast.LENGTH_SHORT).show();
                         }
+                    }
+
+                    @Override
+                    public void onVoiceAssistantClicked() {
+                        bottomSheet.dismiss();
+                        // Get current weather data and open Voice Weather Assistant
+                        WeatherData currentWeather = viewModel.getCurrentWeatherData();
+                        if (currentWeather != null) {
+                            Intent intent = new Intent(MainActivity.this, VoiceWeatherActivity.class);
+                            intent.putExtra("weather_data", currentWeather);
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.slide_in_up, R.anim.fade_scale_out);
+                        } else {
+                            Toast.makeText(MainActivity.this, "Please wait for weather data to load", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onWeatherAlarmsClicked() {
+                        bottomSheet.dismiss();
+                        Intent intent = new Intent(MainActivity.this, com.example.weatherapp.ui.WeatherAlarmActivity.class);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.slide_in_up, R.anim.fade_scale_out);
                     }
 
                     @Override
@@ -845,15 +891,15 @@ public class MainActivity extends AppCompatActivity {
                 }
                 
                 // === 2. PARALLAX BACKGROUND EFFECT ===
-                if (binding.ivBackgroundHeader != null) {
+                if (weatherBackgroundView != null) {
                     // Background moves slower than scroll (parallax)
                     float parallaxOffset = scrollY * 0.5f;
-                    binding.ivBackgroundHeader.setTranslationY(parallaxOffset);
+                    weatherBackgroundView.setTranslationY(parallaxOffset);
                     
                     // Slight zoom out effect
                     float scale = 1f + (scrollProgress * 0.05f);
-                    binding.ivBackgroundHeader.setScaleX(scale);
-                    binding.ivBackgroundHeader.setScaleY(scale);
+                    weatherBackgroundView.setScaleX(scale);
+                    weatherBackgroundView.setScaleY(scale);
                 }
                 
                 // === 3. WEATHER INFO FADE OUT (ONLY BIG TEMP) ===
@@ -940,6 +986,9 @@ public class MainActivity extends AppCompatActivity {
             
             // Update charts with current weather data
             updateChartsWithWeatherData(data);
+            
+            // Update animated weather background
+            updateWeatherBackground(data);
             
             // Animate glassmorphic weather cards
             animateWeatherCards();
@@ -1356,6 +1405,48 @@ public class MainActivity extends AppCompatActivity {
         if (text == null || text.isEmpty()) return text;
         return text.substring(0, 1).toUpperCase() + text.substring(1);
     }
+
+    /**
+     * Update animated weather background based on current conditions
+     * Using Ultra3D system (Option 3) - all effects handled in one view
+     */
+    private void updateWeatherBackground(WeatherData data) {
+        if (weatherBackgroundView == null || ultra3DWeatherView == null) return;
+
+        // Check if it's night time
+        long currentTime = System.currentTimeMillis() / 1000;
+        boolean isNight = currentTime < data.getSunrise() || currentTime > data.getSunset();
+
+        // Update gradient background
+        String condition = data.getWeatherMain();
+        weatherBackgroundView.setWeatherCondition(condition, isNight);
+
+        // Build detailed condition string for better effect matching
+        String conditionLower = condition.toLowerCase();
+        String description = data.getWeatherDescription().toLowerCase();
+        
+        // Combine condition with description for better matching
+        String fullCondition = conditionLower;
+        if (description.contains("overcast")) {
+            fullCondition = "overcast clouds";
+        } else if (description.contains("broken")) {
+            fullCondition = "broken clouds";
+        } else if (description.contains("scattered")) {
+            fullCondition = "scattered clouds";
+        } else if (description.contains("few")) {
+            fullCondition = "few clouds";
+        }
+        
+        Log.d(TAG, "🌤️ Weather: " + condition + " | Description: " + description + " → Full: " + fullCondition);
+        
+        // Pass full condition string to Ultra3D for better effect matching
+        ultra3DWeatherView.setWeather(fullCondition, isNight);
+
+        // Simple log for debugging
+        Log.d(TAG, String.format("� Weather Effects: %s | Night: %s | 3D Layers: 5", 
+            conditionLower, isNight));
+    }
+
 
 
     @Override

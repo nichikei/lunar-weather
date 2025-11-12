@@ -72,6 +72,21 @@ public class WeatherData implements Serializable {
     public String getWeatherIcon() { return weatherIcon; }
     public int getCloudiness() { return cloudiness; }
     public double getVisibility() { return visibility; }
+    
+    // Helper methods for compatibility
+    public String getCondition() { 
+        return weatherMain != null ? weatherMain : weatherDescription; 
+    }
+    
+    public double getUvIndex() {
+        // TODO: Implement UV index from API or return default
+        return 5.0; // Default moderate UV
+    }
+    
+    public double getAqi() {
+        // TODO: Implement AQI from API or return default
+        return 50.0; // Default good AQI
+    }
     public long getSunrise() { return sunrise; }
     public long getSunset() { return sunset; }
     public long getTimestamp() { return timestamp; }

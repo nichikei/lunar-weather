@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_background"
+    android:paddingTop="8dp"
+    android:paddingBottom="32dp">
+
+    <!-- Handle Bar -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bottom_sheet_handle"
+        android:alpha="0.3" />
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:text="⏰ Add Weather Alarm"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="?android:attr/textColorPrimary"
+        android:fontFamily="@font/poppins_bold" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="500dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp">
+
+            <!-- Alarm Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alarm Title"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary"
+                android:fontFamily="@font/poppins_semibold"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etAlarmTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="e.g., Morning Wake Up"
+                android:padding="16dp"
+                android:background="@drawable/rounded_edittext_background"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Time Selection -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary"
+                android:fontFamily="@font/poppins_semibold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvSelectedTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="7:00 AM"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/holo_blue_light"
+                android:fontFamily="@font/poppins_bold"
+                android:gravity="center"
+                android:padding="16dp"
+                android:background="@drawable/rounded_edittext_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Alarm Type -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alarm Type"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary"
+                android:fontFamily="@font/poppins_semibold"
+                android:layout_marginBottom="8dp" />
+
+            <Spinner
+                android:id="@+id/spinnerAlarmType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:background="@drawable/rounded_edittext_background"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Days of Week -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Repeat On"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary"
+                android:fontFamily="@font/poppins_semibold"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/layoutDaysOfWeek"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
+
+                <CheckBox
+                    android:id="@+id/cbMonday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Monday"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/poppins"
+                    android:padding="12dp" />
+
+                <CheckBox
+                    android:id="@+id/cbTuesday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tuesday"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/poppins"
+                    android:padding="12dp" />
+
+                <CheckBox
+                    android:id="@+id/cbWednesday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Wednesday"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/poppins"
+                    android:padding="12dp" />
+
+                <CheckBox
+                    android:id="@+id/cbThursday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Thursday"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/poppins"
+                    android:padding="12dp" />
+
+                <CheckBox
+                    android:id="@+id/cbFriday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Friday"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/poppins"
+                    android:padding="12dp" />
+
+                <CheckBox
+                    android:id="@+id/cbSaturday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Saturday"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/poppins"
+                    android:padding="12dp" />
+
+                <CheckBox
+                    android:id="@+id/cbSunday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Sunday"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/poppins"
+                    android:padding="12dp" />
+
+            </LinearLayout>
+
+            <!-- Save Button -->
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save Alarm"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/poppins_semibold"
+                android:background="@drawable/rounded_button_background"
+                android:padding="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

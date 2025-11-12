@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#40FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <!-- Left - Icon & Time -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvAlarmIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⏰"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/tvAlarmTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="7:30 AM"
+                    android:textSize="28sp"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/poppins_bold"
+                    android:layout_marginStart="12dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvAlarmTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wake Up Early"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_semibold"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvAlarmDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wake up 30 min early if rain"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:alpha="0.7"
+                android:fontFamily="@font/poppins"
+                android:layout_marginTop="2dp" />
+
+            <!-- Days of Week -->
+            <TextView
+                android:id="@+id/tvAlarmDays"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mon, Tue, Wed, Thu, Fri"
+                android:textSize="11sp"
+                android:textColor="@android:color/white"
+                android:alpha="0.6"
+                android:fontFamily="@font/poppins"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+        <!-- Right - Toggle & Delete -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchAlarmEnabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                app:thumbTint="#FFFFFF"
+                app:trackTint="#3B82F6" />
+
+            <ImageButton
+                android:id="@+id/btnDeleteAlarm"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_delete"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Delete"
+                android:layout_marginTop="8dp"
+                app:tint="@android:color/white"
+                android:alpha="0.6" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

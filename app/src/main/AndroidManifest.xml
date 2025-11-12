@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -57,6 +59,16 @@
             android:name=".ui.activities.WeatherMapsActivity"
             android:exported="false"
             android:theme="@style/Theme.WeatherApp" />
+        <activity
+            android:name=".ui.activities.VoiceWeatherActivity"
+            android:exported="false"
+            android:theme="@style/Theme.WeatherApp.NoActionBar"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.WeatherAlarmActivity"
+            android:exported="false"
+            android:theme="@style/Theme.WeatherApp.NoActionBar"
+            android:screenOrientation="portrait" />
 
         <!-- Google Maps API Key -->
         <meta-data
@@ -69,6 +81,15 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.example.weatherapp.ACTION_REFRESH_WEATHER" />
+            </intent-filter>
+        </receiver>
+        
+        <!-- Weather Alarm Receiver -->
+        <receiver
+            android:name=".notification.WeatherAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
