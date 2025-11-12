@@ -49,6 +49,10 @@
             android:name=".ui.activities.ChartsActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.activities.IOSWeatherActivity"
+            android:exported="true"
+            android:theme="@style/Theme.WeatherApp.NoActionBar" />
+        <activity
             android:name=".ui.activities.OutfitSuggestionActivity"
             android:exported="false" />
         <activity

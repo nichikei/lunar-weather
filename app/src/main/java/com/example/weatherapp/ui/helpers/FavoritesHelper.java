@@ -1,6 +1,8 @@
 package com.example.weatherapp.ui.helpers;
 
 import android.content.Intent;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.weatherapp.data.models.FavoriteCity;
@@ -9,23 +11,23 @@ import com.example.weatherapp.R;
 import com.example.weatherapp.domain.repository.FavoriteCitiesManager;
 import com.example.weatherapp.ui.activities.MainActivity;
 import com.example.weatherapp.ui.activities.FavoriteCitiesActivity;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 /**
  * Helper class for managing favorite cities
  * Handles adding, removing, and updating favorite status
  * REFACTORED: Now uses domain model WeatherData instead of data layer WeatherResponse
+ * Updated to support both FAB and regular View (iOS bottom nav)
  */
 public class FavoritesHelper {
     private final MainActivity activity;
     private final FavoriteCitiesManager favoritesManager;
-    private final FloatingActionButton fabButton;
+    private final View favoriteButton;
     
     public FavoritesHelper(MainActivity activity, FavoriteCitiesManager favoritesManager, 
-                          FloatingActionButton fabButton) {
+                          View favoriteButton) {
         this.activity = activity;
         this.favoritesManager = favoritesManager;
-        this.fabButton = fabButton;
+        this.favoriteButton = favoriteButton;
     }
     
     /**
@@ -92,24 +94,56 @@ public class FavoritesHelper {
     }
     
     /**
-     * Update FAB icon based on favorite status
+     * Update favorite button icon based on favorite status
      */
     public void updateFavoriteIcon(String cityName) {
-        if (fabButton != null && cityName != null) {
+        if (favoriteButton != null && cityName != null) {
             boolean isFavorite = favoritesManager.isFavorite(cityName);
             updateFavoriteIcon(isFavorite);
         }
     }
     
     /**
-     * Update FAB icon
+     * Update favorite button icon (works with FAB or ImageView)
      */
     private void updateFavoriteIcon(boolean isFavorite) {
-        if (fabButton != null) {
-            fabButton.setImageResource(
-                isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_heart_line
-            );
+        if (favoriteButton != null) {
+            // Try to find ImageView within the button (for iOS bottom nav)
+            ImageView imageView = null;
+            if (favoriteButton instanceof ImageView) {
+                imageView = (ImageView) favoriteButton;
+            } else {
+                // Search for ImageView child
+                imageView = favoriteButton.findViewById(R.id.fabAddToFavorites);
+                if (imageView == null) {
+                    // Fallback: find first ImageView child
+                    imageView = findImageViewInView(favoriteButton);
+                }
+            }
+            
+            if (imageView != null) {
+                imageView.setImageResource(
+                    isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_heart_line
+                );
+            }
         }
+    }
+    
+    /**
+     * Helper to find ImageView in a View hierarchy
+     */
+    private ImageView findImageViewInView(View view) {
+        if (view instanceof ImageView) {
+            return (ImageView) view;
+        }
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                ImageView found = findImageViewInView(group.getChildAt(i));
+                if (found != null) return found;
+            }
+        }
+        return null;
     }
     
     /**

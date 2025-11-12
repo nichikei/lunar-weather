@@ -47,6 +47,9 @@ dependencies {
     // CardView
     implementation 'androidx.cardview:cardview:1.0.0'
 
+    // BlurView for iOS-style glassmorphism effect
+    implementation 'com.github.Dimezis:BlurView:version-2.0.5'
+
     // Retrofit for API calls
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'

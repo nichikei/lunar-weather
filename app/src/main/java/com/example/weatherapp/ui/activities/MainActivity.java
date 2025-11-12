@@ -70,9 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private WeatherRepositoryImpl repository; // Keep reference to access cached responses
     private static final String API_KEY = "4f8cf691daad596ac4e465c909868d0d";
     
-    // Weather Background Views
-    private com.example.weatherapp.ui.views.WeatherBackgroundView weatherBackgroundView;
-    private com.example.weatherapp.ui.views.Ultra3DWeatherView ultra3DWeatherView;
+    // Weather Background Views - Removed for iOS-style glassmorphism
     
     // Helper classes (UI only)
     private UIUpdateHelper uiUpdateHelper;
@@ -209,9 +207,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Initialize weather background views
-        weatherBackgroundView = findViewById(R.id.weatherBackgroundView);
-        ultra3DWeatherView = findViewById(R.id.ultra3DWeatherView);
+        // Weather background removed - using simple gradient for iOS-style glassmorphism
 
         sharedPreferences = getSharedPreferences("WeatherAppPrefs", MODE_PRIVATE);
 
@@ -263,6 +259,9 @@ public class MainActivity extends AppCompatActivity {
         
         // Setup scroll listener for top bar city name visibility
         setupScrollListener();
+
+        // Setup iOS-style glassmorphism with real blur
+        setupGlassmorphismBlur();
 
         // Apply glass morphism effects to UI elements
         uiSetupHelper.applyGlassMorphismEffects();
@@ -854,6 +853,37 @@ public class MainActivity extends AppCompatActivity {
     }
     
     /**
+     * Setup iOS-style glassmorphism with real BlurView
+     */
+    private void setupGlassmorphismBlur() {
+        com.example.weatherapp.ui.helpers.BlurViewHelper blurHelper = 
+                new com.example.weatherapp.ui.helpers.BlurViewHelper(this, binding.getRoot());
+
+        // Setup hourly forecast card blur
+        eightbitlab.com.blurview.BlurView blurViewHourly = findViewById(R.id.blurViewHourly);
+        if (blurViewHourly != null) {
+            blurHelper.setupCardBlur(blurViewHourly);
+            Log.d(TAG, "✅ Hourly card glassmorphism applied");
+        }
+
+        // Setup 10-day forecast card blur
+        eightbitlab.com.blurview.BlurView blurViewForecast = findViewById(R.id.blurViewForecast);
+        if (blurViewForecast != null) {
+            blurHelper.setupCardBlur(blurViewForecast);
+            Log.d(TAG, "✅ Forecast card glassmorphism applied");
+        }
+
+        // Setup bottom navigation blur
+        eightbitlab.com.blurview.BlurView blurViewBottomNav = findViewById(R.id.blurViewBottomNav);
+        if (blurViewBottomNav != null) {
+            blurHelper.setupBottomNavBlur(blurViewBottomNav);
+            Log.d(TAG, "✅ Bottom nav glassmorphism applied");
+        }
+
+        Log.d(TAG, "🎨 iOS-style glassmorphism setup complete!");
+    }
+
+    /**
      * Setup scroll listener with advanced parallax effects and smooth UI transitions
      */
     private void setupScrollListener() {
@@ -891,16 +921,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 
                 // === 2. PARALLAX BACKGROUND EFFECT ===
-                if (weatherBackgroundView != null) {
-                    // Background moves slower than scroll (parallax)
-                    float parallaxOffset = scrollY * 0.5f;
-                    weatherBackgroundView.setTranslationY(parallaxOffset);
-                    
-                    // Slight zoom out effect
-                    float scale = 1f + (scrollProgress * 0.05f);
-                    weatherBackgroundView.setScaleX(scale);
-                    weatherBackgroundView.setScaleY(scale);
-                }
+                // Removed for iOS-style static gradient background
                 
                 // === 3. WEATHER INFO FADE OUT (ONLY BIG TEMP) ===
                 // Only fade the large temperature/description, keep min opacity at 0.3
@@ -1407,44 +1428,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Update animated weather background based on current conditions
-     * Using Ultra3D system (Option 3) - all effects handled in one view
+     * Update weather background - Simplified for iOS-style glassmorphism
+     * Removed fancy effects for clean, minimal iOS aesthetic
      */
     private void updateWeatherBackground(WeatherData data) {
-        if (weatherBackgroundView == null || ultra3DWeatherView == null) return;
-
-        // Check if it's night time
-        long currentTime = System.currentTimeMillis() / 1000;
-        boolean isNight = currentTime < data.getSunrise() || currentTime > data.getSunset();
-
-        // Update gradient background
-        String condition = data.getWeatherMain();
-        weatherBackgroundView.setWeatherCondition(condition, isNight);
-
-        // Build detailed condition string for better effect matching
-        String conditionLower = condition.toLowerCase();
-        String description = data.getWeatherDescription().toLowerCase();
-        
-        // Combine condition with description for better matching
-        String fullCondition = conditionLower;
-        if (description.contains("overcast")) {
-            fullCondition = "overcast clouds";
-        } else if (description.contains("broken")) {
-            fullCondition = "broken clouds";
-        } else if (description.contains("scattered")) {
-            fullCondition = "scattered clouds";
-        } else if (description.contains("few")) {
-            fullCondition = "few clouds";
-        }
-        
-        Log.d(TAG, "🌤️ Weather: " + condition + " | Description: " + description + " → Full: " + fullCondition);
-        
-        // Pass full condition string to Ultra3D for better effect matching
-        ultra3DWeatherView.setWeather(fullCondition, isNight);
-
-        // Simple log for debugging
-        Log.d(TAG, String.format("� Weather Effects: %s | Night: %s | 3D Layers: 5", 
-            conditionLower, isNight));
+        // iOS Weather uses simple gradient backgrounds - no fancy effects needed
+        Log.d(TAG, "iOS-style background: Simple gradient with glassmorphism panels");
     }
 
 

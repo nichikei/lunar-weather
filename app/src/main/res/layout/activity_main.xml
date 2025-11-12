@@ -1,377 +1,227 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/ios_weather_gradient_bg"
     tools:context=".MainActivity">
 
-    <!-- Animated Weather Background -->
-    <com.example.weatherapp.ui.views.WeatherBackgroundView
-        android:id="@+id/weatherBackgroundView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- Dark Overlay for better text visibility -->
+    <!-- Simple dark overlay for iOS-style clean background -->
     <View
         android:id="@+id/darkOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/overlay_dark" />
+        android:background="#10000000" />
 
-    <!-- Ultra 3D Weather Effects with Depth, Bokeh, Light Leaks, Particles -->
-    <com.example.weatherapp.ui.views.Ultra3DWeatherView
-        android:id="@+id/ultra3DWeatherView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- Premium iOS-style Glassmorphic Top Bar -->
+    <!-- iOS-style Top Bar (Invisible but functional) -->
     <FrameLayout
         android:id="@+id/topGlassBar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_alignParentTop="true"
+        android:layout_gravity="top"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="40dp"
-        android:background="@drawable/top_bar_glass_background"
+        android:background="@android:color/transparent"
         android:elevation="8dp">
 
-        <!-- Search Icon - Left Edge -->
+        <!-- Hidden buttons for compatibility -->
         <FrameLayout
             android:id="@+id/btnSearchIcon"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:layout_gravity="start|center_vertical"
             android:layout_marginStart="6dp"
-            android:background="@drawable/icon_button_background"
+            android:visibility="invisible"
             android:clickable="true"
-            android:focusable="true"
-            android:padding="8dp">
+            android:focusable="true" />
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:contentDescription="Search"
-                android:src="@drawable/ic_search_line"
-                android:tint="#E2DDFD"
-                tools:ignore="UseAppTint" />
-        </FrameLayout>
-
-        <!-- City Name - Centered -->
         <TextView
             android:id="@+id/tvTopBarCityName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Hanoi"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:letterSpacing="0.005"
-            android:fontFamily="sans-serif-medium"
-            android:singleLine="true"
-            android:ellipsize="end"
-            tools:ignore="HardcodedText" />
+            android:visibility="invisible" />
 
-        <!-- Favorites Icon - Right of center -->
         <FrameLayout
             android:id="@+id/btnFavoritesIcon"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:layout_gravity="end|center_vertical"
             android:layout_marginEnd="56dp"
-
-            android:background="@drawable/icon_button_background"
+            android:visibility="invisible"
             android:clickable="true"
-            android:focusable="true"
-            android:padding="8dp">
+            android:focusable="true" />
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_heart_line"
-                android:tint="#E2DDFD"
-                android:contentDescription="Favorites"
-                tools:ignore="UseAppTint" />
-        </FrameLayout>
-
-        <!-- Settings Icon - Right Edge -->
         <FrameLayout
             android:id="@+id/btnSettingsIcon"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:layout_gravity="end|center_vertical"
             android:layout_marginEnd="6dp"
-            android:background="@drawable/settings_floating_button"
+            android:visibility="invisible"
             android:clickable="true"
-            android:focusable="true"
-            android:padding="8dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_settings_line"
-                android:tint="#E2DDFD"
-                android:contentDescription="Settings"
-                tools:ignore="UseAppTint" />
-        </FrameLayout>
+            android:focusable="true" />
     </FrameLayout>
 
-    <!-- Weather Refresh Layout (Pull-to-Refresh) -->
-    <com.example.weatherapp.ui.views.WeatherRefreshLayout
+    <!-- Main Scrollable Content (iOS Style) -->
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/weatherRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
 
-        <!-- Main Content ScrollView -->
-        <ScrollView
+        <LinearLayout
             android:id="@+id/mainScrollView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="100dp">
 
-            <LinearLayout
+            <!-- Status Bar Spacer for iOS style -->
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-            android:orientation="vertical">
+                android:layout_height="44dp" />
 
-            <!-- Top Section with City Name and Weather - Improved Text Hierarchy -->
-
-            <!-- Search Bar with improved depth -->
-
+            <!-- iOS Top Section: City Name & Temperature -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="160dp"
-                android:paddingBottom="32dp"
+                android:gravity="center_horizontal"
+                android:paddingTop="34dp"
                 android:paddingHorizontal="24dp">
 
-                <!-- City Name (keep for backward compatibility but will be hidden) -->
+                <!-- City Name (iOS Style - centered) -->
                 <TextView
                     android:id="@+id/tvCityName"
-                    style="@style/TextStyle.LargeTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="16dp"
-                    android:text="Montreal"
-                    android:visibility="gone"
+                    android:text="Hanoi"
+                    android:textColor="#FFFFFF"
+                    android:textSize="37sp"
+                    android:fontFamily="sans-serif-light"
+                    android:letterSpacing="-0.005"
+                    android:gravity="center"
                     tools:ignore="HardcodedText" />
 
-                <!-- Large Temperature - Bold 80sp for premium hierarchy -->
+                <!-- Current Temperature (iOS Style - 102sp) -->
                 <TextView
                     android:id="@+id/tvTemperature"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="12dp"
-                    android:fontFamily="sans-serif-light"
-                    android:letterSpacing="-0.01"
-                    android:text="19°"
+                    android:layout_marginTop="-5dp"
+                    android:text="21°"
                     android:textColor="#FFFFFF"
-                    android:textSize="80sp"
+                    android:textSize="102sp"
+                    android:fontFamily="sans-serif-thin"
+                    android:letterSpacing="-0.005"
                     tools:ignore="HardcodedText" />
 
-                <!-- Weather Description - Medium 16sp -->
+                <!-- Weather Description (iOS Style) -->
                 <TextView
                     android:id="@+id/tvWeatherDescription"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="6dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:letterSpacing="0.005"
-                    android:text="Mostly Clear"
+                    android:layout_marginTop="2dp"
+                    android:text="Partly Cloudy"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
+                    android:fontFamily="sans-serif"
                     tools:ignore="HardcodedText" />
 
-                <!-- Temp Range - Light 14sp, 50% opacity -->
+                <!-- High/Low Temperature (iOS Style) -->
                 <TextView
                     android:id="@+id/tvTempRange"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:fontFamily="sans-serif-bold"
-                    android:letterSpacing="0.01"
-                    android:text="H:24°   L:18°"
-                    android:textColor="#80FFFFFF"
-                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"
+                    android:text="H:29°  L:15°"
+                    android:textColor="#FFFFFF"
+                    android:textSize="21sp"
+                    android:fontFamily="sans-serif-medium"
                     tools:ignore="HardcodedText" />
+
             </LinearLayout>
 
+            <!-- Hidden Search Container for compatibility -->
             <LinearLayout
                 android:id="@+id/searchContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/search_background"
-                android:padding="12dp"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone"
-                android:elevation="6dp">
+                android:visibility="gone">
 
-                <!-- Search Input Row -->
-                <LinearLayout
+                <EditText
+                    android:id="@+id/etCityName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:visibility="gone"
+                    android:autofillHints="postalAddress" />
 
-                    <EditText
-                        android:id="@+id/etCityName"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="@string/search_city_hint"
-                        android:textColorHint="@color/text_secondary"
-                        android:textColor="@color/text_primary"
-                        android:inputType="text"
-                        android:padding="12dp"
-                        android:background="@android:color/transparent"
-                        android:textSize="16sp"
-                        android:autofillHints="postalAddress" />
+                <ImageButton
+                    android:id="@+id/btnSearch"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:visibility="gone"
+                    android:contentDescription="@string/search_city_hint" />
 
-                    <ImageButton
-                        android:id="@+id/btnSearch"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:src="@android:drawable/ic_menu_search"
-                        app:tint="@color/text_primary"
-                        android:contentDescription="@string/search_city_hint" />
-                </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/border_white_30"
-                    android:layout_marginVertical="8dp" />
-
-                <!-- Current Location Button -->
                 <LinearLayout
                     android:id="@+id/btnCurrentLocation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="12dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:background="?attr/selectableItemBackground">
-
-                    <TextView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:text="📍"
-                        android:textSize="18sp"
-                        android:gravity="center"
-                        android:layout_marginEnd="12dp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/use_current_location"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_mylocation"
-                        app:tint="@color/accent_cyan"
-                        android:contentDescription="@string/use_current_location" />
-                </LinearLayout>
+                    android:visibility="gone" />
             </LinearLayout>
 
-            <!-- Forecast Card Container with improved elevation -->
-            <androidx.cardview.widget.CardView
+            <!-- iOS Hourly Forecast Card with Glassmorphism -->
+            <eightbitlab.com.blurview.BlurView
+                android:id="@+id/blurViewHourly"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="137dp"
-                app:cardCornerRadius="44dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                android:layout_marginStart="21dp"
+                android:layout_marginEnd="21dp"
+                android:layout_marginTop="30dp">
 
-                <LinearLayout
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/card_background"
-                    android:paddingBottom="100dp">
+                    app:cardCornerRadius="15dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#4D000000">
 
-                    <!-- Segmented Control -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="32dp"
-                        android:paddingTop="24dp"
-                        android:paddingBottom="24dp">
+                        android:orientation="vertical"
+                        android:padding="15dp">
 
-                        <TextView
-                            android:id="@+id/btnHourly"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Hourly Forecast"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:fontFamily="sans-serif-medium"
-                            android:gravity="start"
-                            tools:ignore="HardcodedText" />
-
-                        <TextView
-                            android:id="@+id/btnWeekly"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Weekly Forecast"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="15sp"
-                            android:fontFamily="sans-serif-medium"
-                            android:gravity="end"
-                            tools:ignore="HardcodedText" />
-                    </LinearLayout>
+                    <!-- iOS Weather Info Text -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cloudy conditions from 1AM-9AM, with\nshowers expected at 9AM."
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:fontFamily="sans-serif"
+                        android:lineSpacingExtra="2dp"
+                        tools:ignore="HardcodedText" />
 
                     <!-- Divider Line -->
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border_white_30"
-                        android:layout_marginBottom="0dp" />
+                        android:layout_height="0.2dp"
+                        android:layout_marginTop="15dp"
+                        android:background="#80FFFFFF" />
 
-                    <!-- Tab Indicator -->
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="-1dp"
-                        android:layout_marginBottom="16dp"
-                        android:paddingHorizontal="32dp">
-
-                        <View
-                            android:id="@+id/tabIndicator"
-                            android:layout_width="111dp"
-                            android:layout_height="3dp"
-                            android:layout_gravity="start"
-                            android:background="@drawable/tab_indicator" />
-                    </FrameLayout>
-
-                    <!-- Hourly Forecast -->
+                    <!-- Hourly Forecast (iOS Style) -->
                     <HorizontalScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:scrollbars="none"
-                        android:paddingStart="20dp"
-                        android:paddingEnd="20dp"
-                        android:layout_marginBottom="24dp">
+                        android:layout_marginTop="15dp">
 
                         <LinearLayout
                             android:id="@+id/hourlyForecastContainer"
@@ -381,24 +231,103 @@
                         </LinearLayout>
                     </HorizontalScrollView>
 
-                    <!-- Weather Details Section -->
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </eightbitlab.com.blurview.BlurView>
+
+            <!-- iOS 10-Day Forecast Card with Glassmorphism -->
+            <eightbitlab.com.blurview.BlurView
+                android:id="@+id/blurViewForecast"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="21dp"
+                android:layout_marginEnd="21dp"
+                android:layout_marginTop="8dp">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="15dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#4D000000">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                    <!-- 10-Day Forecast Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="15dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="19dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_calendar"
+                            android:tint="#FFFFFF"
+                            android:contentDescription="Calendar"
+                            tools:ignore="UseAppTint" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="5dp"
+                            android:text="10-DAY  FORECAST"
+                            android:textColor="#FFFFFF"
+                            android:textSize="15sp"
+                            android:fontFamily="sans-serif-medium"
+                            tools:ignore="HardcodedText" />
+                    </LinearLayout>
+
+                    <!-- Divider Line -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.2dp"
+                        android:layout_marginHorizontal="15dp"
+                        android:background="#80FFFFFF" />
+
+                    <!-- Hidden buttons for compatibility -->
+                    <TextView
+                        android:id="@+id/btnHourly"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/btnWeekly"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone" />
+
+                    <View
+                        android:id="@+id/tabIndicator"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone" />
+
+                    <!-- iOS Style Weather Details Grid (keep all features) -->
                     <LinearLayout
                         android:id="@+id/weatherDetailsSection"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:paddingHorizontal="24dp"
+                        android:paddingHorizontal="16dp"
                         android:paddingTop="10dp"
-                        android:paddingBottom="32dp">
+                        android:paddingBottom="16dp">
 
-                        <!-- More Features Button - Access Charts, Maps, AI Suggestions -->
+                        <!-- More Features Button (iOS styled) -->
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/btnMoreFeatures"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="16dp"
-                            app:cardCornerRadius="22dp"
-                            app:cardElevation="8dp"
+                            android:layout_marginBottom="8dp"
+                            app:cardCornerRadius="15dp"
+                            app:cardElevation="0dp"
                             app:strokeWidth="0dp"
                             android:clickable="true"
                             android:focusable="true"
@@ -408,190 +337,111 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:background="@drawable/weather_detail_card_background"
-                                android:padding="18dp"
+                                android:background="@drawable/ios_card_background"
+                                android:padding="14dp"
                                 android:orientation="horizontal"
                                 android:gravity="center_vertical">
 
-                                <!-- Icon -->
-                                <com.google.android.material.card.MaterialCardView
-                                    android:layout_width="48dp"
-                                    android:layout_height="48dp"
-                                    app:cardCornerRadius="12dp"
-                                    app:cardElevation="0dp"
-                                    app:strokeWidth="0dp"
-                                    app:cardBackgroundColor="?attr/colorPrimaryContainer">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="✨"
+                                    android:textSize="20sp" />
 
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:gravity="center"
-                                        android:text="✨"
-                                        android:textSize="24sp" />
-                                </com.google.android.material.card.MaterialCardView>
-
-                                <!-- Text Content -->
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
                                     android:orientation="vertical"
-                                    android:layout_marginStart="14dp">
+                                    android:layout_marginStart="10dp">
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="AI Features"
-                                        android:textSize="16sp"
+                                        android:textSize="15sp"
                                         android:textStyle="bold"
-                                        android:textColor="?android:attr/textColorPrimary"
-                                        android:fontFamily="@font/poppins_semibold" />
+                                        android:textColor="#FFFFFF" />
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
                                         android:text="Maps, Outfit &amp; Activity Suggestions"
-                                        android:textSize="12sp"
-                                        android:textColor="?android:attr/textColorSecondary"
-                                        android:fontFamily="@font/poppins" />
+                                        android:textSize="11sp"
+                                        android:textColor="#B0FFFFFF" />
                                 </LinearLayout>
 
-                                <!-- Arrow -->
                                 <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
                                     android:src="@drawable/ic_arrow_forward"
-                                    android:tint="?android:attr/textColorSecondary"
-                                    android:alpha="0.6" />
+                                    android:tint="#FFFFFF"
+                                    android:alpha="0.6"
+                                    tools:ignore="UseAppTint" />
 
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Air Quality Index -->
+                        <!-- Air Quality Index (iOS styled) -->
                         <include
                             android:id="@+id/card_air_quality"
-                            layout="@layout/card_air_quality" />
+                            layout="@layout/card_air_quality"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp" />
 
-                        <!-- Weather Charts Section -->
+                        <!-- Hidden chart views for compatibility -->
+                        <FrameLayout
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:visibility="gone">
+
+                            <com.example.weatherapp.ui.views.charts.WeatherLineChart
+                                android:id="@+id/chartTemperatureMain"
+                                android:layout_width="match_parent"
+                                android:layout_height="200dp" />
+
+                            <com.example.weatherapp.ui.views.charts.AnimatedProgressRing
+                                android:id="@+id/ringHumidityMain"
+                                android:layout_width="120dp"
+                                android:layout_height="120dp" />
+
+                            <com.example.weatherapp.ui.views.charts.WindSpeedGauge
+                                android:id="@+id/gaugeWindSpeedMain"
+                                android:layout_width="match_parent"
+                                android:layout_height="150dp" />
+
+                            <com.example.weatherapp.ui.views.charts.AnimatedProgressRing
+                                android:id="@+id/ringUvIndexMain"
+                                android:layout_width="120dp"
+                                android:layout_height="120dp" />
+                        </FrameLayout>
+
+                        <!-- Forecast Summary (iOS styled) -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="16dp"
-                            app:cardCornerRadius="22dp"
-                            app:cardElevation="8dp"
+                            android:layout_marginBottom="8dp"
+                            app:cardCornerRadius="15dp"
+                            app:cardElevation="0dp"
                             app:cardBackgroundColor="@android:color/transparent">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:background="@drawable/weather_detail_card_background"
-                                android:padding="20dp"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="📊 WEATHER TRENDS"
-                                    android:textColor="@color/text_secondary"
-                                    android:textSize="13sp"
-                                    android:fontFamily="@font/poppins_semibold"
-                                    android:letterSpacing="0.05"
-                                    android:layout_marginBottom="16dp" />
-
-                                <!-- Temperature Chart -->
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Temperature Forecast"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="15sp"
-                                    android:fontFamily="@font/poppins_medium"
-                                    android:layout_marginBottom="8dp" />
-
-                                <com.example.weatherapp.ui.views.charts.WeatherLineChart
-                                    android:id="@+id/chartTemperatureMain"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="200dp"
-                                    android:layout_marginBottom="20dp" />
-
-                                <!-- Humidity Gauge -->
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Humidity Level"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="15sp"
-                                    android:fontFamily="@font/poppins_medium"
-                                    android:layout_marginBottom="8dp" />
-
-                                <com.example.weatherapp.ui.views.charts.AnimatedProgressRing
-                                    android:id="@+id/ringHumidityMain"
-                                    android:layout_width="120dp"
-                                    android:layout_height="120dp"
-                                    android:layout_gravity="center"
-                                    android:layout_marginBottom="20dp" />
-
-                                <!-- Wind Speed Gauge -->
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Wind Speed"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="15sp"
-                                    android:fontFamily="@font/poppins_medium"
-                                    android:layout_marginBottom="8dp" />
-
-                                <com.example.weatherapp.ui.views.charts.WindSpeedGauge
-                                    android:id="@+id/gaugeWindSpeedMain"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="150dp"
-                                    android:layout_marginBottom="20dp" />
-
-                                <!-- UV Index Ring -->
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="UV Index"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="15sp"
-                                    android:fontFamily="@font/poppins_medium"
-                                    android:layout_marginBottom="8dp" />
-
-                                <com.example.weatherapp.ui.views.charts.AnimatedProgressRing
-                                    android:id="@+id/ringUvIndexMain"
-                                    android:layout_width="120dp"
-                                    android:layout_height="120dp"
-                                    android:layout_gravity="center" />
-
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
-
-                        <!-- Medium Widget - 10 Day Forecast Summary -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="match_parent"
-                            android:layout_height="158dp"
-                            android:layout_marginBottom="10dp"
-                            app:cardCornerRadius="22dp"
-                            app:cardElevation="8dp"
-                            app:cardBackgroundColor="@android:color/transparent">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/weather_detail_card_background"
-                                android:padding="20dp"
+                                android:background="@drawable/ios_card_background"
+                                android:padding="16dp"
                                 android:orientation="vertical">
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="WEEKEND FORECAST"
-                                    android:textColor="@color/text_secondary"
+                                    android:textColor="#B0FFFFFF"
                                     android:textSize="13sp"
                                     android:fontFamily="sans-serif-medium"
                                     android:letterSpacing="0.05"
-                                    android:layout_marginBottom="12dp"
+                                    android:layout_marginBottom="8dp"
                                     tools:ignore="HardcodedText" />
 
                                 <TextView
@@ -599,335 +449,305 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Rain expected in 6 of the next 10 days"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="17sp"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="16sp"
                                     android:fontFamily="sans-serif"
-                                    android:lineSpacingExtra="4dp"
+                                    android:lineSpacingExtra="2dp"
                                     tools:ignore="HardcodedText" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
-                        <!-- Row 1: UV Index & Sunrise -->
+                        <!-- Row 1: UV Index & Sunrise (iOS style) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:weightSum="2"
-                            android:layout_marginBottom="10dp">
+                            android:layout_marginBottom="8dp">
 
-                            <!-- UV Index Card -->
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/cardUvIndex"
                                 android:layout_width="0dp"
-                                android:layout_height="164dp"
+                                android:layout_height="155dp"
                                 android:layout_weight="1"
-                                android:layout_marginEnd="5dp"
-                                app:cardCornerRadius="22dp"
-                                app:cardElevation="6dp"
+                                android:layout_marginEnd="4dp"
+                                app:cardCornerRadius="15dp"
+                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@android:color/transparent">
 
                                 <include layout="@layout/card_uv_index" />
                             </androidx.cardview.widget.CardView>
 
-                            <!-- Sunrise Card -->
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/cardSunrise"
                                 android:layout_width="0dp"
-                                android:layout_height="164dp"
+                                android:layout_height="155dp"
                                 android:layout_weight="1"
-                                android:layout_marginStart="5dp"
-                                app:cardCornerRadius="22dp"
-                                app:cardElevation="8dp"
+                                android:layout_marginStart="4dp"
+                                app:cardCornerRadius="15dp"
+                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@android:color/transparent">
 
                                 <include layout="@layout/card_sunrise" />
                             </androidx.cardview.widget.CardView>
                         </LinearLayout>
 
-                        <!-- Row 2: Wind & Rainfall -->
+                        <!-- Row 2: Wind & Rainfall (iOS style) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:weightSum="2"
-                            android:layout_marginBottom="10dp">
+                            android:layout_marginBottom="8dp">
 
-                            <!-- Wind Card -->
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/cardWind"
                                 android:layout_width="0dp"
-                                android:layout_height="164dp"
+                                android:layout_height="155dp"
                                 android:layout_weight="1"
-                                android:layout_marginEnd="5dp"
-                                app:cardCornerRadius="22dp"
-                                app:cardElevation="8dp"
+                                android:layout_marginEnd="4dp"
+                                app:cardCornerRadius="15dp"
+                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@android:color/transparent">
 
                                 <include layout="@layout/card_wind" />
                             </androidx.cardview.widget.CardView>
 
-                            <!-- Rainfall Card -->
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/cardRainfall"
                                 android:layout_width="0dp"
-                                android:layout_height="164dp"
+                                android:layout_height="155dp"
                                 android:layout_weight="1"
-                                android:layout_marginStart="5dp"
-                                app:cardCornerRadius="22dp"
-                                app:cardElevation="8dp"
+                                android:layout_marginStart="4dp"
+                                app:cardCornerRadius="15dp"
+                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@android:color/transparent">
 
                                 <include layout="@layout/card_rain_probability" />
                             </androidx.cardview.widget.CardView>
                         </LinearLayout>
 
-                        <!-- Row 3: Feels Like & Humidity -->
+                        <!-- Row 3: Feels Like & Humidity (iOS style) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:weightSum="2"
-                            android:layout_marginBottom="10dp">
+                            android:layout_marginBottom="8dp">
 
-                            <!-- Feels Like Card -->
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/cardFeelsLike"
                                 android:layout_width="0dp"
-                                android:layout_height="164dp"
+                                android:layout_height="155dp"
                                 android:layout_weight="1"
-                                android:layout_marginEnd="5dp"
-                                app:cardCornerRadius="22dp"
-                                app:cardElevation="8dp"
+                                android:layout_marginEnd="4dp"
+                                app:cardCornerRadius="15dp"
+                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@android:color/transparent">
 
                                 <include layout="@layout/card_feels_like" />
                             </androidx.cardview.widget.CardView>
 
-                            <!-- Humidity Card -->
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/cardHumidity"
                                 android:layout_width="0dp"
-                                android:layout_height="164dp"
+                                android:layout_height="155dp"
                                 android:layout_weight="1"
-                                android:layout_marginStart="5dp"
-                                app:cardCornerRadius="22dp"
-                                app:cardElevation="8dp"
+                                android:layout_marginStart="4dp"
+                                app:cardCornerRadius="15dp"
+                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@android:color/transparent">
 
                                 <include layout="@layout/card_humidity" />
                             </androidx.cardview.widget.CardView>
                         </LinearLayout>
 
-                        <!-- Row 4: Visibility & Pressure -->
+                        <!-- Row 4: Visibility & Pressure (iOS style) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:weightSum="2">
+                            android:weightSum="2"
+                            android:layout_marginBottom="8dp">
 
-                            <!-- Visibility Card -->
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/cardVisibility"
                                 android:layout_width="0dp"
-                                android:layout_height="164dp"
+                                android:layout_height="155dp"
                                 android:layout_weight="1"
-                                android:layout_marginEnd="5dp"
-                                app:cardCornerRadius="22dp"
-                                app:cardElevation="8dp"
+                                android:layout_marginEnd="4dp"
+                                app:cardCornerRadius="15dp"
+                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@android:color/transparent">
 
                                 <include layout="@layout/card_visibility" />
                             </androidx.cardview.widget.CardView>
 
-                            <!-- Pressure Card -->
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/cardPressure"
                                 android:layout_width="0dp"
-                                android:layout_height="164dp"
+                                android:layout_height="155dp"
                                 android:layout_weight="1"
-                                android:layout_marginStart="5dp"
-                                app:cardCornerRadius="22dp"
-                                app:cardElevation="8dp"
+                                android:layout_marginStart="4dp"
+                                app:cardCornerRadius="15dp"
+                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@android:color/transparent">
 
                                 <include layout="@layout/card_pressure" />
                             </androidx.cardview.widget.CardView>
                         </LinearLayout>
 
-                        <!-- Interactive Charts Section -->
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="📊 Interactive Charts"
-                            android:textColor="@color/text_primary"
-                            android:textSize="20sp"
-                            android:fontFamily="@font/poppins_bold"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="12dp"
-                            tools:ignore="HardcodedText" />
+                        <!-- Hidden chart views for compatibility -->
+                        <FrameLayout
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:visibility="gone">
 
-                        <!-- Temperature Line Chart -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="match_parent"
-                            android:layout_height="300dp"
-                            android:layout_marginBottom="16dp"
-                            app:cardCornerRadius="22dp"
-                            app:cardElevation="8dp"
-                            app:cardBackgroundColor="@android:color/transparent">
-
-                            <LinearLayout
+                            <com.example.weatherapp.ui.views.charts.WeatherLineChart
+                                android:id="@+id/chartTemperature"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/weather_detail_card_background"
-                                android:orientation="vertical"
-                                android:padding="20dp">
+                                android:layout_height="200dp" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Temperature Trend"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="16sp"
-                                    android:fontFamily="@font/poppins_semibold"
-                                    android:layout_marginBottom="8dp"
-                                    tools:ignore="HardcodedText" />
+                            <com.example.weatherapp.ui.views.charts.AnimatedProgressRing
+                                android:id="@+id/ringHumidity"
+                                android:layout_width="150dp"
+                                android:layout_height="150dp" />
 
-                                <com.example.weatherapp.ui.views.charts.WeatherLineChart
-                                    android:id="@+id/chartTemperature"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1" />
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
+                            <com.example.weatherapp.ui.views.charts.AnimatedProgressRing
+                                android:id="@+id/ringUvIndex"
+                                android:layout_width="150dp"
+                                android:layout_height="150dp" />
 
-                        <!-- Progress Rings Row -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:weightSum="2"
-                            android:layout_marginBottom="16dp">
-
-                            <!-- Humidity Ring -->
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="0dp"
-                                android:layout_height="220dp"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="8dp"
-                                app:cardCornerRadius="22dp"
-                                app:cardElevation="8dp"
-                                app:cardBackgroundColor="@android:color/transparent">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="@drawable/weather_detail_card_background"
-                                    android:orientation="vertical"
-                                    android:padding="16dp"
-                                    android:gravity="center">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Humidity"
-                                        android:textColor="@color/text_primary"
-                                        android:textSize="14sp"
-                                        android:fontFamily="@font/poppins_semibold"
-                                        android:layout_marginBottom="8dp"
-                                        tools:ignore="HardcodedText" />
-
-                                    <com.example.weatherapp.ui.views.charts.AnimatedProgressRing
-                                        android:id="@+id/ringHumidity"
-                                        android:layout_width="160dp"
-                                        android:layout_height="160dp" />
-                                </LinearLayout>
-                            </androidx.cardview.widget.CardView>
-
-                            <!-- Wind Speed Ring -->
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="0dp"
-                                android:layout_height="220dp"
-                                android:layout_weight="1"
-                                android:layout_marginStart="8dp"
-                                app:cardCornerRadius="22dp"
-                                app:cardElevation="8dp"
-                                app:cardBackgroundColor="@android:color/transparent">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="@drawable/weather_detail_card_background"
-                                    android:orientation="vertical"
-                                    android:padding="16dp"
-                                    android:gravity="center">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="UV Index"
-                                        android:textColor="@color/text_primary"
-                                        android:textSize="14sp"
-                                        android:fontFamily="@font/poppins_semibold"
-                                        android:layout_marginBottom="8dp"
-                                        tools:ignore="HardcodedText" />
-
-                                    <com.example.weatherapp.ui.views.charts.AnimatedProgressRing
-                                        android:id="@+id/ringUvIndex"
-                                        android:layout_width="160dp"
-                                        android:layout_height="160dp" />
-                                </LinearLayout>
-                            </androidx.cardview.widget.CardView>
-                        </LinearLayout>
-
-                        <!-- Wind Speed Gauge -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="match_parent"
-                            android:layout_height="280dp"
-                            android:layout_marginBottom="16dp"
-                            app:cardCornerRadius="22dp"
-                            app:cardElevation="8dp"
-                            app:cardBackgroundColor="@android:color/transparent">
-
-                            <LinearLayout
+                            <com.example.weatherapp.ui.views.charts.WindSpeedGauge
+                                android:id="@+id/gaugeWindSpeed"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/weather_detail_card_background"
-                                android:orientation="vertical"
-                                android:padding="20dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Wind Speed"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="16sp"
-                                    android:fontFamily="@font/poppins_semibold"
-                                    android:layout_marginBottom="8dp"
-                                    tools:ignore="HardcodedText" />
-
-                                <com.example.weatherapp.ui.views.charts.WindSpeedGauge
-                                    android:id="@+id/gaugeWindSpeed"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1" />
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
+                                android:layout_height="150dp" />
+                        </FrameLayout>
 
                     </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </eightbitlab.com.blurview.BlurView>
         </LinearLayout>
-        </ScrollView>
-    
-    </com.example.weatherapp.ui.views.WeatherRefreshLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- iOS Bottom Navigation Bar with Glassmorphism -->
+    <eightbitlab.com.blurview.BlurView
+        android:id="@+id/blurViewBottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="78dp"
+        android:layout_gravity="bottom">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:elevation="0dp">
+
+            <!-- Navigation Buttons Row -->
+            <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingTop="8dp">
+
+            <!-- Map Button -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_map_pin_line"
+                    app:tint="#FFFFFF"
+                    android:contentDescription="Map" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Map"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+
+            <!-- Weather Button (Active) -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_weather_cloudy_line"
+                    app:tint="#FFFFFF"
+                    android:contentDescription="Weather" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Weather"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+
+            <!-- Settings Button -->
+            <LinearLayout
+                android:id="@+id/fabAddToFavorites"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_settings_line"
+                    app:tint="#FFFFFF"
+                    android:contentDescription="Settings" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Settings"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Home Indicator -->
+        <View
+            android:layout_width="134dp"
+            android:layout_height="5dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/ios_home_indicator" />
+        </LinearLayout>
+    </eightbitlab.com.blurview.BlurView>
 
     <!-- Loading Indicator -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:indeterminateTint="@color/text_primary"
+        android:layout_gravity="center"
+        android:indeterminateTint="#FFFFFF"
         android:visibility="gone" />
 
     <!-- Error Message -->
@@ -935,32 +755,13 @@
         android:id="@+id/tvError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_gravity="center"
         android:text="Error loading weather data"
-        android:textColor="@color/text_primary"
+        android:textColor="#FFFFFF"
         android:textSize="16sp"
+        android:fontFamily="sans-serif-light"
         android:visibility="gone"
         tools:ignore="HardcodedText" />
-
-    <!-- FAB: Add to Favorites -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddToFavorites"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-
-        android:layout_marginStart="24dp"
-        android:layout_marginBottom="24dp"
-
-        android:contentDescription="Settings"
-
-        android:src="@drawable/ic_settings_line"
-        app:tint="@android:color/white"
-        app:backgroundTint="#9B6FFF"
-        app:elevation="8dp"
-        app:rippleColor="#E2DDFD" />
 
     <!-- Hidden Views for compatibility -->
     <TextView
@@ -974,4 +775,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone" />
-</RelativeLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
