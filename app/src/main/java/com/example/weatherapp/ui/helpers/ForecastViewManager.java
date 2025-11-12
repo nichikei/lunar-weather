@@ -15,26 +15,37 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Manages forecast views (hourly and weekly)
+ * Manages forecast views (hourly and daily)
  * Handles creation and population of forecast items
  */
 public class ForecastViewManager {
 
     private final Context context;
-    private final LinearLayout forecastContainer;
+    private final LinearLayout hourlyForecastContainer;
+    private final LinearLayout dailyForecastContainer;
     private final String temperatureUnit;
 
+    // Old constructor for backward compatibility
     public ForecastViewManager(Context context, LinearLayout forecastContainer, String temperatureUnit) {
         this.context = context;
-        this.forecastContainer = forecastContainer;
+        this.hourlyForecastContainer = forecastContainer;
+        this.dailyForecastContainer = forecastContainer;
+        this.temperatureUnit = temperatureUnit;
+    }
+
+    // New constructor with separate containers
+    public ForecastViewManager(Context context, LinearLayout hourlyContainer, LinearLayout dailyContainer, String temperatureUnit) {
+        this.context = context;
+        this.hourlyForecastContainer = hourlyContainer;
+        this.dailyForecastContainer = dailyContainer;
         this.temperatureUnit = temperatureUnit;
     }
 
     /**
-     * Create hourly forecast view from domain model
+     * Create hourly forecast view from domain model (iOS style)
      */
     public void createHourlyForecastView(ForecastData forecastData) {
-        forecastContainer.removeAllViews();
+        hourlyForecastContainer.removeAllViews();
 
         List<ForecastData.HourlyForecast> hourlyItems = forecastData.getHourlyForecasts();
         if (hourlyItems == null || hourlyItems.isEmpty()) {
@@ -42,50 +53,51 @@ public class ForecastViewManager {
         }
 
         boolean isFirst = true;
-        int itemsToShow = Math.min(8, hourlyItems.size());
+        int itemsToShow = Math.min(24, hourlyItems.size()); // Show 24 hours
 
         for (int i = 0; i < itemsToShow; i++) {
             ForecastData.HourlyForecast item = hourlyItems.get(i);
 
-            View itemView;
-            if (isFirst) {
-                itemView = LayoutInflater.from(context).inflate(R.layout.item_hourly_forecast_now, forecastContainer, false);
-                isFirst = false;
-            } else {
-                itemView = LayoutInflater.from(context).inflate(R.layout.item_hourly_forecast, forecastContainer, false);
-            }
+            // Use iOS style layout
+            View itemView = LayoutInflater.from(context).inflate(R.layout.item_hourly_forecast_ios, hourlyForecastContainer, false);
 
-            populateHourlyItem(itemView, item, i);
-            forecastContainer.addView(itemView);
+            populateHourlyItemIOS(itemView, item, isFirst);
+            hourlyForecastContainer.addView(itemView);
+            
+            if (isFirst) {
+                isFirst = false;
+            }
         }
     }
 
     /**
-     * Create weekly forecast view from domain model
+     * Create weekly/daily forecast view from domain model (iOS style - vertical list)
      */
     public void createWeeklyForecastView(ForecastData forecastData) {
-        forecastContainer.removeAllViews();
+        dailyForecastContainer.removeAllViews();
 
         List<ForecastData.DailyForecast> dailyItems = forecastData.getDailyForecasts();
         if (dailyItems == null || dailyItems.isEmpty()) {
+            android.util.Log.w("ForecastViewManager", "Daily forecast data is null or empty");
             return;
         }
 
         boolean isFirst = true;
-        String tempSymbol = temperatureUnit.equals("celsius") ? "°" : "°F";
+        int itemsToShow = Math.min(10, dailyItems.size()); // Show 10 days
+        android.util.Log.d("ForecastViewManager", "Daily forecast: total items=" + dailyItems.size() + ", showing=" + itemsToShow);
 
-        for (ForecastData.DailyForecast dailyForecast : dailyItems) {
-            View itemView;
+        for (int i = 0; i < itemsToShow; i++) {
+            ForecastData.DailyForecast dailyForecast = dailyItems.get(i);
 
+            // Use iOS style layout
+            View itemView = LayoutInflater.from(context).inflate(R.layout.item_daily_forecast_ios, dailyForecastContainer, false);
+
+            populateDailyItemIOS(itemView, dailyForecast, isFirst);
+            dailyForecastContainer.addView(itemView);
+            
             if (isFirst) {
-                itemView = LayoutInflater.from(context).inflate(R.layout.item_weekly_forecast_today, forecastContainer, false);
                 isFirst = false;
-            } else {
-                itemView = LayoutInflater.from(context).inflate(R.layout.item_weekly_forecast, forecastContainer, false);
             }
-
-            populateWeeklyItem(itemView, dailyForecast, tempSymbol);
-            forecastContainer.addView(itemView);
         }
     }
 
@@ -155,6 +167,71 @@ public class ForecastViewManager {
             } else {
                 tvWeeklyRainProbability.setVisibility(View.INVISIBLE);
             }
+        }
+    }
+
+    /**
+     * Populate hourly item with iOS style layout
+     */
+    private void populateHourlyItemIOS(View itemView, ForecastData.HourlyForecast item, boolean isFirst) {
+        TextView tvTime = itemView.findViewById(R.id.tvTime);
+        ImageView ivWeatherIcon = itemView.findViewById(R.id.ivWeatherIcon);
+        TextView tvTemperature = itemView.findViewById(R.id.tvTemperature);
+
+        // Format time
+        Calendar itemTime = Calendar.getInstance();
+        itemTime.setTimeInMillis(item.getTimestamp() * 1000);
+
+        if (isFirst) {
+            tvTime.setText("Bây giờ");
+        } else {
+            int hour = itemTime.get(Calendar.HOUR_OF_DAY);
+            tvTime.setText(String.format(Locale.getDefault(), "%d giờ", hour));
+        }
+
+        // Set weather icon
+        String weatherIcon = item.getWeatherIcon().toLowerCase();
+        ivWeatherIcon.setImageResource(getWeatherIconResource(weatherIcon));
+
+        // Set temperature
+        int temp = (int) Math.round(item.getTemperature());
+        tvTemperature.setText(String.format(Locale.getDefault(), "%d°", temp));
+    }
+
+    /**
+     * Populate daily item with iOS style layout (vertical list)
+     */
+    private void populateDailyItemIOS(View itemView, ForecastData.DailyForecast dailyForecast, boolean isFirst) {
+        TextView tvDayName = itemView.findViewById(R.id.tvDayName);
+        ImageView ivWeatherIcon = itemView.findViewById(R.id.ivWeatherIcon);
+        TextView tvLowTemp = itemView.findViewById(R.id.tvLowTemp);
+        TextView tvHighTemp = itemView.findViewById(R.id.tvHighTemp);
+        View divider = itemView.findViewById(R.id.divider);
+
+        // Format day name
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(dailyForecast.getTimestamp() * 1000);
+        
+        String dayName;
+        if (isFirst) {
+            dayName = "Hôm nay";
+        } else {
+            String[] days = {"CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7"};
+            dayName = days[calendar.get(Calendar.DAY_OF_WEEK) - 1];
+        }
+
+        tvDayName.setText(dayName);
+        ivWeatherIcon.setImageResource(getWeatherIconResource(dailyForecast.getWeatherIcon().toLowerCase()));
+        
+        // Set temperatures
+        int lowTemp = (int) Math.round(dailyForecast.getTempMin());
+        int highTemp = (int) Math.round(dailyForecast.getTempMax());
+        tvLowTemp.setText(String.format(Locale.getDefault(), "%d°", lowTemp));
+        tvHighTemp.setText(String.format(Locale.getDefault(), "%d°", highTemp));
+
+        // Hide divider for last item (will be handled by parent)
+        if (divider != null) {
+            divider.setVisibility(View.VISIBLE);
         }
     }
 

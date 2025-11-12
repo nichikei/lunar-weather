@@ -1,53 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- iOS Style transparent glass card -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Subtle purple neon glow radius 20dp, opacity 0.18 -->
-    <item
-        android:left="-10dp"
-        android:top="-10dp"
-        android:right="-10dp"
-        android:bottom="-10dp">
-        <shape android:shape="rectangle">
-            <gradient
-                android:type="radial"
-                android:gradientRadius="120dp"
-                android:centerX="0.5"
-                android:centerY="0.5"
-                android:startColor="#2E7B5CFF"
-                android:centerColor="#1C7B5CFF"
-                android:endColor="#007B5CFF" />
-            <corners android:radius="@dimen/corner_radius_card" />
-        </shape>
-    </item>
-
-    <!-- Enhanced shadow with 18dp blur, 6dp offset y, opacity 0.2 -->
-    <item
-        android:left="0dp"
-        android:top="6dp"
-        android:right="0dp"
-        android:bottom="0dp">
-        <shape android:shape="rectangle">
-            <gradient
-                android:type="radial"
-                android:gradientRadius="180dp"
-                android:centerX="0.5"
-                android:centerY="0.5"
-                android:startColor="#33000000"
-                android:centerColor="#18000000"
-                android:endColor="#00000000" />
-            <corners android:radius="@dimen/corner_radius_card" />
-        </shape>
-    </item>
-
-    <!-- Main glass card - single blur surface -->
+    <!-- Main glass card - iOS transparent style -->
     <item>
         <shape android:shape="rectangle">
-            <!-- 25% transparent glass -->
-            <solid android:color="#402A1B6B" />
-            <corners android:radius="@dimen/corner_radius_card" />
-            <!-- Refined thin border 25% opacity -->
+            <!-- Dark semi-transparent background for glassmorphism -->
+            <solid android:color="#4D000000" />
+            <corners android:radius="15dp" />
+            <!-- Subtle white border -->
             <stroke
-                android:width="1dp"
-                android:color="#40FFFFFF" />
+                android:width="0.5dp"
+                android:color="#33FFFFFF" />
         </shape>
     </item>
 </layer-list>

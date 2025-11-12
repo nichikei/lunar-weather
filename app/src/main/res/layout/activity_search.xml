@@ -4,24 +4,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background">
+    android:background="@drawable/ios_sky_background">
 
-    <!-- Background Blur Circles -->
+    <!-- Animated Gradient Background -->
     <View
-        android:layout_width="352dp"
-        android:layout_height="352dp"
-        android:layout_marginStart="-3dp"
-        android:layout_marginTop="80dp"
-        android:background="@drawable/blur_circle"
-        android:alpha="0.3" />
-
-    <View
-        android:layout_width="365dp"
-        android:layout_height="365dp"
-        android:layout_marginStart="122dp"
-        android:layout_marginTop="470dp"
-        android:background="@drawable/blur_circle"
-        android:alpha="0.3" />
+        android:id="@+id/animatedBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/search_animated_gradient" />
+    
+    <!-- Blur Overlay for depth -->
+    <eightbitlab.com.blurview.BlurView
+        android:id="@+id/blurOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:blurOverlayColor="#20000000" />
 
     <!-- Top Navigation Bar -->
     <LinearLayout
@@ -30,8 +27,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingTop="50dp"
-        android:paddingBottom="10dp"
-        android:background="#40000000">
+        android:paddingBottom="16dp"
+        android:background="@android:color/transparent">
 
         <!-- Navigation -->
         <LinearLayout
@@ -84,13 +81,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@drawable/weather_detail_card_background"
+            android:background="@drawable/ios_card_background"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
-            android:padding="16dp"
-            android:gravity="center_vertical">
+            android:layout_marginTop="12dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="12dp"
+            android:paddingVertical="12dp"
+            android:gravity="center_vertical"
+            android:elevation="2dp">
 
-
+            <!-- Search Icon Left -->
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/ic_menu_search"
+                android:tint="#99FFFFFF"
+                android:layout_marginEnd="12dp"
+                android:contentDescription="Search"
+                tools:ignore="UseAppTint" />
 
             <EditText
                 android:id="@+id/etSearch"
@@ -98,24 +106,26 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Search location..."
-                android:textColorHint="#99FFFFFF"
-                android:textColor="@color/text_white"
+                android:textColorHint="#80FFFFFF"
+                android:textColor="#FFFFFF"
                 android:textSize="17sp"
                 android:background="@android:color/transparent"
                 android:fontFamily="sans-serif"
                 android:inputType="text"
                 android:autofillHints="postalAddress"
                 android:imeOptions="actionSearch"
+                android:paddingVertical="4dp"
                 tools:ignore="HardcodedText" />
 
             <ImageButton
                 android:id="@+id/btnSearchIcon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_search"
                 android:tint="#FFFFFF"
-                android:padding="8dp"
+                android:padding="6dp"
+                android:visibility="gone"
                 android:contentDescription="Search"
                 tools:ignore="UseAppTint" />
         </LinearLayout>
@@ -126,67 +136,71 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@drawable/weather_detail_card_background"
+            android:background="@drawable/ios_card_background"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="12dp"
-            android:padding="16dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="16dp"
+            android:paddingVertical="16dp"
             android:gravity="center_vertical"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:elevation="2dp">
 
             <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:src="@drawable/ic_location_glow"
-                android:layout_marginEnd="12dp"
-                android:contentDescription="Location" />
+                android:layout_marginEnd="14dp"
+                android:contentDescription="Location"
+                app:tint="#4A9EFF" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Use Current Location"
-                android:textColor="@color/text_white"
+                android:textColor="#FFFFFF"
                 android:textSize="17sp"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="sans-serif"
                 tools:ignore="HardcodedText" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="›"
-                android:textColor="#FFFFFF"
-                android:textSize="28sp"
-                android:fontFamily="sans-serif-light"
-                tools:ignore="HardcodedText" />
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/ic_menu_more"
+                android:rotation="270"
+                android:contentDescription="Arrow"
+                app:tint="#80FFFFFF" />
         </LinearLayout>
     </LinearLayout>
+
+    <!-- Recent Searches Header -->
+    <TextView
+        android:id="@+id/tvRecentSearches"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/topBar"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginBottom="8dp"
+        android:text="Recent Searches"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.01" />
 
     <!-- Cities List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewCities"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/topBar"
-        android:layout_marginTop="16dp"
-        android:paddingHorizontal="26dp"
-        android:paddingBottom="20dp"
+        android:layout_below="@id/tvRecentSearches"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="0dp"
+        android:paddingBottom="24dp"
         android:clipToPadding="false"
         android:overScrollMode="never" />
 
-    <!-- Floating Action Button -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabSearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        android:contentDescription="Search"
-        android:src="@android:drawable/ic_menu_search"
-        app:tint="@android:color/white"
-        app:backgroundTint="#9B6FFF"
-        app:elevation="8dp"
-        app:rippleColor="#E2DDFD" />
 </RelativeLayout>

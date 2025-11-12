@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/weather_card_ripple"
+    android:background="@drawable/ios_card_background"
     android:padding="16dp"
     android:clickable="true"
     android:focusable="true">
@@ -49,37 +49,76 @@
         android:layout_marginBottom="16dp"
         tools:ignore="HardcodedText" />
 
-    <!-- Sun Arc with Gradient Line -->
-    <RelativeLayout
+    <!-- iOS Sun Arc -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:layout_marginBottom="8dp">
 
-        <!-- Base horizontal line -->
+        <!-- Horizon Line -->
         <View
-            android:id="@+id/baseLine"
+            android:id="@+id/horizonLine"
             android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_alignParentBottom="true"
-            android:background="#40FFFFFF" />
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="#30000000" />
 
-        <!-- Gradient line on top -->
+        <!-- Sun Arc Path (Semi-circle) -->
         <View
+            android:id="@+id/sunArcPath"
             android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/sunrise_gradient_line" />
+            android:layout_height="match_parent"
+            android:background="@drawable/ios_sun_arc_gradient"
+            android:alpha="0.6" />
 
-        <!-- Sun Position Indicator Dot -->
-        <View
-            android:id="@+id/sunDot"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_centerHorizontal="true"
-            android:layout_above="@id/baseLine"
-            android:layout_marginBottom="2dp"
-            android:background="@drawable/sun_dot_glow" />
-    </RelativeLayout>
+        <!-- Sunrise Marker -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:orientation="vertical"
+            android:gravity="center">
+            
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/ios_sun_dot" />
+            
+        </LinearLayout>
+
+        <!-- Current Sun Position -->
+        <LinearLayout
+            android:id="@+id/currentSunPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="8dp">
+            
+            <View
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/ios_sun_dot" />
+            
+        </LinearLayout>
+
+        <!-- Sunset Marker -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:orientation="vertical"
+            android:gravity="center">
+            
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/ios_sun_dot" />
+            
+        </LinearLayout>
+
+    </FrameLayout>
 
     <!-- Sunset Time -->
     <TextView

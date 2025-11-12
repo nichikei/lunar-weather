@@ -107,25 +107,35 @@ public class FavoritesHelper {
      * Update favorite button icon (works with FAB or ImageView)
      */
     private void updateFavoriteIcon(boolean isFavorite) {
-        if (favoriteButton != null) {
-            // Try to find ImageView within the button (for iOS bottom nav)
-            ImageView imageView = null;
-            if (favoriteButton instanceof ImageView) {
-                imageView = (ImageView) favoriteButton;
-            } else {
-                // Search for ImageView child
-                imageView = favoriteButton.findViewById(R.id.fabAddToFavorites);
-                if (imageView == null) {
-                    // Fallback: find first ImageView child
-                    imageView = findImageViewInView(favoriteButton);
-                }
+        if (favoriteButton == null) {
+            return;
+        }
+        
+        // Try to find ImageView within the button (for iOS bottom nav)
+        ImageView imageView = null;
+        
+        if (favoriteButton instanceof ImageView) {
+            imageView = (ImageView) favoriteButton;
+        } else if (favoriteButton instanceof android.view.ViewGroup) {
+            // First try to find by ID
+            imageView = favoriteButton.findViewById(R.id.ivFavoriteIcon);
+            if (imageView == null) {
+                // Fallback: search for any ImageView child
+                imageView = findImageViewInView(favoriteButton);
             }
-            
-            if (imageView != null) {
+        }
+        
+        // Only update if we found a valid ImageView
+        if (imageView != null) {
+            try {
                 imageView.setImageResource(
                     isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_heart_line
                 );
+            } catch (ClassCastException e) {
+                android.util.Log.e("FavoritesHelper", "Failed to update favorite icon", e);
             }
+        } else {
+            android.util.Log.w("FavoritesHelper", "No ImageView found in favoriteButton to update icon");
         }
     }
     

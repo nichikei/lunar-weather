@@ -44,17 +44,17 @@ public class BlurViewHelper {
     }
 
     /**
-     * Setup blur for bottom navigation (iOS-style tab bar)
+     * Setup blur for bottom navigation (iOS-style tab bar - Day mode)
      */
     public void setupBottomNavBlur(BlurView blurView) {
-        setupBlur(blurView, 20f, 0x4D000000); // Dark semi-transparent
+        setupBlur(blurView, 20f, 0x33FFFFFF); // White semi-transparent (iOS day mode)
     }
 
     /**
-     * Setup blur for weather cards
+     * Setup blur for weather cards (iOS day mode)
      */
     public void setupCardBlur(BlurView blurView) {
-        setupBlur(blurView, 15f, 0x4D000000); // Dark semi-transparent
+        setupBlur(blurView, 18f, 0x33FFFFFF); // White semi-transparent (iOS day mode)
     }
 
     /**

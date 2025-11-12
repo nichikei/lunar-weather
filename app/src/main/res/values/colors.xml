@@ -66,10 +66,10 @@
     <color name="gradient_glow_purple_end">#9E4CFF</color>
 
     <!-- ========== LEGACY ALIASES (for backward compatibility) ========== -->
-    <!-- Text aliases -->
-    <color name="text_primary">@color/text_high</color>
-    <color name="text_secondary">@color/text_mid</color>
-    <color name="text_tertiary">@color/text_low</color>
+    <!-- Text aliases - iOS Day Mode (Updated for video background) -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B3FFFFFF</color>
+    <color name="text_tertiary">@color/label_light_tertiary</color>
     <color name="text_quaternary">#66A7ABF7</color>
     <color name="text_white">#FFFFFF</color>
     <color name="text_white_70">@color/text_mid</color>

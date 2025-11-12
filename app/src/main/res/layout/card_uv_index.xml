@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/weather_card_ripple"
+    android:background="@drawable/ios_card_background"
     android:padding="16dp"
     android:clickable="true"
     android:focusable="true">
@@ -57,13 +57,62 @@
         android:textColor="@color/text_primary"
         android:textSize="13sp"
         android:fontFamily="@font/poppins"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         tools:ignore="HardcodedText" />
 
-    <!-- UV Trend Chart -->
-    <com.example.weatherapp.ui.views.charts.UVTrendChart
-        android:id="@+id/uvTrendChart"
+    <!-- iOS UV Gradient Bar -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="4dp" />
+        android:layout_height="6dp"
+        android:background="@drawable/ios_uv_progress_bg">
+        
+        <View
+            android:id="@+id/uvGradientBar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/ios_uv_gradient" />
+        
+    </FrameLayout>
+
+    <!-- UV Scale Labels -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+        
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="0"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            android:gravity="start"
+            tools:ignore="HardcodedText" />
+        
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="11+"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            android:gravity="end"
+            tools:ignore="HardcodedText" />
+        
+    </LinearLayout>
+
+    <!-- Description -->
+    <TextView
+        android:id="@+id/tvDetailDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Use sunscreen for extended outdoor activity."
+        android:textColor="@color/text_secondary"
+        android:textSize="11sp"
+        android:fontFamily="@font/poppins"
+        android:maxLines="2"
+        tools:ignore="HardcodedText" />
 </LinearLayout>

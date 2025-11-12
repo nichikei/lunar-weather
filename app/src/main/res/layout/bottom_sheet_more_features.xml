@@ -4,59 +4,60 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/bottom_sheet_background"
+    android:background="@drawable/ios_card_background"
     android:paddingTop="8dp"
     android:paddingBottom="32dp">
 
-    <!-- Handle Bar -->
+    <!-- Handle Bar (iOS style) -->
     <View
-        android:layout_width="40dp"
-        android:layout_height="4dp"
+        android:layout_width="36dp"
+        android:layout_height="5dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/bottom_sheet_handle"
-        android:alpha="0.3" />
+        android:alpha="0.4" />
 
-    <!-- Title -->
+    <!-- Title (iOS style) -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="6dp"
         android:text="More Features"
-        android:textSize="24sp"
+        android:textSize="28sp"
         android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary"
-        android:fontFamily="@font/poppins_bold" />
+        android:textColor="#FFFFFF"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="-0.01" />
 
-    <!-- Subtitle -->
+    <!-- Subtitle (iOS style) -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        android:text="Explore weather maps &amp; AI-powered recommendations"
-        android:textSize="14sp"
-        android:textColor="?android:attr/textColorSecondary"
-        android:fontFamily="@font/poppins" />
+        android:layout_marginBottom="28dp"
+        android:text="Explore weather features &amp; tools"
+        android:textSize="15sp"
+        android:textColor="#B3FFFFFF"
+        android:fontFamily="sans-serif" />
 
-    <!-- Weather Maps Category -->
+    <!-- Section Header (iOS style) -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:layout_marginBottom="12dp"
-        android:text="�️ MAPS &amp; VISUALIZATION"
-        android:textSize="12sp"
+        android:text="MAPS &amp; TOOLS"
+        android:textSize="13sp"
         android:textStyle="bold"
-        android:textColor="?android:attr/textColorSecondary"
-        android:letterSpacing="0.1"
-        android:fontFamily="@font/poppins_semibold" />
+        android:textColor="#99FFFFFF"
+        android:letterSpacing="0.04"
+        android:fontFamily="sans-serif-medium" />
 
     <!-- Weather Maps Option -->
     <com.google.android.material.card.MaterialCardView
@@ -65,10 +66,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="12dp"
-        app:cardCornerRadius="16dp"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp"
+        app:cardBackgroundColor="#4D000000"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground">
@@ -80,22 +82,13 @@
             android:padding="16dp"
             android:gravity="center_vertical">
 
-            <!-- Icon Container -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="#E8F5E9">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="�️"
-                    android:textSize="28sp" />
-            </com.google.android.material.card.MaterialCardView>
+            <!-- Icon (iOS style - no background) -->
+            <TextView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:text="🗺️"
+                android:textSize="32sp" />
 
             <!-- Text Content -->
             <LinearLayout
@@ -103,35 +96,33 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="12dp"
                 android:layout_marginEnd="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Weather Maps"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:fontFamily="@font/poppins_semibold" />
+                    android:textSize="17sp"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="sans-serif-medium" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
                     android:text="Interactive radar &amp; temperature maps"
-                    android:textSize="13sp"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:fontFamily="@font/poppins" />
+                    android:textSize="14sp"
+                    android:textColor="#B3FFFFFF"
+                    android:fontFamily="sans-serif" />
             </LinearLayout>
 
             <!-- Arrow Icon -->
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:src="@drawable/ic_arrow_forward"
-                android:tint="?android:attr/textColorSecondary"
-                android:alpha="0.5" />
+                android:tint="#99FFFFFF" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -142,10 +133,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="12dp"
-        app:cardCornerRadius="16dp"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp"
+        app:cardBackgroundColor="#4D000000"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground">
@@ -157,22 +149,12 @@
             android:padding="16dp"
             android:gravity="center_vertical">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="#E3F2FD">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="🎙️"
-                    android:textSize="28sp"
-                    android:gravity="center"
-                    android:textAlignment="center" />
-            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:text="🎙️"
+                android:textSize="32sp"
+                android:gravity="center" />
 
             <!-- Text Content -->
             <LinearLayout
@@ -180,35 +162,33 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="12dp"
                 android:layout_marginEnd="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Voice Assistant"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:fontFamily="@font/poppins_semibold" />
+                    android:textSize="17sp"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="sans-serif-medium" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
                     android:text="Ask weather questions with your voice"
-                    android:textSize="13sp"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:fontFamily="@font/poppins" />
+                    android:textSize="14sp"
+                    android:textColor="#B3FFFFFF"
+                    android:fontFamily="sans-serif" />
             </LinearLayout>
 
             <!-- Arrow Icon -->
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:src="@drawable/ic_arrow_forward"
-                android:tint="?android:attr/textColorSecondary"
-                android:alpha="0.5" />
+                android:tint="#99FFFFFF" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -219,10 +199,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="12dp"
-        app:cardCornerRadius="16dp"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp"
+        app:cardBackgroundColor="#4D000000"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground">
@@ -234,22 +215,12 @@
             android:padding="16dp"
             android:gravity="center_vertical">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="#FFF3E0">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="⏰"
-                    android:textSize="28sp"
-                    android:gravity="center"
-                    android:textAlignment="center" />
-            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:text="⏰"
+                android:textSize="32sp"
+                android:gravity="center" />
 
             <!-- Text Content -->
             <LinearLayout
@@ -257,35 +228,33 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="12dp"
                 android:layout_marginEnd="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Weather Alarms"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:fontFamily="@font/poppins_semibold" />
+                    android:textSize="17sp"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="sans-serif-medium" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
                     android:text="Smart alarms based on weather conditions"
-                    android:textSize="13sp"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:fontFamily="@font/poppins" />
+                    android:textSize="14sp"
+                    android:textColor="#B3FFFFFF"
+                    android:fontFamily="sans-serif" />
             </LinearLayout>
 
             <!-- Arrow Icon -->
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:src="@drawable/ic_arrow_forward"
-                android:tint="?android:attr/textColorSecondary"
-                android:alpha="0.5" />
+                android:tint="#99FFFFFF" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -295,14 +264,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="12dp"
-        android:text="🤖 AI-POWERED RECOMMENDATIONS"
-        android:textSize="12sp"
+        android:text="AI RECOMMENDATIONS"
+        android:textSize="13sp"
         android:textStyle="bold"
-        android:textColor="?android:attr/textColorSecondary"
-        android:letterSpacing="0.1"
-        android:fontFamily="@font/poppins_semibold" />
+        android:textColor="#99FFFFFF"
+        android:letterSpacing="0.04"
+        android:fontFamily="sans-serif-medium" />
 
     <!-- AI Outfit Suggestions -->
     <com.google.android.material.card.MaterialCardView
@@ -311,10 +280,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="12dp"
-        app:cardCornerRadius="16dp"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp"
+        app:cardBackgroundColor="#4D000000"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground">
@@ -326,55 +296,44 @@
             android:padding="16dp"
             android:gravity="center_vertical">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="#F3E5F5">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="👔"
-                    android:textSize="28sp" />
-            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:text="👔"
+                android:textSize="32sp" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="12dp"
                 android:layout_marginEnd="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="AI Outfit Suggestions"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:fontFamily="@font/poppins_semibold" />
+                    android:textSize="17sp"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="sans-serif-medium" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
                     android:text="What to wear based on weather"
-                    android:textSize="13sp"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:fontFamily="@font/poppins" />
+                    android:textSize="14sp"
+                    android:textColor="#B3FFFFFF"
+                    android:fontFamily="sans-serif" />
             </LinearLayout>
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:src="@drawable/ic_arrow_forward"
-                android:tint="?android:attr/textColorSecondary"
-                android:alpha="0.5" />
+                android:tint="#99FFFFFF" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -389,9 +348,11 @@
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp"
+        app:cardBackgroundColor="#4D000000"
         android:clickable="true"
         android:focusable="true"
-        android:foreground="?attr/selectableItemBackground">
+        android:foreground="?attr/selectableItemBackground"
+        android:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -406,14 +367,14 @@
                 app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="#E8F5E9">
+                app:cardBackgroundColor="#2D000000">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="🎯"
-                    android:textSize="28sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_target"
+                    android:tint="#FFFFFF" />
             </com.google.android.material.card.MaterialCardView>
 
             <LinearLayout
@@ -430,7 +391,7 @@
                     android:text="Activity Suggestions"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="#FFFFFF"
                     android:fontFamily="@font/poppins_semibold" />
 
                 <TextView
@@ -439,7 +400,7 @@
                     android:layout_marginTop="4dp"
                     android:text="Best activities for today's weather"
                     android:textSize="13sp"
-                    android:textColor="?android:attr/textColorSecondary"
+                    android:textColor="#B3FFFFFF"
                     android:fontFamily="@font/poppins" />
             </LinearLayout>
 
@@ -447,8 +408,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_arrow_forward"
-                android:tint="?android:attr/textColorSecondary"
-                android:alpha="0.5" />
+                android:tint="#99FFFFFF" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

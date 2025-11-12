@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- iOS-style Dynamic Sky Background with depth -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Deep space gradient base -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="180"
+                android:startColor="#0A1628"
+                android:centerColor="#1A2842"
+                android:endColor="#2D3E5F" />
+        </shape>
+    </item>
+    
+    <!-- Subtle cloud layer effect -->
+    <item android:top="200dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="400dp"
+                android:centerX="0.3"
+                android:centerY="0.3"
+                android:startColor="#15FFFFFF"
+                android:endColor="#00FFFFFF" />
+        </shape>
+    </item>
+    
+    <item android:top="400dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="350dp"
+                android:centerX="0.7"
+                android:centerY="0.5"
+                android:startColor="#12FFFFFF"
+                android:endColor="#00FFFFFF" />
+        </shape>
+    </item>
+    
+</layer-list>

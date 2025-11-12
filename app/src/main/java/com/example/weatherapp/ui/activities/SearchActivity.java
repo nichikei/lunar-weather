@@ -2,9 +2,14 @@ package com.example.weatherapp.ui.activities;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
 
@@ -24,9 +29,14 @@ import com.example.weatherapp.ui.helpers.LocationHelper;
 import com.example.weatherapp.ui.helpers.RecyclerViewScrollAnimator;
 import com.example.weatherapp.ui.helpers.SlideInItemAnimator;
 import com.google.android.gms.location.LocationServices;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * SearchActivity with MVVM pattern
@@ -44,6 +54,13 @@ public class SearchActivity extends AppCompatActivity {
     public static final String EXTRA_LATITUDE = "latitude";
     public static final String EXTRA_LONGITUDE = "longitude";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
+    
+    private static final String PREFS_NAME = "WeatherAppPrefs";
+    private static final String KEY_RECENT_SEARCHES = "recent_searches";
+    private static final int MAX_RECENT_SEARCHES = 10;
+    
+    private SharedPreferences sharedPreferences;
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +72,60 @@ public class SearchActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         
         locationHelper = new LocationHelper(this, LocationServices.getFusedLocationProviderClient(this));
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        gson = new Gson();
 
+        // Setup animated background
+        setupAnimatedBackground();
+        setupBlurEffect();
+        
         setupObservers();
         setupListeners();
         setupRecyclerView();
         
-        // Load popular cities
-        viewModel.loadPopularCities();
+        // Load recent searches first, if none then load popular cities
+        loadRecentSearches();
+    }
+    
+    /**
+     * Setup animated gradient background
+     */
+    private void setupAnimatedBackground() {
+        try {
+            View animatedBg = binding.getRoot().findViewById(R.id.animatedBackground);
+            if (animatedBg != null) {
+                AnimationDrawable animDrawable = (AnimationDrawable) animatedBg.getBackground();
+                if (animDrawable != null) {
+                    animDrawable.setEnterFadeDuration(2000);
+                    animDrawable.setExitFadeDuration(2000);
+                    animDrawable.start();
+                }
+            }
+        } catch (Exception e) {
+            Log.e("SearchActivity", "Error starting background animation", e);
+        }
+    }
+    
+    /**
+     * Setup blur effect overlay
+     */
+    private void setupBlurEffect() {
+        try {
+            eightbitlab.com.blurview.BlurView blurView = binding.getRoot().findViewById(R.id.blurOverlay);
+            if (blurView != null) {
+                float radius = 10f;
+                
+                View decorView = getWindow().getDecorView();
+                ViewGroup rootView = decorView.findViewById(android.R.id.content);
+                android.graphics.drawable.Drawable windowBackground = decorView.getBackground();
+                
+                blurView.setupWith(rootView, new eightbitlab.com.blurview.RenderScriptBlur(this))
+                    .setFrameClearDrawable(windowBackground)
+                    .setBlurRadius(radius);
+            }
+        } catch (Exception e) {
+            Log.e("SearchActivity", "Error setting up blur effect", e);
+        }
     }
     
     /**
@@ -197,10 +261,14 @@ public class SearchActivity extends AppCompatActivity {
      * Handle city selection from list
      */
     private void onCitySelected(CityWeather city) {
+        // Save to recent searches
+        saveRecentSearch(city.getCityName());
         returnCityToMain(city.getCityName());
     }
 
     private void searchCity(String cityName) {
+        // Save to recent searches
+        saveRecentSearch(cityName);
         // Return searched city to MainActivity
         returnCityToMain(cityName);
     }
@@ -210,6 +278,74 @@ public class SearchActivity extends AppCompatActivity {
         resultIntent.putExtra(EXTRA_CITY_NAME, cityName);
         setResult(RESULT_OK, resultIntent);
         finish();
+    }
+    
+    /**
+     * Save a city search to recent searches history
+     */
+    private void saveRecentSearch(String cityName) {
+        List<String> recentSearches = getRecentSearchesList();
+        
+        // Remove if already exists (to move it to top)
+        recentSearches.remove(cityName);
+        
+        // Add to beginning
+        recentSearches.add(0, cityName);
+        
+        // Keep only last MAX_RECENT_SEARCHES
+        if (recentSearches.size() > MAX_RECENT_SEARCHES) {
+            recentSearches = recentSearches.subList(0, MAX_RECENT_SEARCHES);
+        }
+        
+        // Save to SharedPreferences
+        String json = gson.toJson(recentSearches);
+        sharedPreferences.edit().putString(KEY_RECENT_SEARCHES, json).apply();
+    }
+    
+    /**
+     * Get recent searches list from SharedPreferences
+     */
+    private List<String> getRecentSearchesList() {
+        String json = sharedPreferences.getString(KEY_RECENT_SEARCHES, null);
+        if (json != null) {
+            Type type = new TypeToken<List<String>>() {}.getType();
+            return new ArrayList<>(gson.fromJson(json, type));
+        }
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Load recent searches and display them
+     */
+    private void loadRecentSearches() {
+        List<String> recentSearches = getRecentSearchesList();
+        
+        if (!recentSearches.isEmpty()) {
+            // Show recent searches header
+            binding.tvRecentSearches.setVisibility(android.view.View.VISIBLE);
+            
+            // Convert city names to CityWeather objects for adapter
+            List<CityWeather> recentCities = new ArrayList<>();
+            for (String cityName : recentSearches) {
+                // Create CityWeather with minimal info for recent searches
+                CityWeather city = new CityWeather(
+                    cityName,
+                    "", // Empty country
+                    "Recent Search", // Description
+                    0, // temp
+                    0, // high
+                    0, // low
+                    "" // icon name
+                );
+                recentCities.add(city);
+            }
+            
+            updateCitiesList(recentCities);
+        } else {
+            // No recent searches, load popular cities
+            binding.tvRecentSearches.setVisibility(android.view.View.GONE);
+            viewModel.loadPopularCities();
+        }
     }
 
     private void returnLocationToMain(double latitude, double longitude) {

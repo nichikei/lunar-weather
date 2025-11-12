@@ -70,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
     private WeatherRepositoryImpl repository; // Keep reference to access cached responses
     private static final String API_KEY = "4f8cf691daad596ac4e465c909868d0d";
     
-    // Weather Background Views - Removed for iOS-style glassmorphism
+    // Weather Background Views
+    private android.widget.VideoView videoBackground;
     
     // Helper classes (UI only)
     private UIUpdateHelper uiUpdateHelper;
@@ -207,7 +208,9 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Weather background removed - using simple gradient for iOS-style glassmorphism
+        // Initialize video background
+        videoBackground = binding.videoBackground;
+        setupVideoView("clear", false); // Default video
 
         sharedPreferences = getSharedPreferences("WeatherAppPrefs", MODE_PRIVATE);
 
@@ -349,7 +352,8 @@ public class MainActivity extends AppCompatActivity {
     private void initializeHelpers() {
         uiUpdateHelper = new UIUpdateHelper(binding, temperatureUnit, windSpeedUnit, pressureUnit);
         locationHelper = new LocationHelper(this, fusedLocationClient);
-        forecastViewManager = new ForecastViewManager(this, binding.hourlyForecastContainer, temperatureUnit);
+        // Note: forecastViewManager will be used for both hourly and daily forecasts
+        forecastViewManager = new ForecastViewManager(this, binding.hourlyForecastContainer, binding.dailyForecastContainer, temperatureUnit);
         uiSetupHelper = new UISetupHelper(this, binding);
         navigationHelper = new NavigationHelper(this);
         favoritesHelper = new FavoritesHelper(this, favoritesManager, binding.fabAddToFavorites);
@@ -443,18 +447,11 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initializeMicroCharts() {
         try {
-            // Initialize UV Trend Chart
-            com.example.weatherapp.ui.views.charts.UVTrendChart uvTrendChart = 
-                binding.getRoot().findViewById(R.id.uvTrendChart);
-            if (uvTrendChart != null) {
-                // Set sample data (will be replaced with real API data)
-                List<Float> sampleUV = new ArrayList<>();
-                List<String> sampleHours = new ArrayList<>();
-                for (int i = 6; i <= 18; i += 2) {
-                    sampleUV.add((float)(Math.random() * 10));
-                    sampleHours.add(i + "h");
-                }
-                uvTrendChart.setUVData(sampleUV, sampleHours);
+            // Initialize UV Gradient Bar (iOS style - replaced chart)
+            View uvGradientBar = binding.getRoot().findViewById(R.id.uvGradientBar);
+            if (uvGradientBar != null) {
+                // UV gradient bar will be updated dynamically in updateUVTrendChart()
+                // No initialization needed here
             }
             
             // Initialize Humidity Area Chart
@@ -829,22 +826,36 @@ public class MainActivity extends AppCompatActivity {
                     isHourlyView = isHourly;
                     uiSetupHelper.animateTabSelection(isHourly);
                     
-                    // Update forecast display when tab changes
-                    UIState<ForecastData> forecastState = viewModel.getForecastState().getValue();
-                    if (forecastState instanceof UIState.Success) {
-                        ForecastData data = ((UIState.Success<ForecastData>) forecastState).getData();
-                        if (forecastViewManager != null && data != null) {
-                            Log.d(TAG, "Tab changed to " + (isHourly ? "Hourly" : "Weekly"));
-                            if (isHourly) {
-                                forecastViewManager.createHourlyForecastView(data);
-                            } else {
-                                forecastViewManager.createWeeklyForecastView(data);
-                            }
-                        }
-                    }
+                    // Note: With iOS style, both views are always shown
+                    // Tab switching is kept for backward compatibility but doesn't affect visibility
+                    Log.d(TAG, "Tab selection changed to " + (isHourly ? "Hourly" : "Daily") + 
+                          " (both views remain visible in iOS style)");
                 }
             }
         });
+        
+        // Setup Settings button click (iOS bottom nav)
+        View btnSettings = binding.getRoot().findViewById(R.id.btnSettingsNav);
+        if (btnSettings != null) {
+            btnSettings.setOnClickListener(v -> {
+                settingsLauncher.launch(new Intent(this, SettingsActivity.class));
+            });
+        }
+        
+        // Setup Add City button (+ icon near city name)
+        View btnAddCity = binding.getRoot().findViewById(R.id.btnAddCity);
+        if (btnAddCity != null) {
+            btnAddCity.setOnClickListener(v -> openSearchActivity());
+        }
+    }
+
+    /**
+     * Open Search Activity
+     */
+    private void openSearchActivity() {
+        Intent intent = new Intent(this, SearchActivity.class);
+        searchLauncher.launch(intent); // Use searchLauncher to receive result
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     private void toggleSearchBar() {
@@ -1038,14 +1049,16 @@ public class MainActivity extends AppCompatActivity {
             updateMicroChartsWithForecast(data);
         }
         
-        // Update hourly/weekly forecast cards
+        // Update forecast views - iOS style: Show both hourly and daily together
         if (forecastViewManager != null && data != null) {
-            Log.d(TAG, "Updating forecast cards with " + data.getHourlyForecasts().size() + " hourly items");
-            if (isHourlyView) {
-                forecastViewManager.createHourlyForecastView(data);
-            } else {
-                forecastViewManager.createWeeklyForecastView(data);
-            }
+            Log.d(TAG, "Updating forecast views - Hourly: " + data.getHourlyForecasts().size() + 
+                  " items, Daily: " + data.getDailyForecasts().size() + " days");
+            
+            // Always show hourly forecast (in first card)
+            forecastViewManager.createHourlyForecastView(data);
+            
+            // Always show 10-day forecast (in second card) - iOS style
+            forecastViewManager.createWeeklyForecastView(data);
         }
     }
 
@@ -1219,26 +1232,31 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateUVTrendChart(int currentUV) {
         try {
-            com.example.weatherapp.ui.views.charts.UVTrendChart uvChart = 
-                binding.getRoot().findViewById(R.id.uvTrendChart);
-            if (uvChart != null) {
-                // Simulate UV trend based on current UV (peaks at noon)
-                List<Float> uvValues = new ArrayList<>();
-                List<String> hourLabels = new ArrayList<>();
+            // Update UV Gradient Bar width (iOS style)
+            View uvGradientBar = binding.getRoot().findViewById(R.id.uvGradientBar);
+            if (uvGradientBar != null) {
+                // Calculate width percentage based on UV index (0-11+ scale)
+                float uvPercentage = Math.min(currentUV / 11f, 1f);
                 
-                // Generate UV curve (6AM to 6PM)
-                for (int hour = 6; hour <= 18; hour += 2) {
-                    // UV peaks at noon (12), simulate bell curve
-                    float uvValue = currentUV * (1 - Math.abs(hour - 12) / 6f) * 0.9f;
-                    uvValues.add(Math.max(0, uvValue));
-                    hourLabels.add(hour + "h");
-                }
+                // Update width after layout is measured
+                uvGradientBar.post(() -> {
+                    try {
+                        android.view.ViewGroup parent = (android.view.ViewGroup) uvGradientBar.getParent();
+                        if (parent != null) {
+                            android.widget.FrameLayout.LayoutParams params = 
+                                (android.widget.FrameLayout.LayoutParams) uvGradientBar.getLayoutParams();
+                            params.width = (int)(parent.getWidth() * uvPercentage);
+                            uvGradientBar.setLayoutParams(params);
+                        }
+                    } catch (Exception e) {
+                        android.util.Log.e("MainActivity", "Error setting UV bar width", e);
+                    }
+                });
                 
-                uvChart.setUVData(uvValues, hourLabels);
-                android.util.Log.d("MainActivity", "Updated UV trend chart");
+                android.util.Log.d("MainActivity", "Updated UV gradient bar: " + currentUV + " (" + (uvPercentage * 100) + "%)");
             }
         } catch (Exception e) {
-            android.util.Log.e("MainActivity", "Error updating UV trend chart", e);
+            android.util.Log.e("MainActivity", "Error updating UV gradient bar", e);
         }
     }
 
@@ -1428,15 +1446,173 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Get video resource ID based on weather condition and time of day
+     * @param condition Weather condition string (e.g., "Rain", "Clear", "Clouds")
+     * @param isNight Whether it's currently nighttime
+     * @return Resource ID of the appropriate video
+     */
+    private int getVideoForWeather(String condition, boolean isNight) {
+        // Convert condition to lowercase for case-insensitive comparison
+        String conditionLower = condition.toLowerCase();
+        
+        Log.d(TAG, "🎬 getVideoForWeather: condition='" + condition + "', isNight=" + isNight);
+        
+        // Priority 1: If it's night, always return night video
+        if (isNight) {
+            Log.d(TAG, "✅ Video selected: night.mp4 (reason: isNight=true)");
+            return R.raw.night;
+        }
+        
+        // Priority 2: Daytime conditions
+        // Rain conditions
+        if (conditionLower.contains("rain") || 
+            conditionLower.contains("drizzle") || 
+            conditionLower.contains("storm")) {
+            Log.d(TAG, "✅ Video selected: rain.mp4 (reason: condition contains rain/drizzle/storm)");
+            return R.raw.rain;
+        }
+        
+        // Cloudy/Foggy conditions
+        if (conditionLower.contains("cloud") || 
+            conditionLower.contains("fog") || 
+            conditionLower.contains("haze")) {
+            Log.d(TAG, "✅ Video selected: night.mp4 (reason: cloudy/foggy → night default)");
+            return R.raw.night;
+        }
+        
+        // Clear/Sunny conditions
+        if (conditionLower.contains("clear") || 
+            conditionLower.contains("sun")) {
+            Log.d(TAG, "✅ Video selected: night.mp4 (reason: clear/sunny → night default)");
+            return R.raw.night;
+        }
+        
+        // Default: night video
+        Log.d(TAG, "✅ Video selected: night.mp4 (reason: default fallback)");
+        return R.raw.night;
+    }
+
+    /**
+     * Setup video background view
+     * @param condition Weather condition string
+     * @param isNight Whether it's currently nighttime
+     */
+    private void setupVideoView(String condition, boolean isNight) {
+        if (videoBackground == null) {
+            Log.e(TAG, "VideoView is null, cannot setup video");
+            return;
+        }
+        
+        try {
+            // Get the appropriate video resource ID
+            int videoId = getVideoForWeather(condition, isNight);
+            
+            // Build video path
+            String videoPath = "android.resource://" + getPackageName() + "/" + videoId;
+            
+            // Set video URI
+            android.net.Uri videoUri = android.net.Uri.parse(videoPath);
+            videoBackground.setVideoURI(videoUri);
+            
+            // Set looping and scale for portrait mode
+            videoBackground.setOnPreparedListener(mp -> {
+                mp.setLooping(true);
+                mp.setVolume(0f, 0f); // Mute the video
+                
+                // Scale video to fill screen (crop to fit)
+                // Get video dimensions
+                int videoWidth = mp.getVideoWidth();
+                int videoHeight = mp.getVideoHeight();
+                
+                // Get screen dimensions
+                int screenWidth = getResources().getDisplayMetrics().widthPixels;
+                int screenHeight = getResources().getDisplayMetrics().heightPixels;
+                
+                // Calculate scale to fill screen
+                float scaleX = (float) screenWidth / videoWidth;
+                float scaleY = (float) screenHeight / videoHeight;
+                float scale = Math.max(scaleX, scaleY); // Use larger scale to fill
+                
+                // Calculate scaled dimensions
+                int scaledWidth = (int) (videoWidth * scale);
+                int scaledHeight = (int) (videoHeight * scale);
+                
+                // Update VideoView layout params
+                android.view.ViewGroup.LayoutParams layoutParams = videoBackground.getLayoutParams();
+                layoutParams.width = scaledWidth;
+                layoutParams.height = scaledHeight;
+                videoBackground.setLayoutParams(layoutParams);
+                
+                Log.d(TAG, "Video scaled: " + videoWidth + "x" + videoHeight + 
+                      " -> " + scaledWidth + "x" + scaledHeight + 
+                      " (screen: " + screenWidth + "x" + screenHeight + ")");
+            });
+            
+            // Handle errors
+            videoBackground.setOnErrorListener((mp, what, extra) -> {
+                Log.e(TAG, "VideoView error: what=" + what + ", extra=" + extra);
+                return true; // Return true to indicate we handled the error
+            });
+            
+            // Start playing
+            videoBackground.start();
+            
+            Log.d(TAG, "Video background setup complete: " + videoPath);
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting up video background", e);
+        }
+    }
+
+    /**
      * Update weather background - Simplified for iOS-style glassmorphism
      * Removed fancy effects for clean, minimal iOS aesthetic
      */
     private void updateWeatherBackground(WeatherData data) {
         // iOS Weather uses simple gradient backgrounds - no fancy effects needed
         Log.d(TAG, "iOS-style background: Simple gradient with glassmorphism panels");
+        
+        // Update video background based on weather condition
+        if (data != null) {
+            // Get weather condition from WeatherData
+            String condition = data.getWeatherMain();
+            
+            // Determine if it's nighttime based on current time and sunrise/sunset
+            boolean isNight = false;
+            long currentTime = System.currentTimeMillis() / 1000; // Current time in seconds
+            long sunrise = data.getSunrise();
+            long sunset = data.getSunset();
+            
+            // Check if current time is outside sunrise-sunset range
+            if (sunrise > 0 && sunset > 0) {
+                isNight = currentTime < sunrise || currentTime > sunset;
+            }
+            
+            // Update video background
+            setupVideoView(condition, isNight);
+            
+            Log.d(TAG, "Weather background updated: condition=" + condition + ", isNight=" + isNight);
+        }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Restart video when returning from other activities (e.g., SearchActivity)
+        if (videoBackground != null && !videoBackground.isPlaying()) {
+            videoBackground.start();
+            Log.d(TAG, "Video restarted in onResume()");
+        }
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Pause video when leaving activity to save battery
+        if (videoBackground != null && videoBackground.isPlaying()) {
+            videoBackground.pause();
+            Log.d(TAG, "Video paused in onPause()");
+        }
+    }
 
     @Override
     protected void onDestroy() {
@@ -1446,6 +1622,11 @@ public class MainActivity extends AppCompatActivity {
         }
         if (chartAnimHelper != null) {
             chartAnimHelper.cleanup();
+        }
+        // Stop and release video resources
+        if (videoBackground != null) {
+            videoBackground.stopPlayback();
+            videoBackground = null;
         }
         // Clear chart references
         chartTemperature = null;

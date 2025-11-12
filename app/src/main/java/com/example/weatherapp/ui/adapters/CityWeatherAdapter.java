@@ -71,8 +71,8 @@ public class CityWeatherAdapter extends RecyclerView.Adapter<CityWeatherAdapter.
         // Set weather icon - always use resource ID
         holder.ivWeatherIcon.setImageResource(city.getIconResourceId());
 
-        // Set gradient background for the card
-        holder.cardBackground.setBackgroundResource(city.getGradientBackground());
+        // Keep iOS-style transparent background from XML (don't override)
+        // holder.cardBackground.setBackgroundResource(city.getGradientBackground());
 
         // Update favorite button icon based on favorite status
         boolean isFavorite = favoriteCitiesManager.isFavorite(city.getCityName());
