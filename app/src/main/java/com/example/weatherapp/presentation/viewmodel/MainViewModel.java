@@ -81,12 +81,12 @@ public class MainViewModel extends ViewModel {
      */
     public void loadWeatherByCity(String cityName) {
         if (cityName == null || cityName.trim().isEmpty()) {
-            weatherState.setValue(new UIState.Error<>("City name cannot be empty"));
+            weatherState.postValue(new UIState.Error<>("City name cannot be empty"));
             return;
         }
         
         this.currentCityName = cityName;
-        weatherState.setValue(new UIState.Loading<>());
+        weatherState.postValue(new UIState.Loading<>());
         
         getWeatherByCityUseCase.execute(cityName, temperatureUnit, 
             new GetWeatherByCityUseCase.Callback() {
@@ -117,7 +117,7 @@ public class MainViewModel extends ViewModel {
     public void loadWeatherByCoordinates(double latitude, double longitude) {
         this.currentLatitude = latitude;
         this.currentLongitude = longitude;
-        weatherState.setValue(new UIState.Loading<>());
+        weatherState.postValue(new UIState.Loading<>());
         
         getWeatherByCoordinatesUseCase.execute(latitude, longitude, temperatureUnit,
             new GetWeatherByCoordinatesUseCase.Callback() {
@@ -147,7 +147,7 @@ public class MainViewModel extends ViewModel {
             return; // No coordinates available
         }
         
-        forecastState.setValue(new UIState.Loading<>());
+        forecastState.postValue(new UIState.Loading<>());
         
         getForecastUseCase.execute(currentLatitude, currentLongitude, temperatureUnit,
             new GetForecastUseCase.Callback() {
@@ -171,7 +171,7 @@ public class MainViewModel extends ViewModel {
             return; // No coordinates available
         }
         
-        uvIndexState.setValue(new UIState.Loading<>());
+        uvIndexState.postValue(new UIState.Loading<>());
         
         getUVIndexUseCase.execute(currentLatitude, currentLongitude,
             new GetUVIndexUseCase.Callback() {
@@ -195,7 +195,7 @@ public class MainViewModel extends ViewModel {
             return; // No coordinates available
         }
         
-        airQualityState.setValue(new UIState.Loading<>());
+        airQualityState.postValue(new UIState.Loading<>());
         
         getAirQualityUseCase.execute(currentLatitude, currentLongitude,
             new GetAirQualityUseCase.Callback() {

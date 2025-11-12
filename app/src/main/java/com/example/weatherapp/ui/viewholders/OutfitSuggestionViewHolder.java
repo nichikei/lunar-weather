@@ -34,9 +34,37 @@ public class OutfitSuggestionViewHolder extends RecyclerView.ViewHolder {
         if (suggestion == null) return;
 
         tvEmoji.setText(suggestion.getEmoji());
-        tvCategory.setText(suggestion.getCategory());
+        
+        // Add priority badge to category
+        String categoryWithPriority = suggestion.getPriorityBadge() + suggestion.getCategory();
+        tvCategory.setText(categoryWithPriority);
+        
+        // Highlight suggestion based on priority
         tvSuggestion.setText(suggestion.getSuggestion());
-        tvReasoning.setText(suggestion.getReasoning());
+        
+        // Add fabric type to reasoning if available
+        String reasoning = suggestion.getReasoning();
+        if (suggestion.getFabricType() != null && !suggestion.getFabricType().isEmpty() 
+            && !suggestion.getFabricType().equals("N/A")) {
+            reasoning += "\n🧵 Fabric: " + suggestion.getFabricType();
+        }
+        tvReasoning.setText(reasoning);
+        
+        // Style based on priority
+        switch (suggestion.getPriority()) {
+            case ESSENTIAL:
+                tvSuggestion.setTextColor(itemView.getContext().getColor(android.R.color.holo_red_dark));
+                tvCategory.setTextColor(itemView.getContext().getColor(android.R.color.holo_red_dark));
+                break;
+            case RECOMMENDED:
+                tvSuggestion.setTextColor(itemView.getContext().getColor(android.R.color.holo_blue_dark));
+                tvCategory.setTextColor(itemView.getContext().getColor(android.R.color.holo_blue_dark));
+                break;
+            case OPTIONAL:
+                tvSuggestion.setTextColor(itemView.getContext().getColor(android.R.color.darker_gray));
+                tvCategory.setTextColor(itemView.getContext().getColor(android.R.color.darker_gray));
+                break;
+        }
     }
 
     /**

@@ -90,6 +90,9 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
+        // Smart Alert Switches
+        setupSmartAlertSwitches();
+        
         // Temperature Unit - Using PreferenceHelper for switch pair
         preferenceHelper.setupSwitchPair(
                 binding.switchCelsius,
@@ -162,8 +165,7 @@ public class SettingsActivity extends AppCompatActivity {
         WorkManager workManager = WorkManager.getInstance(this);
 
         if (enabled) {
-            // For testing: Use OneTimeWorkRequest with 2 minute delay
-            // Note: PeriodicWorkRequest minimum interval is 15 minutes on Android
+            // Schedule weather notification check
             androidx.work.OneTimeWorkRequest weatherWorkRequest =
                     new androidx.work.OneTimeWorkRequest.Builder(
                             WeatherNotificationWorker.class)
@@ -176,8 +178,8 @@ public class SettingsActivity extends AppCompatActivity {
                     weatherWorkRequest
             );
 
-            android.widget.Toast.makeText(this, "Weather notification will show in 2 minutes (test mode)",
-                    android.widget.Toast.LENGTH_LONG).show();
+            android.widget.Toast.makeText(this, "Weather notifications enabled",
+                    android.widget.Toast.LENGTH_SHORT).show();
         } else {
             // Cancel all scheduled notifications
             workManager.cancelUniqueWork("WeatherNotification");
@@ -191,6 +193,59 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Setup Smart Weather Alert switches
+     */
+    private void setupSmartAlertSwitches() {
+        com.example.weatherapp.utils.WeatherAlertPreferences alertPrefs = 
+                new com.example.weatherapp.utils.WeatherAlertPreferences(this);
+        com.example.weatherapp.utils.WeatherAlertScheduler scheduler = 
+                new com.example.weatherapp.utils.WeatherAlertScheduler();
+        
+        // Load saved preferences
+        binding.switchRainAlerts.setChecked(alertPrefs.areRainAlertsEnabled());
+        binding.switchUVAlerts.setChecked(alertPrefs.areUVAlertsEnabled());
+        binding.switchAirQualityAlerts.setChecked(alertPrefs.areAirQualityAlertsEnabled());
+        binding.switchWeatherChangeAlerts.setChecked(alertPrefs.areWeatherChangeAlertsEnabled());
+        
+        // Rain alerts
+        binding.switchRainAlerts.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            alertPrefs.setRainAlertsEnabled(isChecked);
+            android.widget.Toast.makeText(this, 
+                    isChecked ? "Rain alerts enabled" : "Rain alerts disabled", 
+                    android.widget.Toast.LENGTH_SHORT).show();
+        });
+        
+        // UV alerts
+        binding.switchUVAlerts.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            alertPrefs.setUVAlertsEnabled(isChecked);
+            android.widget.Toast.makeText(this, 
+                    isChecked ? "UV alerts enabled" : "UV alerts disabled", 
+                    android.widget.Toast.LENGTH_SHORT).show();
+        });
+        
+        // Air quality alerts
+        binding.switchAirQualityAlerts.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            alertPrefs.setAirQualityAlertsEnabled(isChecked);
+            android.widget.Toast.makeText(this, 
+                    isChecked ? "Air quality alerts enabled" : "Air quality alerts disabled", 
+                    android.widget.Toast.LENGTH_SHORT).show();
+        });
+        
+        // Weather change alerts
+        binding.switchWeatherChangeAlerts.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            alertPrefs.setWeatherChangeAlertsEnabled(isChecked);
+            android.widget.Toast.makeText(this, 
+                    isChecked ? "Weather change alerts enabled" : "Weather change alerts disabled", 
+                    android.widget.Toast.LENGTH_SHORT).show();
+        });
+        
+        // Schedule alerts if any alert is enabled
+        if (alertPrefs.areAlertsEnabled()) {
+            scheduler.scheduleWeatherAlerts(this, alertPrefs.getAlertFrequency());
+        }
+    }
+    
     @Override
     protected void onDestroy() {
         super.onDestroy();

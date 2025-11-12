@@ -93,6 +93,29 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.6.1'
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
 
+    // ========== NEW: Material Design 3 & Animations ==========
+    // Google Maps for Weather Maps feature
+    implementation libs.play.services.maps
+    
+    // Lottie for smooth animations
+    implementation libs.lottie
+    
+    // Glide for image loading
+    implementation libs.glide
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
+    
+    // Shimmer effect for loading states
+    implementation libs.shimmer
+    
+    // ViewPager2 for smooth page transitions
+    implementation 'androidx.viewpager2:viewpager2:1.1.0'
+    
+    // SwipeRefreshLayout
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    
+    // Palette for dynamic colors
+    implementation 'androidx.palette:palette:1.0.0'
+
     // ========== Testing Dependencies ==========
     // Unit Testing
     testImplementation libs.junit

@@ -4,8 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/weather_detail_card_background"
-    android:padding="16dp">
+    android:background="@drawable/weather_card_ripple"
+    android:padding="16dp"
+    android:clickable="true"
+    android:focusable="true">
 
     <!-- Icon and Title Row -->
     <LinearLayout

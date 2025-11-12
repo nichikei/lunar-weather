@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original beautiful purple glass with ripple effect -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#407B5CFF">
+    
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <corners android:radius="22dp" />
+            <solid android:color="#FFFFFFFF" />
+        </shape>
+    </item>
+    
+    <item>
+        <layer-list>
+            <!-- Subtle purple neon glow -->
+            <item
+                android:left="-10dp"
+                android:top="-10dp"
+                android:right="-10dp"
+                android:bottom="-10dp">
+                <shape android:shape="rectangle">
+                    <gradient
+                        android:type="radial"
+                        android:gradientRadius="120dp"
+                        android:centerX="0.5"
+                        android:centerY="0.5"
+                        android:startColor="#2E7B5CFF"
+                        android:centerColor="#1C7B5CFF"
+                        android:endColor="#007B5CFF" />
+                    <corners android:radius="22dp" />
+                </shape>
+            </item>
+
+            <!-- Enhanced shadow -->
+            <item
+                android:left="0dp"
+                android:top="6dp"
+                android:right="0dp"
+                android:bottom="0dp">
+                <shape android:shape="rectangle">
+                    <gradient
+                        android:type="radial"
+                        android:gradientRadius="180dp"
+                        android:centerX="0.5"
+                        android:centerY="0.5"
+                        android:startColor="#33000000"
+                        android:centerColor="#18000000"
+                        android:endColor="#00000000" />
+                    <corners android:radius="22dp" />
+                </shape>
+            </item>
+
+            <!-- Main glass card - beautiful purple -->
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="#402A1B6B" />
+                    <corners android:radius="22dp" />
+                    <stroke
+                        android:width="1dp"
+                        android:color="#40FFFFFF" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+</ripple>

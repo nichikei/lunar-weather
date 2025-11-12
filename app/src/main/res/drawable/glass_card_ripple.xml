@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Glassmorphic ripple effect for touch feedback -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#30FFFFFF">
+    
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <solid android:color="#FFFFFFFF" />
+        </shape>
+    </item>
+    
+    <item>
+        <layer-list>
+            <!-- Shadow layer -->
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="26dp" />
+                    <solid android:color="#08000000" />
+                </shape>
+            </item>
+            
+            <!-- Glass surface -->
+            <item
+                android:bottom="4dp"
+                android:left="2dp"
+                android:right="2dp"
+                android:top="2dp">
+                <shape android:shape="rectangle">
+                    <corners android:radius="24dp" />
+                    <gradient
+                        android:angle="135"
+                        android:endColor="#20FFFFFF"
+                        android:startColor="#25FFFFFF"
+                        android:type="linear" />
+                    <stroke
+                        android:width="1.5dp"
+                        android:color="#35FFFFFF" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+</ripple>

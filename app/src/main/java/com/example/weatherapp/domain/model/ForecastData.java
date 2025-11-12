@@ -41,10 +41,11 @@ public class ForecastData {
         private final int humidity;
         private final double windSpeed;
         private final int rainProbability; // 0-100
+        private final double pressure; // hPa
         
         public HourlyForecast(long timestamp, double temperature, String weatherIcon, 
                               String weatherDescription, int humidity, double windSpeed, 
-                              int rainProbability) {
+                              int rainProbability, double pressure) {
             this.timestamp = timestamp;
             this.temperature = temperature;
             this.weatherIcon = weatherIcon;
@@ -52,6 +53,15 @@ public class ForecastData {
             this.humidity = humidity;
             this.windSpeed = windSpeed;
             this.rainProbability = rainProbability;
+            this.pressure = pressure;
+        }
+        
+        // Constructor without pressure for backward compatibility
+        public HourlyForecast(long timestamp, double temperature, String weatherIcon, 
+                              String weatherDescription, int humidity, double windSpeed, 
+                              int rainProbability) {
+            this(timestamp, temperature, weatherIcon, weatherDescription, humidity, 
+                 windSpeed, rainProbability, 1013.0); // Default pressure
         }
         
         public long getTimestamp() { return timestamp; }
@@ -61,6 +71,7 @@ public class ForecastData {
         public int getHumidity() { return humidity; }
         public double getWindSpeed() { return windSpeed; }
         public int getRainProbability() { return rainProbability; }
+        public double getPressure() { return pressure; }
     }
     
     /**

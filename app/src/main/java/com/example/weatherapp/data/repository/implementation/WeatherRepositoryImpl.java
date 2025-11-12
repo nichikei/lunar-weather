@@ -38,11 +38,24 @@ public class WeatherRepositoryImpl implements WeatherRepository {
     private final WeatherDao weatherDao;
     private final Executor executor;
     
+    // Cache latest responses for ChartsActivity
+    private WeatherResponse latestWeatherResponse;
+    private HourlyForecastResponse latestHourlyForecastResponse;
+    
     public WeatherRepositoryImpl(Context context, String apiKey) {
         this.apiService = RetrofitClient.getInstance().getWeatherApi();
         this.apiKey = apiKey;
         this.weatherDao = WeatherDatabase.getInstance(context).weatherDao();
         this.executor = Executors.newSingleThreadExecutor();
+    }
+    
+    // Getters for cached responses
+    public WeatherResponse getLatestWeatherResponse() {
+        return latestWeatherResponse;
+    }
+    
+    public HourlyForecastResponse getLatestHourlyForecastResponse() {
+        return latestHourlyForecastResponse;
     }
     
     @Override
@@ -153,6 +166,10 @@ public class WeatherRepositoryImpl implements WeatherRepository {
             @Override
             public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    // Cache the response for ChartsActivity
+                    latestWeatherResponse = response.body();
+                    Log.d(TAG, "✓ Cached WeatherResponse for charts");
+                    
                     WeatherData weatherData = DomainMapper.toWeatherData(response.body(), temperatureUnit);
                     if (weatherData != null) {
                         // Cache the result
@@ -200,6 +217,10 @@ public class WeatherRepositoryImpl implements WeatherRepository {
             @Override
             public void onResponse(Call<HourlyForecastResponse> call, Response<HourlyForecastResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    // Cache the response for ChartsActivity
+                    latestHourlyForecastResponse = response.body();
+                    Log.d(TAG, "✓ Cached HourlyForecastResponse for charts");
+                    
                     ForecastData forecastData = DomainMapper.toForecastData(response.body());
                     if (forecastData != null) {
                         callback.onSuccess(forecastData);

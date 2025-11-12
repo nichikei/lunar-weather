@@ -3,9 +3,11 @@ package com.example.weatherapp.ui.helpers;
 import android.content.Intent;
 import android.widget.Toast;
 
+import com.example.weatherapp.R;
 import com.example.weatherapp.data.responses.AirQualityResponse;
 import com.example.weatherapp.data.responses.HourlyForecastResponse;
 import com.example.weatherapp.data.responses.WeatherResponse;
+import com.example.weatherapp.domain.model.WeatherData;
 import com.example.weatherapp.ui.activities.ChartsActivity;
 import com.example.weatherapp.ui.activities.MainActivity;
 import com.example.weatherapp.ui.activities.OutfitSuggestionActivity;
@@ -46,7 +48,7 @@ public class NavigationHelper {
     /**
      * Open Outfit Suggestion Activity
      */
-    public void openOutfitSuggestionActivity(WeatherResponse weatherData) {
+    public void openOutfitSuggestionActivity(WeatherData weatherData) {
         if (weatherData == null) {
             Toast.makeText(activity, "Weather data not available yet", Toast.LENGTH_SHORT).show();
             return;
@@ -55,5 +57,6 @@ public class NavigationHelper {
         Intent intent = new Intent(activity, OutfitSuggestionActivity.class);
         intent.putExtra("weather_data", weatherData);
         activity.startActivity(intent);
+        activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 }

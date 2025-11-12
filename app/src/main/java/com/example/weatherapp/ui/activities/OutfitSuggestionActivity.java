@@ -1,6 +1,7 @@
 package com.example.weatherapp.ui.activities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -72,12 +73,23 @@ public class OutfitSuggestionActivity extends AppCompatActivity {
 
         // === NHẬN DỮ LIỆU THỜI TIẾT TỪ INTENT ===
         // MainActivity gửi dữ liệu thời tiết qua Intent khi user bấm nút "Outfit Suggestion"
-        weatherData = (WeatherResponse) getIntent().getSerializableExtra("weather_data");
+        // Receive WeatherData from Intent and convert to WeatherResponse
+        com.example.weatherapp.domain.model.WeatherData domainWeatherData = 
+            (com.example.weatherapp.domain.model.WeatherData) getIntent().getSerializableExtra("weather_data");
 
         // Kiểm tra dữ liệu có tồn tại không
-        if (weatherData == null) {
+        if (domainWeatherData == null) {
             Toast.makeText(this, "No weather data available", Toast.LENGTH_SHORT).show();
             finish();  // Đóng Activity nếu không có dữ liệu
+            return;
+        }
+        
+        // Convert WeatherData to WeatherResponse for OutfitSuggestionService
+        weatherData = convertToWeatherResponse(domainWeatherData);
+        
+        if (weatherData == null) {
+            Toast.makeText(this, "Failed to process weather data", Toast.LENGTH_SHORT).show();
+            finish();
             return;
         }
 
@@ -196,6 +208,85 @@ public class OutfitSuggestionActivity extends AppCompatActivity {
             default:
                 // Mặc định
                 return R.drawable.sun_cloud_angled_rain;
+        }
+    }
+    
+    /**
+     * Convert WeatherData (domain model) to WeatherResponse (for OutfitSuggestionService)
+     * This is necessary because OutfitSuggestionService expects WeatherResponse format
+     * Uses Gson to create the JSON representation and deserialize back
+     */
+    private WeatherResponse convertToWeatherResponse(com.example.weatherapp.domain.model.WeatherData data) {
+        try {
+            // Build a JSON structure matching WeatherResponse format
+            com.google.gson.JsonObject json = new com.google.gson.JsonObject();
+            
+            // Main weather info (temperature in Kelvin for API compatibility)
+            com.google.gson.JsonObject main = new com.google.gson.JsonObject();
+            main.addProperty("temp", data.getTemperature() + 273.15); // Celsius to Kelvin
+            main.addProperty("feels_like", data.getFeelsLike() + 273.15);
+            main.addProperty("humidity", data.getHumidity());
+            main.addProperty("pressure", (int) data.getPressure());
+            main.addProperty("temp_min", data.getMinTemperature() + 273.15);
+            main.addProperty("temp_max", data.getMaxTemperature() + 273.15);
+            json.add("main", main);
+            
+            // Wind info
+            com.google.gson.JsonObject wind = new com.google.gson.JsonObject();
+            wind.addProperty("speed", data.getWindSpeed());
+            wind.addProperty("deg", data.getWindDegree());
+            json.add("wind", wind);
+            
+            // Weather condition array
+            com.google.gson.JsonArray weatherArray = new com.google.gson.JsonArray();
+            com.google.gson.JsonObject weather = new com.google.gson.JsonObject();
+            weather.addProperty("main", data.getWeatherMain());
+            weather.addProperty("description", data.getWeatherDescription());
+            weather.addProperty("icon", data.getWeatherIcon());
+            weatherArray.add(weather);
+            json.add("weather", weatherArray);
+            
+            // Clouds
+            com.google.gson.JsonObject clouds = new com.google.gson.JsonObject();
+            clouds.addProperty("all", data.getCloudiness());
+            json.add("clouds", clouds);
+            
+            // City name
+            json.addProperty("name", data.getCityName());
+            
+            // Visibility
+            json.addProperty("visibility", (int) data.getVisibility());
+            
+            // Timestamp
+            json.addProperty("dt", data.getTimestamp());
+            
+            // Coordinates
+            com.google.gson.JsonObject coord = new com.google.gson.JsonObject();
+            coord.addProperty("lat", data.getLatitude());
+            coord.addProperty("lon", data.getLongitude());
+            json.add("coord", coord);
+            
+            // Sys info
+            com.google.gson.JsonObject sys = new com.google.gson.JsonObject();
+            sys.addProperty("country", data.getCountryCode());
+            sys.addProperty("sunrise", data.getSunrise());
+            sys.addProperty("sunset", data.getSunset());
+            json.add("sys", sys);
+            
+            // Rain (if available)
+            if (data.getRainVolume() != null) {
+                com.google.gson.JsonObject rain = new com.google.gson.JsonObject();
+                rain.addProperty("1h", data.getRainVolume());
+                json.add("rain", rain);
+            }
+            
+            // Convert JSON to WeatherResponse using Gson
+            com.google.gson.Gson gson = new com.google.gson.Gson();
+            return gson.fromJson(json, WeatherResponse.class);
+            
+        } catch (Exception e) {
+            Log.e("OutfitSuggestionActivity", "Error converting WeatherData to WeatherResponse", e);
+            return null;
         }
     }
 }

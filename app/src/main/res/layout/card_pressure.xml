@@ -4,8 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/weather_detail_card_background"
-    android:padding="16dp">
+    android:background="@drawable/weather_card_ripple"
+    android:padding="16dp"
+    android:clickable="true"
+    android:focusable="true">
 
     <!-- Icon and Title Row -->
     <LinearLayout
@@ -35,32 +37,33 @@
             tools:ignore="HardcodedText" />
     </LinearLayout>
 
-    <!-- Circular Gauge -->
-    <RelativeLayout
+    <!-- Pressure Value -->
+    <TextView
+        android:id="@+id/tvDetailValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1013"
+        android:textColor="@color/text_primary"
+        android:textSize="42sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/poppins_bold"
+        android:layout_marginBottom="4dp"
+        tools:ignore="HardcodedText" />
+
+    <!-- Unit -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="hPa"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp"
+        android:fontFamily="@font/poppins"
+        android:layout_marginBottom="8dp"
+        tools:ignore="HardcodedText" />
+
+    <!-- Pressure Trend Chart -->
+    <com.example.weatherapp.ui.views.charts.PressureTrendChart
+        android:id="@+id/pressureTrendChart"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginVertical="8dp">
-
-        <!-- Gauge Circle -->
-        <View
-            android:id="@+id/gaugeCircle"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_centerInParent="true"
-            android:background="@drawable/pressure_gauge_simple" />
-
-        <!-- Value in Center -->
-        <TextView
-            android:id="@+id/tvDetailValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1013"
-            android:textColor="@color/text_primary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/poppins_bold"
-            android:layout_centerInParent="true"
-            tools:ignore="HardcodedText" />
-    </RelativeLayout>
+        android:layout_height="70dp" />
 </LinearLayout>

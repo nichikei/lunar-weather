@@ -71,4 +71,34 @@ public class AirQualityData {
             default: return "#808080"; // Gray
         }
     }
+    
+    /**
+     * Get main pollutant based on highest value
+     */
+    public String getMainPollutant() {
+        double maxValue = Math.max(Math.max(Math.max(pm2_5, pm10), Math.max(o3, no2)), Math.max(so2, co));
+        
+        if (maxValue == pm2_5) return "PM2.5";
+        if (maxValue == pm10) return "PM10";
+        if (maxValue == o3) return "O3";
+        if (maxValue == no2) return "NO2";
+        if (maxValue == so2) return "SO2";
+        if (maxValue == co) return "CO";
+        
+        return "Unknown";
+    }
+    
+    /**
+     * Convert AQI (1-5 scale) to US AQI (0-500 scale)
+     */
+    public int getUSAQI() {
+        switch (aqi) {
+            case 1: return 50;   // Good: 0-50
+            case 2: return 100;  // Fair: 51-100
+            case 3: return 150;  // Moderate: 101-150
+            case 4: return 200;  // Poor: 151-200
+            case 5: return 300;  // Very Poor: 201-300
+            default: return 0;
+        }
+    }
 }

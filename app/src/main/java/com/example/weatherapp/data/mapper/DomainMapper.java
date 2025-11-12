@@ -84,7 +84,8 @@ public class DomainMapper {
                             item.getWeather().get(0).getDescription() : "",
                     item.getMain() != null ? item.getMain().getHumidity() : 0,
                     item.getWind() != null ? item.getWind().getSpeed() : 0,
-                    (int) (item.getPop() * 100)
+                    (int) (item.getPop() * 100),
+                    item.getMain() != null ? item.getMain().getPressure() : 1013.0
             );
             hourlyForecasts.add(hourly);
             

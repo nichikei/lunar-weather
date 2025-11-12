@@ -4,8 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/weather_detail_card_background"
-    android:padding="16dp">
+    android:background="@drawable/weather_card_ripple"
+    android:padding="16dp"
+    android:clickable="true"
+    android:focusable="true">
 
     <!-- Icon and Title Row -->
     <LinearLayout
@@ -41,21 +43,28 @@
         android:layout_height="wrap_content"
         android:text="90%"
         android:textColor="@color/text_primary"
-        android:textSize="48sp"
+        android:textSize="42sp"
         android:textStyle="bold"
         android:fontFamily="@font/poppins_bold"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="8dp"
         tools:ignore="HardcodedText" />
+
+    <!-- Humidity Trend Chart -->
+    <com.example.weatherapp.ui.views.charts.HumidityAreaChart
+        android:id="@+id/humidityAreaChart"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginBottom="4dp" />
 
     <!-- Description -->
     <TextView
         android:id="@+id/tvDetailDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="The dew point is 17\nright now."
+        android:text="The dew point is 17° right now."
         android:textColor="@color/text_secondary"
-        android:textSize="12sp"
+        android:textSize="11sp"
         android:fontFamily="@font/poppins"
-        android:maxLines="2"
+        android:maxLines="1"
         tools:ignore="HardcodedText" />
 </LinearLayout>

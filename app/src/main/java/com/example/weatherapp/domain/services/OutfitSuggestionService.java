@@ -161,19 +161,42 @@ public class OutfitSuggestionService {
         String description = weatherData.getWeather().get(0).getDescription();
         double windSpeed = weatherData.getWind().getSpeed();
         int humidity = weatherData.getMain().getHumidity();
+        double feelsLike = toC(weatherData.getMain().getFeelsLike());
+        int clouds = weatherData.getClouds() != null ? weatherData.getClouds().getAll() : 0;
 
-        // Prompt CỰC NGẮN + bó cứng độ dài từng field để tránh MAX_TOKENS
-        return "Return ONLY this JSON array (EXACTLY 5 items). Keep each \"suggestion\" ≤ 4 words, \"reasoning\" ≤ 10 words.\n\n" +
+        // Enhanced prompt with priority levels and fabric recommendations for Gemini AI
+        return "You are a fashion and weather expert. Return ONLY a JSON array with EXACTLY 7 outfit suggestions.\n\n" +
+                "Each item must have: category, suggestion (≤6 words), reasoning (≤15 words), emoji, priority, fabricType\n\n" +
+                "Priority levels:\n" +
+                "- \"ESSENTIAL\": Critical/必須 for current weather (e.g., rain jacket in rain, winter coat in freezing)\n" +
+                "- \"RECOMMENDED\": Strongly advised for comfort\n" +
+                "- \"OPTIONAL\": Nice to have but not necessary\n\n" +
+                "Categories & appropriate emojis:\n" +
+                "1. Base Layer (👕/🎽) - inner clothing\n" +
+                "2. Outer Layer (🧥/🧥) - jacket/coat\n" +
+                "3. Lower Body (👖/🩳) - pants/shorts\n" +
+                "4. Footwear (👟/👢/👡) - shoes/boots\n" +
+                "5. Head & Face (🧢/🕶️/🎩) - hat/sunglasses/cap\n" +
+                "6. Accessories (☂️/🧣/🎒) - umbrella/scarf/bag\n" +
+                "7. Extra Tips (💡/⚡/✨) - health/safety advice\n\n" +
+                "Weather Context:\n" +
+                "- Temperature: " + String.format("%.1f", temp) + "°C (feels like " + String.format("%.1f", feelsLike) + "°C)\n" +
+                "- Condition: " + condition + " (" + description + ")\n" +
+                "- Wind Speed: " + String.format("%.1f", windSpeed) + " m/s\n" +
+                "- Humidity: " + humidity + "%\n" +
+                "- Cloud Coverage: " + clouds + "%\n\n" +
+                "Consider:\n" +
+                "- Temperature comfort zones: <0°C(extreme cold), 0-10°C(cold), 10-20°C(cool), 20-28°C(pleasant), >28°C(hot)\n" +
+                "- Weather protection: rain→waterproof, sun→UV protection, wind→wind-resistant\n" +
+                "- Fabric recommendations: thermal(cold), moisture-wicking(hot/humid), waterproof(rain), breathable(warm)\n" +
+                "- Health & safety: hydration, sun protection, hypothermia prevention\n\n" +
+                "Example format:\n" +
                 "[\n" +
-                "  {\"category\":\"Upper Body\",\"suggestion\":\"\",\"reasoning\":\"\",\"emoji\":\"🧥\"},\n" +
-                "  {\"category\":\"Lower Body\",\"suggestion\":\"\",\"reasoning\":\"\",\"emoji\":\"👖\"},\n" +
-                "  {\"category\":\"Footwear\",\"suggestion\":\"\",\"reasoning\":\"\",\"emoji\":\"👟\"},\n" +
-                "  {\"category\":\"Accessories\",\"suggestion\":\"\",\"reasoning\":\"\",\"emoji\":\"🕶️\"},\n" +
-                "  {\"category\":\"Extra Tips\",\"suggestion\":\"\",\"reasoning\":\"\",\"emoji\":\"✨\"}\n" +
+                "  {\"category\":\"Base Layer\",\"suggestion\":\"Thermal long-sleeve shirt\",\"reasoning\":\"Cold temperature needs insulated foundation\",\"emoji\":\"👕\",\"priority\":\"ESSENTIAL\",\"fabricType\":\"Merino wool thermal\"},\n" +
+                "  {\"category\":\"Outer Layer\",\"suggestion\":\"Waterproof rain jacket\",\"reasoning\":\"Rain protection critical to stay dry\",\"emoji\":\"🧥\",\"priority\":\"ESSENTIAL\",\"fabricType\":\"Gore-Tex waterproof\"},\n" +
+                "  ...\n" +
                 "]\n\n" +
-                "Context: T=" + Math.round(temp) + "°C; " + condition + "(" + description + "); " +
-                "Wind=" + String.format("%.1f", windSpeed) + " m/s; Humidity=" + humidity + "%.\n" +
-                "Output must be valid JSON array only.";
+                "Output ONLY the JSON array, no other text. Ensure valid JSON syntax.";
     }
 
     private List<OutfitSuggestion> parseGeminiResponse(String responseBody, WeatherResponse weatherData,
@@ -234,15 +257,29 @@ public class OutfitSuggestionService {
                     String suggestion = obj.optString("suggestion", "");
                     String reasoning = obj.optString("reasoning", "");
                     String emoji = obj.optString("emoji", "👔");
+                    String priorityStr = obj.optString("priority", "RECOMMENDED");
+                    String fabricType = obj.optString("fabricType", "");
 
                     if (!suggestion.isEmpty()) {
-                        suggestions.add(new OutfitSuggestion(
+                        // Parse priority from string to enum
+                        OutfitSuggestion.Priority priority;
+                        try {
+                            priority = OutfitSuggestion.Priority.valueOf(priorityStr.toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            priority = OutfitSuggestion.Priority.RECOMMENDED;
+                            Log.w(TAG, "Invalid priority '" + priorityStr + "', using RECOMMENDED");
+                        }
+                        
+                        OutfitSuggestion outfitSuggestion = new OutfitSuggestion(
                                 category,
                                 suggestion,
                                 reasoning,
-                                emoji
-                        ));
-                        Log.d(TAG, "  ✓ " + (i+1) + ". " + category + ": " + suggestion);
+                                emoji,
+                                priority,
+                                fabricType
+                        );
+                        suggestions.add(outfitSuggestion);
+                        Log.d(TAG, "  ✓ " + (i+1) + ". [" + priority + "] " + category + ": " + suggestion);
                     }
                 }
 
@@ -259,62 +296,155 @@ public class OutfitSuggestionService {
 
     private List<OutfitSuggestion> getDefaultOutfitSuggestions(WeatherResponse weatherData) {
         List<OutfitSuggestion> suggestions = new ArrayList<>();
-        double temp = weatherData.getMain().getTemp();
+        double temp = toC(weatherData.getMain().getTemp());
+        double feelsLike = toC(weatherData.getMain().getFeelsLike());
         String condition = weatherData.getWeather().get(0).getMain().toLowerCase();
         double windSpeed = weatherData.getWind().getSpeed();
+        int humidity = weatherData.getMain().getHumidity();
+        
+        Log.d(TAG, "Generating default suggestions for: " + temp + "°C, " + condition);
 
-        // Upper Body
-        if (temp < 10) {
+        // Base Layer (Inner clothing)
+        if (temp < 0) {
             suggestions.add(new OutfitSuggestion(
-                    "Upper Body",
-                    "Heavy jacket or winter coat",
-                    "It's cold outside, you need warm layers",
-                    "🧥"
+                    "Base Layer",
+                    "Thermal underwear + warm shirt",
+                    "Extreme cold requires insulated base layers",
+                    "🥶",
+                    OutfitSuggestion.Priority.ESSENTIAL,
+                    "Merino wool or synthetic thermal"
+            ));
+        } else if (temp < 10) {
+            suggestions.add(new OutfitSuggestion(
+                    "Base Layer",
+                    "Long-sleeve thermal or flannel",
+                    "Cold weather needs warm foundation layer",
+                    "👕",
+                    OutfitSuggestion.Priority.ESSENTIAL,
+                    "Cotton blend or fleece"
             ));
         } else if (temp < 20) {
             suggestions.add(new OutfitSuggestion(
-                    "Upper Body",
-                    "Light jacket or sweater",
-                    "Mild temperature, a light layer is perfect",
-                    "🧥"
+                    "Base Layer",
+                    "Long-sleeve shirt or light sweater",
+                    "Cool temperature, comfortable base layer needed",
+                    "👕",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Cotton or cotton blend"
             ));
         } else if (temp < 28) {
             suggestions.add(new OutfitSuggestion(
-                    "Upper Body",
-                    "T-shirt or casual shirt",
-                    "Comfortable temperature for light clothing",
-                    "👕"
+                    "Base Layer",
+                    "T-shirt or polo shirt",
+                    "Pleasant temperature for standard clothing",
+                    "👕",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Breathable cotton"
             ));
         } else {
             suggestions.add(new OutfitSuggestion(
-                    "Upper Body",
-                    "Breathable tank top or light shirt",
-                    "It's hot, stay cool with minimal clothing",
-                    "👕"
+                    "Base Layer",
+                    "Light tank top or athletic shirt",
+                    "Hot weather requires minimal, breathable base",
+                    "🎽",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Moisture-wicking synthetic"
+            ));
+        }
+
+        // Outer Layer (Jacket/Coat)
+        if (condition.contains("rain") || condition.contains("drizzle")) {
+            suggestions.add(new OutfitSuggestion(
+                    "Outer Layer",
+                    "Waterproof rain jacket",
+                    "Rain protection essential, stay dry",
+                    "🧥",
+                    OutfitSuggestion.Priority.ESSENTIAL,
+                    "Waterproof nylon or Gore-Tex"
+            ));
+        } else if (temp < 5) {
+            suggestions.add(new OutfitSuggestion(
+                    "Outer Layer",
+                    "Heavy winter coat or parka",
+                    "Very cold, need maximum insulation",
+                    "🧥",
+                    OutfitSuggestion.Priority.ESSENTIAL,
+                    "Down or synthetic insulation"
+            ));
+        } else if (temp < 15) {
+            suggestions.add(new OutfitSuggestion(
+                    "Outer Layer",
+                    "Medium jacket or hoodie",
+                    "Cool weather, light insulation needed",
+                    "🧥",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Fleece or light insulation"
+            ));
+        } else if (temp < 22 && windSpeed > 5) {
+            suggestions.add(new OutfitSuggestion(
+                    "Outer Layer",
+                    "Windbreaker or light jacket",
+                    "Windy conditions need wind protection",
+                    "🧥",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Wind-resistant nylon"
+            ));
+        } else if (temp >= 22) {
+            suggestions.add(new OutfitSuggestion(
+                    "Outer Layer",
+                    "No jacket needed",
+                    "Warm enough without outer layer",
+                    "☀️",
+                    OutfitSuggestion.Priority.OPTIONAL,
+                    "N/A"
             ));
         }
 
         // Lower Body
-        if (temp < 15) {
+        if (temp < 0) {
+            suggestions.add(new OutfitSuggestion(
+                    "Lower Body",
+                    "Insulated pants or thermal leggings",
+                    "Extreme cold requires insulated leg wear",
+                    "🥾",
+                    OutfitSuggestion.Priority.ESSENTIAL,
+                    "Thermal or insulated fabric"
+            ));
+        } else if (temp < 15) {
             suggestions.add(new OutfitSuggestion(
                     "Lower Body",
                     "Jeans or warm pants",
-                    "Keep your legs warm in cooler weather",
-                    "👖"
+                    "Cool weather, keep legs warm and comfortable",
+                    "👖",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Denim or cotton pants"
             ));
         } else if (temp < 25) {
             suggestions.add(new OutfitSuggestion(
                     "Lower Body",
-                    "Casual pants or jeans",
-                    "Comfortable for moderate temperatures",
-                    "👖"
+                    "Chinos or casual pants",
+                    "Moderate temperature, standard pants work well",
+                    "👖",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Cotton or cotton blend"
+            ));
+        } else if (temp < 30) {
+            suggestions.add(new OutfitSuggestion(
+                    "Lower Body",
+                    "Shorts or light pants",
+                    "Warm weather, stay cool with lighter options",
+                    "🩳",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Cotton or linen"
             ));
         } else {
             suggestions.add(new OutfitSuggestion(
                     "Lower Body",
-                    "Shorts or light skirt",
-                    "Stay cool in warm weather",
-                    "🩳"
+                    "Light shorts or breathable skirt",
+                    "Hot weather requires minimal, airy clothing",
+                    "🩳",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Linen or moisture-wicking"
             ));
         }
 
@@ -323,29 +453,99 @@ public class OutfitSuggestionService {
             suggestions.add(new OutfitSuggestion(
                     "Footwear",
                     "Waterproof boots or rain shoes",
-                    "Keep your feet dry in wet conditions",
-                    "👢"
+                    "Wet conditions require waterproof footwear",
+                    "👢",
+                    OutfitSuggestion.Priority.ESSENTIAL,
+                    "Waterproof rubber or treated leather"
+            ));
+        } else if (condition.contains("snow")) {
+            suggestions.add(new OutfitSuggestion(
+                    "Footwear",
+                    "Insulated winter boots",
+                    "Snow requires warm, waterproof boots",
+                    "🥾",
+                    OutfitSuggestion.Priority.ESSENTIAL,
+                    "Insulated waterproof boots"
             ));
         } else if (temp < 10) {
             suggestions.add(new OutfitSuggestion(
                     "Footwear",
-                    "Boots or closed-toe shoes",
-                    "Warm footwear for cold weather",
-                    "👟"
+                    "Closed shoes or ankle boots",
+                    "Cold weather, keep feet warm and protected",
+                    "👟",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Leather or insulated material"
             ));
-        } else if (temp > 25) {
+        } else if (temp < 25) {
             suggestions.add(new OutfitSuggestion(
                     "Footwear",
-                    "Sandals or breathable sneakers",
-                    "Keep your feet cool and comfortable",
-                    "👟"
+                    "Sneakers or casual shoes",
+                    "Comfortable shoes for moderate weather",
+                    "👟",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Canvas or breathable mesh"
             ));
         } else {
             suggestions.add(new OutfitSuggestion(
                     "Footwear",
-                    "Casual sneakers or shoes",
-                    "Versatile footwear for pleasant weather",
-                    "👟"
+                    "Sandals or breathable sneakers",
+                    "Hot weather, prioritize ventilation and comfort",
+                    "👡",
+                    OutfitSuggestion.Priority.RECOMMENDED,
+                    "Open-toe or mesh material"
+            ));
+        }
+
+        // Head & Face Protection
+        if (condition.contains("rain")) {
+            suggestions.add(new OutfitSuggestion(
+                    "Head & Face",
+                    "Hood or waterproof hat",
+                    "Keep head dry in rainy conditions",
+                    "🧢",
+                    OutfitSuggestion.Priority.ESSENTIAL
+            ));
+        } else if (condition.contains("sun") || condition.contains("clear")) {
+            if (temp > 25) {
+                suggestions.add(new OutfitSuggestion(
+                        "Head & Face",
+                        "Sun hat and sunglasses",
+                        "Strong sun requires face and eye protection",
+                        "�️",
+                        OutfitSuggestion.Priority.ESSENTIAL
+                ));
+            } else {
+                suggestions.add(new OutfitSuggestion(
+                        "Head & Face",
+                        "Sunglasses recommended",
+                        "Sunny weather, protect your eyes",
+                        "🕶️",
+                        OutfitSuggestion.Priority.RECOMMENDED
+                ));
+            }
+        } else if (temp < 5) {
+            suggestions.add(new OutfitSuggestion(
+                    "Head & Face",
+                    "Warm beanie or winter hat",
+                    "Very cold, prevent heat loss from head",
+                    "🧢",
+                    OutfitSuggestion.Priority.ESSENTIAL
+            ));
+        } else if (windSpeed > 8) {
+            suggestions.add(new OutfitSuggestion(
+                    "Head & Face",
+                    "Cap or hat for wind protection",
+                    "Windy conditions, secure headwear helps",
+                    "🧢",
+                    OutfitSuggestion.Priority.RECOMMENDED
+            ));
+        } else {
+            suggestions.add(new OutfitSuggestion(
+                    "Head & Face",
+                    "Optional cap or sunglasses",
+                    "Comfortable conditions, headwear is optional",
+                    "🧢",
+                    OutfitSuggestion.Priority.OPTIONAL
             ));
         }
 
@@ -353,37 +553,50 @@ public class OutfitSuggestionService {
         if (condition.contains("rain")) {
             suggestions.add(new OutfitSuggestion(
                     "Accessories",
-                    "Umbrella and waterproof bag",
-                    "Essential protection from rain",
-                    "☂️"
+                    "Umbrella + waterproof bag",
+                    "Essential rain protection for you and belongings",
+                    "☂️",
+                    OutfitSuggestion.Priority.ESSENTIAL
             ));
-        } else if (condition.contains("clear") || condition.contains("sun")) {
+        } else if (temp < 5) {
             suggestions.add(new OutfitSuggestion(
                     "Accessories",
-                    "Sunglasses and hat",
-                    "Protect yourself from the sun",
-                    "🕶️"
+                    "Scarf, gloves, and hand warmers",
+                    "Very cold, protect extremities from frostbite",
+                    "🧣",
+                    OutfitSuggestion.Priority.ESSENTIAL
             ));
-        } else if (temp < 10) {
+        } else if (temp < 15) {
             suggestions.add(new OutfitSuggestion(
                     "Accessories",
-                    "Scarf and gloves",
-                    "Extra warmth for cold weather",
-                    "🧣"
+                    "Light scarf and gloves",
+                    "Cool weather, extra warmth accessories helpful",
+                    "🧣",
+                    OutfitSuggestion.Priority.RECOMMENDED
             ));
-        } else if (windSpeed > 5) {
+        } else if (condition.contains("sun") || temp > 25) {
             suggestions.add(new OutfitSuggestion(
                     "Accessories",
-                    "Light scarf or windbreaker",
-                    "Protect against wind",
-                    "🧣"
+                    "Sunscreen SPF 30+ and water bottle",
+                    "Sun/heat protection, stay hydrated",
+                    "�",
+                    OutfitSuggestion.Priority.ESSENTIAL
+            ));
+        } else if (windSpeed > 6) {
+            suggestions.add(new OutfitSuggestion(
+                    "Accessories",
+                    "Light scarf for wind",
+                    "Windy day, scarf provides comfort",
+                    "🧣",
+                    OutfitSuggestion.Priority.RECOMMENDED
             ));
         } else {
             suggestions.add(new OutfitSuggestion(
                     "Accessories",
-                    "Sunglasses",
-                    "Optional but recommended for comfort",
-                    "🕶️"
+                    "Backpack or bag for layers",
+                    "Weather may change, bring extra layer",
+                    "🎒",
+                    OutfitSuggestion.Priority.OPTIONAL
             ));
         }
 
@@ -391,33 +604,62 @@ public class OutfitSuggestionService {
         if (condition.contains("snow")) {
             suggestions.add(new OutfitSuggestion(
                     "Extra Tips",
-                    "Layer up with thermal wear",
-                    "Multiple layers trap heat better in snow",
-                    "❄️"
+                    "Layer with thermal + fleece + coat",
+                    "Snow requires 3-layer system for warmth",
+                    "❄️",
+                    OutfitSuggestion.Priority.ESSENTIAL
             ));
-        } else if (temp > 30) {
+        } else if (temp > 32) {
             suggestions.add(new OutfitSuggestion(
                     "Extra Tips",
-                    "Stay hydrated, use sunscreen",
-                    "Protect your skin in hot weather",
-                    "☀️"
+                    "Light colors + hydrate every 30min",
+                    "Extreme heat, light colors reflect sun better",
+                    "🥵",
+                    OutfitSuggestion.Priority.ESSENTIAL
             ));
-        } else if (weatherData.getMain().getHumidity() > 80) {
+        } else if (feelsLike < temp - 3) {
             suggestions.add(new OutfitSuggestion(
                     "Extra Tips",
-                    "Choose moisture-wicking fabrics",
-                    "High humidity makes you sweat more",
-                    "💧"
+                    "Dress for feels-like temperature",
+                    "Wind chill makes it feel colder than actual temp",
+                    "🌡️",
+                    OutfitSuggestion.Priority.RECOMMENDED
+            ));
+        } else if (humidity > 80 && temp > 20) {
+            suggestions.add(new OutfitSuggestion(
+                    "Extra Tips",
+                    "Moisture-wicking fabrics preferred",
+                    "High humidity increases sweat, need breathable fabric",
+                    "💧",
+                    OutfitSuggestion.Priority.RECOMMENDED
+            ));
+        } else if (humidity < 30) {
+            suggestions.add(new OutfitSuggestion(
+                    "Extra Tips",
+                    "Use moisturizer, lip balm",
+                    "Low humidity dries skin, protect with moisturizer",
+                    "💄",
+                    OutfitSuggestion.Priority.RECOMMENDED
+            ));
+        } else if (Math.abs(temp - 20) < 5) {
+            suggestions.add(new OutfitSuggestion(
+                    "Extra Tips",
+                    "Perfect weather - enjoy outdoors!",
+                    "Ideal temperature range for outdoor activities",
+                    "✨",
+                    OutfitSuggestion.Priority.OPTIONAL
             ));
         } else {
             suggestions.add(new OutfitSuggestion(
                     "Extra Tips",
-                    "Dress in layers for flexibility",
-                    "Easy to adjust to temperature changes",
-                    "✨"
+                    "Bring extra layer, just in case",
+                    "Weather can change, be prepared with backup",
+                    "🎒",
+                    OutfitSuggestion.Priority.RECOMMENDED
             ));
         }
 
+        Log.d(TAG, "Generated " + suggestions.size() + " default outfit suggestions");
         return suggestions;
     }
 }

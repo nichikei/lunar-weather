@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardActivity"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header: Icon + Title + Score -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txtActivityIcon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:text="🏃"
+                android:textSize="32sp"
+                android:gravity="center"
+                android:background="@drawable/circle_background"
+                android:backgroundTint="#F5F5F5" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
+
+                <TextView
+                    android:id="@+id/txtActivityTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Morning Run"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/txtActivityCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚽ SPORT"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_marginTop="2dp"
+                    android:textAllCaps="true" />
+
+            </LinearLayout>
+
+            <!-- Suitability Score Badge -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp"
+                android:background="@drawable/rounded_background"
+                android:backgroundTint="#E8F5E9">
+
+                <TextView
+                    android:id="@+id/txtSuitabilityScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="95%"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Score"
+                    android:textSize="10sp"
+                    android:textColor="@android:color/darker_gray" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Description -->
+        <TextView
+            android:id="@+id/txtActivityDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Perfect weather for outdoor running. Low UV and comfortable temperature."
+            android:textSize="14sp"
+            android:textColor="@android:color/black"
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="2dp" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Reason -->
+        <TextView
+            android:id="@+id/txtActivityReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="💡 Ideal temperature and clear skies"
+            android:textSize="13sp"
+            android:textColor="@android:color/darker_gray"
+            android:lineSpacingExtra="2dp" />
+
+        <!-- Best Time -->
+        <TextView
+            android:id="@+id/txtBestTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="⏰ Best time: Morning 6-10 AM"
+            android:textSize="13sp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginTop="4dp" />
+
+        <!-- Add to Calendar Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddToCalendar"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:text="📅 Add to Calendar"
+            android:textSize="14sp"
+            app:icon="@android:drawable/ic_menu_my_calendar"
+            app:iconGravity="start"
+            app:cornerRadius="12dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,6 +1,38 @@
-# Weather App 🌤️
+# Weather App 🌤️ - Material Design 3 Edition
 
-Ứng dụng thời tiết Android với kiến trúc MVVM + Clean Architecture, thiết kế glassmorphism phong cách iOS, offline caching với Room Database, và dữ liệu thời tiết real-time.
+> **Version 2.0.0-MD3** - Now with Material Design 3, Smooth Animations & Interactive Weather Maps! 🎉
+
+Ứng dụng thời tiết Android hiện đại với **Material Design 3**, kiến trúc **MVVM + Clean Architecture**, **Interactive Weather Maps**, **Smooth Animations**, glassmorphism design, offline caching với Room Database, và dữ liệu thời tiết real-time.
+
+## 🎉 What's New in v2.0
+
+### ✨ Material Design 3
+- Complete MD3 color system với light/dark themes
+- Modern glassmorphism effects
+- Dynamic gradient backgrounds
+- Enhanced typography hierarchy
+- Elevated card designs
+
+### 🎬 Smooth Animations
+- MaterialAnimationHelper với 15+ animation types
+- Page transition animations
+- Smooth scroll effects với parallax
+- Staggered list animations
+- Button interactions với bounce/pulse effects
+
+### 🗺️ Interactive Weather Maps (NEW!)
+- **Google Maps integration** với custom dark theme
+- **5 Weather Layers**:
+  - 🌡️ Temperature overlay
+  - 🌧️ Precipitation/Rain overlay
+  - ☁️ Clouds coverage
+  - 💨 Wind speed visualization
+  - 📊 Pressure patterns
+- Real-time OpenWeatherMap tile layers
+- Layer switching với Material Design chips
+- Location markers và zoom controls
+
+**📚 See detailed changes:** [CHANGELOG.md](CHANGELOG.md)
 
 ## ✨ Tính Năng
 

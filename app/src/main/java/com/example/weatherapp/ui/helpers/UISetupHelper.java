@@ -29,7 +29,10 @@ public class UISetupHelper {
         void onLocationRequested();
         void onToggleFavorite();
         void onViewChartsRequested();
+        void onWeatherMapsRequested();
         void onOutfitSuggestionRequested();
+        void onActivitySuggestionsRequested(); // NEW
+        void onMoreFeaturesRequested(); // NEW - Opens bottom sheet
         void onFavoritesListRequested();
         void onTabChanged(boolean isHourly);
     }
@@ -89,15 +92,12 @@ public class UISetupHelper {
             callbacks.onLocationRequested();
         });
 
-        // View Charts button
-        binding.btnViewCharts.setOnClickListener(v -> {
-            callbacks.onViewChartsRequested();
-        });
-
-        // Outfit Suggestion button
-        binding.btnOutfitSuggestion.setOnClickListener(v -> {
-            callbacks.onOutfitSuggestionRequested();
-        });
+        // More Features button - Opens bottom sheet with Charts, Maps, AI Suggestions
+        if (binding.btnMoreFeatures != null) {
+            binding.btnMoreFeatures.setOnClickListener(v -> {
+                callbacks.onMoreFeaturesRequested();
+            });
+        }
 
         // Hourly/Weekly toggle buttons
         binding.btnHourly.setOnClickListener(v -> {

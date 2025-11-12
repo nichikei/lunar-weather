@@ -6,7 +6,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +35,8 @@ import com.example.weatherapp.domain.repository.WeatherRepository;
 import com.example.weatherapp.presentation.state.UIState;
 import com.example.weatherapp.presentation.viewmodel.MainViewModel;
 import com.example.weatherapp.presentation.viewmodel.MainViewModelFactory;
+import com.example.weatherapp.ui.dialogs.MoreFeaturesBottomSheet;
+import com.example.weatherapp.ui.helpers.ChartAnimationHelper;
 import com.example.weatherapp.ui.helpers.FavoritesHelper;
 import com.example.weatherapp.ui.helpers.FlagshipEffectsHelper;
 import com.example.weatherapp.ui.helpers.ForecastSummaryGenerator;
@@ -41,10 +47,16 @@ import com.example.weatherapp.ui.helpers.NotificationHelper;
 import com.example.weatherapp.ui.helpers.ParallaxAnimationHelper;
 import com.example.weatherapp.ui.helpers.UISetupHelper;
 import com.example.weatherapp.ui.helpers.UIUpdateHelper;
+import com.example.weatherapp.ui.views.charts.AnimatedProgressRing;
+import com.example.weatherapp.ui.views.charts.WeatherLineChart;
+import com.example.weatherapp.ui.views.charts.WindSpeedGauge;
 import com.example.weatherapp.utils.LocaleHelper;
 import com.example.weatherapp.widget.WeatherWidget;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * MainActivity - Refactored with MVVM Architecture
@@ -52,8 +64,10 @@ import com.google.android.gms.location.LocationServices;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     private ActivityMainBinding binding;
     private MainViewModel viewModel;
+    private WeatherRepositoryImpl repository; // Keep reference to access cached responses
     private static final String API_KEY = "4f8cf691daad596ac4e465c909868d0d";
     
     // Helper classes (UI only)
@@ -64,11 +78,18 @@ public class MainActivity extends AppCompatActivity {
     private NavigationHelper navigationHelper;
     private FavoritesHelper favoritesHelper;
     private NotificationHelper notificationHelper;
+    private ChartAnimationHelper chartAnimHelper;
     
     // Managers
     private SharedPreferences sharedPreferences;
     private FavoriteCitiesManager favoritesManager;
     private FusedLocationProviderClient fusedLocationClient;
+
+    // Chart components
+    private WeatherLineChart chartTemperature;
+    private AnimatedProgressRing ringHumidity;
+    private AnimatedProgressRing ringUvIndex;
+    private WindSpeedGauge gaugeWindSpeed;
 
     // UI State only
     private boolean isSearchVisible = false;
@@ -209,6 +230,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Schedule weather notifications
         notificationHelper.scheduleWeatherNotifications();
+        
+        // Initialize Smart Weather Alerts
+        initializeSmartWeatherAlerts();
 
         // Flagship: Handle system bars with immersive padding
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -262,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
      * Initialize ViewModel with Repository (MVVM Pattern)
      */
     private void initializeViewModel() {
-        WeatherRepository repository = new WeatherRepositoryImpl(this, API_KEY);
+        repository = new WeatherRepositoryImpl(this, API_KEY); // Keep reference for charts
         MainViewModelFactory factory = new MainViewModelFactory(repository);
         viewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
         viewModel.setTemperatureUnit(temperatureUnit);
@@ -323,8 +347,239 @@ public class MainActivity extends AppCompatActivity {
         navigationHelper = new NavigationHelper(this);
         favoritesHelper = new FavoritesHelper(this, favoritesManager, binding.fabAddToFavorites);
         notificationHelper = new NotificationHelper(this, sharedPreferences, requestPermissionLauncher);
+        chartAnimHelper = new ChartAnimationHelper();
+        
+        // Initialize chart components
+        initializeCharts();
+    }
+    
+    /**
+     * Initialize interactive chart components
+     */
+    private void initializeCharts() {
+        try {
+            // Original charts (if they exist in layout)
+            chartTemperature = binding.getRoot().findViewById(R.id.chartTemperature);
+            ringHumidity = binding.getRoot().findViewById(R.id.ringHumidity);
+            ringUvIndex = binding.getRoot().findViewById(R.id.ringUvIndex);
+            gaugeWindSpeed = binding.getRoot().findViewById(R.id.gaugeWindSpeed);
+            
+            // New charts in main section (use these if originals don't exist)
+            if (chartTemperature == null) {
+                chartTemperature = binding.getRoot().findViewById(R.id.chartTemperatureMain);
+            }
+            if (ringHumidity == null) {
+                ringHumidity = binding.getRoot().findViewById(R.id.ringHumidityMain);
+            }
+            if (ringUvIndex == null) {
+                ringUvIndex = binding.getRoot().findViewById(R.id.ringUvIndexMain);
+            }
+            if (gaugeWindSpeed == null) {
+                gaugeWindSpeed = binding.getRoot().findViewById(R.id.gaugeWindSpeedMain);
+            }
+            
+            if (chartTemperature != null) {
+                chartTemperature.setLineColor(Color.parseColor("#FF6B6B"));
+                chartTemperature.setGradientColors(
+                    Color.parseColor("#80FF6B6B"), 
+                    Color.TRANSPARENT
+                );
+                
+                // Set sample data initially (will be replaced with real data)
+                List<WeatherLineChart.ChartDataPoint> sampleData = new ArrayList<>();
+                sampleData.add(new WeatherLineChart.ChartDataPoint(22f, "12:00", "°C"));
+                sampleData.add(new WeatherLineChart.ChartDataPoint(24f, "15:00", "°C"));
+                sampleData.add(new WeatherLineChart.ChartDataPoint(26f, "18:00", "°C"));
+                sampleData.add(new WeatherLineChart.ChartDataPoint(25f, "21:00", "°C"));
+                sampleData.add(new WeatherLineChart.ChartDataPoint(23f, "00:00", "°C"));
+                chartTemperature.setData(sampleData);
+            }
+            
+            if (ringHumidity != null) {
+                ringHumidity.setGradientColors(
+                    Color.parseColor("#4CAF50"),
+                    Color.parseColor("#8BC34A"),
+                    Color.parseColor("#FFEB3B")
+                );
+                ringHumidity.setLabel("Humidity");
+                ringHumidity.setUnit("%");
+                // Set sample value (will be replaced with real data)
+                ringHumidity.setProgress(65f);
+            }
+            
+            if (ringUvIndex != null) {
+                ringUvIndex.setGradientColors(
+                    Color.parseColor("#FFA726"),
+                    Color.parseColor("#FF7043"),
+                    Color.parseColor("#F44336")
+                );
+                ringUvIndex.setLabel("UV Index");
+                ringUvIndex.setUnit("");
+                // Set sample value (will be replaced with real data)
+                ringUvIndex.setProgress(50f); // 5/10 UV index
+            }
+            
+            if (gaugeWindSpeed != null) {
+                // Set sample value (will be replaced with real data)
+                gaugeWindSpeed.setSpeed(15f); // 15 km/h
+            }
+            
+            // Initialize micro-charts in detail cards
+            initializeMicroCharts();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Initialize micro-charts in weather detail cards
+     */
+    private void initializeMicroCharts() {
+        try {
+            // Initialize UV Trend Chart
+            com.example.weatherapp.ui.views.charts.UVTrendChart uvTrendChart = 
+                binding.getRoot().findViewById(R.id.uvTrendChart);
+            if (uvTrendChart != null) {
+                // Set sample data (will be replaced with real API data)
+                List<Float> sampleUV = new ArrayList<>();
+                List<String> sampleHours = new ArrayList<>();
+                for (int i = 6; i <= 18; i += 2) {
+                    sampleUV.add((float)(Math.random() * 10));
+                    sampleHours.add(i + "h");
+                }
+                uvTrendChart.setUVData(sampleUV, sampleHours);
+            }
+            
+            // Initialize Humidity Area Chart
+            com.example.weatherapp.ui.views.charts.HumidityAreaChart humidityChart = 
+                binding.getRoot().findViewById(R.id.humidityAreaChart);
+            if (humidityChart != null) {
+                List<Float> sampleHumidity = new ArrayList<>();
+                List<String> sampleHours = new ArrayList<>();
+                for (int i = 0; i < 8; i++) {
+                    sampleHumidity.add(60f + (float)(Math.random() * 30));
+                    sampleHours.add((i * 3) + "h");
+                }
+                humidityChart.setHumidityData(sampleHumidity, sampleHours);
+            }
+            
+            // Initialize Pressure Trend Chart
+            com.example.weatherapp.ui.views.charts.PressureTrendChart pressureChart = 
+                binding.getRoot().findViewById(R.id.pressureTrendChart);
+            if (pressureChart != null) {
+                List<Float> samplePressure = new ArrayList<>();
+                List<String> sampleHours = new ArrayList<>();
+                for (int i = 0; i < 8; i++) {
+                    samplePressure.add(1010f + (float)(Math.random() * 15));
+                    sampleHours.add((i * 3) + "h");
+                }
+                pressureChart.setPressureData(samplePressure, sampleHours);
+            }
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Error initializing micro-charts", e);
+        }
+    }
+    
+    /**
+     * Animate weather detail cards with staggered glassmorphic entrance
+     */
+    private void animateWeatherCards() {
+        try {
+            // Get all card views
+            androidx.cardview.widget.CardView[] cards = {
+                findViewById(R.id.cardUvIndex),
+                findViewById(R.id.cardSunrise),
+                findViewById(R.id.cardWind),
+                findViewById(R.id.cardRainfall),
+                findViewById(R.id.cardFeelsLike),
+                findViewById(R.id.cardHumidity),
+                findViewById(R.id.cardVisibility),
+                findViewById(R.id.cardPressure)
+            };
+            
+            // Staggered animation with glassmorphic effect
+            int delayIncrement = 80; // 80ms between each card
+            int duration = 500; // 500ms per animation
+            
+            for (int i = 0; i < cards.length; i++) {
+                final androidx.cardview.widget.CardView card = cards[i];
+                if (card != null) {
+                    // Initial state: invisible and translated down
+                    card.setAlpha(0f);
+                    card.setTranslationY(40f);
+                    card.setScaleX(0.92f);
+                    card.setScaleY(0.92f);
+                    
+                    // Animate with delay
+                    card.animate()
+                        .alpha(1f)
+                        .translationY(0f)
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setStartDelay(i * delayIncrement)
+                        .setDuration(duration)
+                        .setInterpolator(new android.view.animation.DecelerateInterpolator(1.5f))
+                        .start();
+                    
+                    // Add touch feedback animation
+                    setupCardTouchFeedback(card);
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Error animating weather cards", e);
+        }
+    }
+    
+    /**
+     * Setup glassmorphic touch feedback for card
+     */
+    private void setupCardTouchFeedback(androidx.cardview.widget.CardView card) {
+        card.setOnTouchListener(new android.view.View.OnTouchListener() {
+            @Override
+            public boolean onTouch(android.view.View v, android.view.MotionEvent event) {
+                switch (event.getAction()) {
+                    case android.view.MotionEvent.ACTION_DOWN:
+                        // Scale down with smooth animation
+                        v.animate()
+                            .scaleX(0.96f)
+                            .scaleY(0.96f)
+                            .setDuration(150)
+                            .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                            .start();
+                        break;
+                    case android.view.MotionEvent.ACTION_UP:
+                    case android.view.MotionEvent.ACTION_CANCEL:
+                        // Scale back to normal
+                        v.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(150)
+                            .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                            .start();
+                        break;
+                }
+                return false; // Allow click events to pass through
+            }
+        });
     }
 
+    /**
+     * Initialize Smart Weather Alerts system
+     */
+    private void initializeSmartWeatherAlerts() {
+        com.example.weatherapp.utils.WeatherAlertPreferences alertPrefs = 
+                new com.example.weatherapp.utils.WeatherAlertPreferences(this);
+        
+        // Only schedule if alerts are enabled
+        if (alertPrefs.areAlertsEnabled()) {
+            int frequency = 2; // Check every 2 minutes
+            com.example.weatherapp.utils.WeatherAlertScheduler.scheduleWeatherAlerts(this, frequency);
+            Log.d(TAG, "🔔 Smart Weather Alerts initialized with " + frequency + " min frequency");
+        } else {
+            Log.d(TAG, "Smart Weather Alerts are disabled");
+        }
+    }
+    
     private void loadSettings() {
         temperatureUnit = SettingsActivity.getTemperatureUnit(sharedPreferences);
         windSpeedUnit = SettingsActivity.getWindSpeedUnit(sharedPreferences);
@@ -367,13 +622,155 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onViewChartsRequested() {
-                // Get data from ViewModel states
-                navigationHelper.openChartsActivity(null, null, 0);
+                // Get UV Index
+                int uvIndex = 0;
+                UIState<Integer> uvState = viewModel.getUVIndexState().getValue();
+                if (uvState instanceof UIState.Success) {
+                    uvIndex = ((UIState.Success<Integer>) uvState).getData();
+                }
+                
+                // Get cached responses from repository
+                com.example.weatherapp.data.responses.WeatherResponse currentData = repository.getLatestWeatherResponse();
+                com.example.weatherapp.data.responses.HourlyForecastResponse hourlyData = repository.getLatestHourlyForecastResponse();
+                
+                // Debug logging
+                Log.d(TAG, "Opening charts - currentData: " + (currentData != null ? "✓" : "✗") + 
+                          ", hourlyData: " + (hourlyData != null ? "✓" : "✗") + 
+                          ", uvIndex: " + uvIndex);
+                
+                if (currentData == null || hourlyData == null) {
+                    // Data not ready yet - refresh to fetch from network
+                    Toast.makeText(MainActivity.this, "Refreshing data for charts...", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Charts data not available, triggering refresh");
+                    
+                    // Trigger refresh to fetch fresh data from network (will populate cache)
+                    viewModel.refreshAllData();
+                    
+                    // Show hint to user
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        Toast.makeText(MainActivity.this, "Please try again in a moment", Toast.LENGTH_SHORT).show();
+                    }, 1500);
+                    return;
+                }
+                
+                // Open charts activity
+                navigationHelper.openChartsActivity(hourlyData, currentData, uvIndex);
+            }
+
+            @Override
+            public void onWeatherMapsRequested() {
+                // Open Weather Maps activity with current location
+                Intent intent = new Intent(MainActivity.this, WeatherMapsActivity.class);
+                intent.putExtra("latitude", viewModel.getCurrentLatitude());
+                intent.putExtra("longitude", viewModel.getCurrentLongitude());
+                intent.putExtra("cityName", viewModel.getCurrentCityName());
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
 
             @Override
             public void onOutfitSuggestionRequested() {
-                navigationHelper.openOutfitSuggestionActivity(null);
+                // Get current weather data from ViewModel
+                WeatherData currentWeather = viewModel.getCurrentWeatherData();
+                if (currentWeather != null) {
+                    // Convert WeatherData to WeatherResponse for OutfitSuggestionActivity
+                    navigationHelper.openOutfitSuggestionActivity(currentWeather);
+                } else {
+                    Toast.makeText(MainActivity.this, "Please wait for weather data to load", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onActivitySuggestionsRequested() {
+                // Open Activity Suggestions with current weather data
+                WeatherData currentWeather = viewModel.getCurrentWeatherData();
+                if (currentWeather != null) {
+                    Intent intent = new Intent(MainActivity.this, ActivitySuggestionsActivity.class);
+                    // Pass weather data as JSON
+                    intent.putExtra("weather_data", new com.google.gson.Gson().toJson(currentWeather));
+                    
+                    // Pass UV Index if available
+                    UIState<Integer> uvState = viewModel.getUVIndexState().getValue();
+                    if (uvState instanceof UIState.Success) {
+                        int uvIndex = ((UIState.Success<Integer>) uvState).getData();
+                        intent.putExtra("uv_index", uvIndex);
+                    }
+                    
+                    // Pass AQI if available
+                    UIState<AirQualityData> aqiState = viewModel.getAirQualityState().getValue();
+                    if (aqiState instanceof UIState.Success) {
+                        AirQualityData aqiData = ((UIState.Success<AirQualityData>) aqiState).getData();
+                        intent.putExtra("aqi", aqiData.getAqi());
+                    }
+                    
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                } else {
+                    Toast.makeText(MainActivity.this, "Loading weather data...", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onMoreFeaturesRequested() {
+                // Show bottom sheet with all features
+                MoreFeaturesBottomSheet bottomSheet = MoreFeaturesBottomSheet.newInstance();
+                bottomSheet.setListener(new MoreFeaturesBottomSheet.MoreFeaturesListener() {
+                    @Override
+                    public void onWeatherMapsClicked() {
+                        bottomSheet.dismiss();
+                        // Reuse existing weather maps logic
+                        WeatherData currentWeather = viewModel.getCurrentWeatherData();
+                        if (currentWeather != null) {
+                            Intent intent = new Intent(MainActivity.this, WeatherMapsActivity.class);
+                            intent.putExtra("latitude", currentWeather.getLatitude());
+                            intent.putExtra("longitude", currentWeather.getLongitude());
+                            intent.putExtra("cityName", currentWeather.getCityName());
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        } else {
+                            Toast.makeText(MainActivity.this, "Loading location...", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onOutfitSuggestionsClicked() {
+                        bottomSheet.dismiss();
+                        // Get current weather data and open outfit suggestions
+                        WeatherData currentWeather = viewModel.getCurrentWeatherData();
+                        if (currentWeather != null) {
+                            navigationHelper.openOutfitSuggestionActivity(currentWeather);
+                        } else {
+                            Toast.makeText(MainActivity.this, "Please wait for weather data to load", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onActivitySuggestionsClicked() {
+                        bottomSheet.dismiss();
+                        // Reuse existing activity suggestions logic
+                        WeatherData currentWeather = viewModel.getCurrentWeatherData();
+                        if (currentWeather != null) {
+                            Intent intent = new Intent(MainActivity.this, ActivitySuggestionsActivity.class);
+                            intent.putExtra("weather_data", new com.google.gson.Gson().toJson(currentWeather));
+                            
+                            UIState<Integer> uvState = viewModel.getUVIndexState().getValue();
+                            if (uvState instanceof UIState.Success) {
+                                intent.putExtra("uv_index", ((UIState.Success<Integer>) uvState).getData());
+                            }
+                            
+                            UIState<AirQualityData> aqiState = viewModel.getAirQualityState().getValue();
+                            if (aqiState instanceof UIState.Success) {
+                                intent.putExtra("aqi", ((UIState.Success<AirQualityData>) aqiState).getData().getAqi());
+                            }
+                            
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        } else {
+                            Toast.makeText(MainActivity.this, "Loading weather data...", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                bottomSheet.show(getSupportFragmentManager(), "MoreFeaturesBottomSheet");
             }
 
             @Override
@@ -386,6 +783,20 @@ public class MainActivity extends AppCompatActivity {
                 if (isHourlyView != isHourly) {
                     isHourlyView = isHourly;
                     uiSetupHelper.animateTabSelection(isHourly);
+                    
+                    // Update forecast display when tab changes
+                    UIState<ForecastData> forecastState = viewModel.getForecastState().getValue();
+                    if (forecastState instanceof UIState.Success) {
+                        ForecastData data = ((UIState.Success<ForecastData>) forecastState).getData();
+                        if (forecastViewManager != null && data != null) {
+                            Log.d(TAG, "Tab changed to " + (isHourly ? "Hourly" : "Weekly"));
+                            if (isHourly) {
+                                forecastViewManager.createHourlyForecastView(data);
+                            } else {
+                                forecastViewManager.createWeeklyForecastView(data);
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -527,6 +938,12 @@ public class MainActivity extends AppCompatActivity {
             // Update favorite icon
             favoritesHelper.updateFavoriteIcon(data.getCityName());
             
+            // Update charts with current weather data
+            updateChartsWithWeatherData(data);
+            
+            // Animate glassmorphic weather cards
+            animateWeatherCards();
+            
             // Animate entrance
             animateWeatherEntrance();
             
@@ -540,6 +957,26 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateForecastUI(ForecastData data) {
         uiSetupHelper.showWeatherDetails();
+        
+        // Update temperature line chart with forecast data
+        if (chartTemperature != null && data != null) {
+            updateTemperatureChart(data);
+        }
+        
+        // Update micro-charts in detail cards
+        if (data != null) {
+            updateMicroChartsWithForecast(data);
+        }
+        
+        // Update hourly/weekly forecast cards
+        if (forecastViewManager != null && data != null) {
+            Log.d(TAG, "Updating forecast cards with " + data.getHourlyForecasts().size() + " hourly items");
+            if (isHourlyView) {
+                forecastViewManager.createHourlyForecastView(data);
+            } else {
+                forecastViewManager.createWeeklyForecastView(data);
+            }
+        }
     }
 
     /**
@@ -547,6 +984,14 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateUVIndexUI(int uvIndex) {
         uiUpdateHelper.updateUVIndexCard(uvIndex);
+        
+        // Update UV index ring
+        if (ringUvIndex != null) {
+            ringUvIndex.setProgress(uvIndex * 10f); // Scale 0-10 to 0-100
+        }
+        
+        // Update UV trend chart
+        updateUVTrendChart(uvIndex);
     }
 
     /**
@@ -554,6 +999,177 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateAirQualityUI(AirQualityData data) {
         // Air quality data received and ready for display
+    }
+    
+    /**
+     * Update charts with current weather data
+     */
+    private void updateChartsWithWeatherData(WeatherData data) {
+        try {
+            android.util.Log.d("MainActivity", "Updating charts with weather data:");
+            android.util.Log.d("MainActivity", "Humidity: " + data.getHumidity());
+            android.util.Log.d("MainActivity", "Wind Speed: " + data.getWindSpeed());
+            
+            // Update humidity ring
+            if (ringHumidity != null) {
+                float humidity = (float) data.getHumidity();
+                android.util.Log.d("MainActivity", "Setting humidity ring to: " + humidity);
+                ringHumidity.setProgress(humidity);
+                ringHumidity.setShowParticles(true);
+            }
+            
+            // Update wind gauge
+            if (gaugeWindSpeed != null) {
+                float windSpeed = (float) data.getWindSpeed();
+                android.util.Log.d("MainActivity", "Setting wind gauge to: " + windSpeed);
+                gaugeWindSpeed.setSpeed(windSpeed);
+            }
+            
+            // Animate charts entrance with stagger
+            if (chartAnimHelper != null) {
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (chartTemperature != null) {
+                        chartAnimHelper.slideInChartFromBottom(chartTemperature, 600);
+                    }
+                }, 300);
+                
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (ringHumidity != null && ringUvIndex != null) {
+                        chartAnimHelper.animateProgressRings(200, ringHumidity, ringUvIndex);
+                    }
+                }, 600);
+                
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (gaugeWindSpeed != null) {
+                        chartAnimHelper.bounceInChart(gaugeWindSpeed, 800);
+                    }
+                }, 1000);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Update temperature line chart with forecast data
+     */
+    private void updateTemperatureChart(ForecastData data) {
+        try {
+            List<WeatherLineChart.ChartDataPoint> chartData = new ArrayList<>();
+            
+            // Get hourly forecasts
+            List<ForecastData.HourlyForecast> hourlyForecasts = data.getHourlyForecasts();
+            android.util.Log.d("MainActivity", "Updating temperature chart, forecasts: " + 
+                (hourlyForecasts != null ? hourlyForecasts.size() : "null"));
+            
+            if (hourlyForecasts != null && !hourlyForecasts.isEmpty()) {
+                // Get first 8 hourly forecasts
+                int count = Math.min(8, hourlyForecasts.size());
+                android.util.Log.d("MainActivity", "Processing " + count + " forecasts");
+                
+                for (int i = 0; i < count; i++) {
+                    ForecastData.HourlyForecast item = hourlyForecasts.get(i);
+                    
+                    // Convert timestamp to readable format
+                    long timestamp = item.getTimestamp();
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
+                    String timeLabel = sdf.format(new java.util.Date(timestamp * 1000));
+                    
+                    String tempUnit = temperatureUnit.equals("celsius") ? "°C" : "°F";
+                    float temp = (float) item.getTemperature();
+                    
+                    android.util.Log.d("MainActivity", "Adding point: " + timeLabel + " = " + temp + tempUnit);
+                    chartData.add(new WeatherLineChart.ChartDataPoint(temp, timeLabel, tempUnit));
+                }
+            }
+            
+            if (!chartData.isEmpty() && chartTemperature != null) {
+                android.util.Log.d("MainActivity", "Setting " + chartData.size() + " data points to temperature chart");
+                chartTemperature.setData(chartData);
+            } else {
+                android.util.Log.e("MainActivity", "Chart data is empty or chart is null!");
+            }
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Error updating temperature chart", e);
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Update micro-charts in detail cards with real forecast data
+     */
+    private void updateMicroChartsWithForecast(ForecastData data) {
+        try {
+            List<ForecastData.HourlyForecast> hourlyForecasts = data.getHourlyForecasts();
+            if (hourlyForecasts == null || hourlyForecasts.isEmpty()) {
+                return;
+            }
+            
+            // Prepare data for charts (use first 8 hours)
+            int count = Math.min(8, hourlyForecasts.size());
+            List<Float> humidityValues = new ArrayList<>();
+            List<Float> pressureValues = new ArrayList<>();
+            List<String> hourLabels = new ArrayList<>();
+            
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
+            
+            for (int i = 0; i < count; i++) {
+                ForecastData.HourlyForecast item = hourlyForecasts.get(i);
+                humidityValues.add((float) item.getHumidity());
+                pressureValues.add((float) item.getPressure());
+                
+                String timeLabel = sdf.format(new java.util.Date(item.getTimestamp() * 1000));
+                hourLabels.add(timeLabel);
+            }
+            
+            // Update Humidity Chart
+            com.example.weatherapp.ui.views.charts.HumidityAreaChart humidityChart = 
+                binding.getRoot().findViewById(R.id.humidityAreaChart);
+            if (humidityChart != null) {
+                humidityChart.setHumidityData(humidityValues, hourLabels);
+                android.util.Log.d("MainActivity", "Updated humidity chart with " + humidityValues.size() + " points");
+            }
+            
+            // Update Pressure Chart
+            com.example.weatherapp.ui.views.charts.PressureTrendChart pressureChart = 
+                binding.getRoot().findViewById(R.id.pressureTrendChart);
+            if (pressureChart != null) {
+                pressureChart.setPressureData(pressureValues, hourLabels);
+                android.util.Log.d("MainActivity", "Updated pressure chart with " + pressureValues.size() + " points");
+            }
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Error updating micro-charts", e);
+        }
+    }
+    
+    /**
+     * Update UV trend chart with hourly UV data
+     * Note: This requires UV forecast data from API (not available in basic OpenWeather)
+     * Using simulated data for demo purposes
+     */
+    private void updateUVTrendChart(int currentUV) {
+        try {
+            com.example.weatherapp.ui.views.charts.UVTrendChart uvChart = 
+                binding.getRoot().findViewById(R.id.uvTrendChart);
+            if (uvChart != null) {
+                // Simulate UV trend based on current UV (peaks at noon)
+                List<Float> uvValues = new ArrayList<>();
+                List<String> hourLabels = new ArrayList<>();
+                
+                // Generate UV curve (6AM to 6PM)
+                for (int hour = 6; hour <= 18; hour += 2) {
+                    // UV peaks at noon (12), simulate bell curve
+                    float uvValue = currentUV * (1 - Math.abs(hour - 12) / 6f) * 0.9f;
+                    uvValues.add(Math.max(0, uvValue));
+                    hourLabels.add(hour + "h");
+                }
+                
+                uvChart.setUVData(uvValues, hourLabels);
+                android.util.Log.d("MainActivity", "Updated UV trend chart");
+            }
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Error updating UV trend chart", e);
+        }
     }
 
     /**
@@ -663,11 +1279,8 @@ public class MainActivity extends AppCompatActivity {
         }
         
         // Action buttons
-        if (binding.btnViewCharts != null) {
-            UISetupHelper.addPressAnimation(binding.btnViewCharts);
-        }
-        if (binding.btnOutfitSuggestion != null) {
-            UISetupHelper.addPressAnimation(binding.btnOutfitSuggestion);
+        if (binding.btnMoreFeatures != null) {
+            UISetupHelper.addPressAnimation(binding.btnMoreFeatures);
         }
         if (binding.fabAddToFavorites != null) {
             UISetupHelper.addPressAnimation(binding.fabAddToFavorites);
@@ -703,8 +1316,7 @@ public class MainActivity extends AppCompatActivity {
         // Enhanced cards
         android.view.View[] premiumCards = new android.view.View[] {
             binding.getRoot().findViewById(R.id.card_air_quality),
-            binding.getRoot().findViewById(R.id.btnViewCharts),
-            binding.getRoot().findViewById(R.id.btnOutfitSuggestion)
+            binding.getRoot().findViewById(R.id.btnMoreFeatures)
         };
         
         for (android.view.View card : premiumCards) {
@@ -752,6 +1364,14 @@ public class MainActivity extends AppCompatActivity {
         if (locationHelper != null) {
             locationHelper.cleanup();
         }
+        if (chartAnimHelper != null) {
+            chartAnimHelper.cleanup();
+        }
+        // Clear chart references
+        chartTemperature = null;
+        ringHumidity = null;
+        ringUvIndex = null;
+        gaugeWindSpeed = null;
         binding = null;
     }
 }

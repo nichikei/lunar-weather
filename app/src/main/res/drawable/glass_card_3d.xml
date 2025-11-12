@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Enhanced glassmorphic card with 3D depth shadows -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Outer shadow (largest, softest) -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="26dp" />
+            <solid android:color="#08000000" />
+        </shape>
+    </item>
+    
+    <!-- Mid shadow -->
+    <item
+        android:bottom="4dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:top="2dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="25dp" />
+            <solid android:color="#10000000" />
+        </shape>
+    </item>
+    
+    <!-- Main glass surface -->
+    <item
+        android:bottom="6dp"
+        android:left="3dp"
+        android:right="3dp"
+        android:top="3dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <!-- Glassmorphic gradient for depth -->
+            <gradient
+                android:angle="135"
+                android:endColor="#20FFFFFF"
+                android:startColor="#25FFFFFF"
+                android:type="linear" />
+            <!-- Glass border highlight -->
+            <stroke
+                android:width="1.5dp"
+                android:color="#35FFFFFF" />
+        </shape>
+    </item>
+    
+    <!-- Inner highlight (top-left light reflection) -->
+    <item
+        android:bottom="8dp"
+        android:left="5dp"
+        android:right="5dp"
+        android:top="5dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="22dp" />
+            <stroke
+                android:width="1dp"
+                android:color="#20FFFFFF" />
+        </shape>
+    </item>
+    
+</layer-list>

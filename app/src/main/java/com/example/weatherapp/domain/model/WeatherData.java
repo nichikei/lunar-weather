@@ -1,10 +1,12 @@
 package com.example.weatherapp.domain.model;
 
+import java.io.Serializable;
+
 /**
  * Domain model for Weather data
  * Clean, business-logic focused model independent of API response structure
  */
-public class WeatherData {
+public class WeatherData implements Serializable {
     private final String cityName;
     private final String countryCode;
     private final double temperature;

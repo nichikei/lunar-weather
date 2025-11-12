@@ -49,6 +49,19 @@
         <activity
             android:name=".ui.activities.OutfitSuggestionActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.activities.ActivitySuggestionsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.WeatherApp" />
+        <activity
+            android:name=".ui.activities.WeatherMapsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.WeatherApp" />
+
+        <!-- Google Maps API Key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBXa_YOUR_API_KEY_HERE" />
 
         <!-- Notification Receiver -->
         <receiver
