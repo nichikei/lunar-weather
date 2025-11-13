@@ -11,6 +11,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
@@ -68,10 +70,20 @@
             android:exported="false"
             android:theme="@style/Theme.WeatherApp" />
         <activity
+            android:name=".ui.activities.OSMWeatherMapActivity"
+            android:exported="false"
+            android:theme="@style/Theme.WeatherApp.NoActionBar" />
+        <activity
             android:name=".ui.activities.VoiceWeatherActivity"
             android:exported="false"
             android:theme="@style/Theme.WeatherApp.NoActionBar"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activities.WeatherChatBotActivity"
+            android:exported="false"
+            android:theme="@style/Theme.WeatherApp.NoActionBar"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.WeatherAlarmActivity"
             android:exported="false"

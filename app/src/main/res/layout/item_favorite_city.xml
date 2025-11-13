@@ -1,76 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- iOS Style Favorite City Item -->
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="4dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    android:backgroundTint="@color/card_background">
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@android:color/transparent">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:background="@drawable/ios_card_background"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:minHeight="88dp">
 
-        <!-- City Info -->
+        <!-- Left: City Info -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/leftSection"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/btnRemove"
+            android:layout_toStartOf="@id/rightSection"
+            android:layout_marginEnd="16dp"
             android:orientation="vertical">
 
+            <!-- City Name -->
             <TextView
                 android:id="@+id/tvCityName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hanoi, VN"
-                android:textColor="@color/text_primary"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/poppins_bold"
-                android:layout_marginBottom="4dp" />
+                android:text="Hanoi"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="4dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:ignore="HardcodedText" />
 
-            <LinearLayout
+            <!-- Weather Description -->
+            <TextView
+                android:id="@+id/tvWeatherDesc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/tvTemperature"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="25°C"
-                    android:textColor="@color/text_primary"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/poppins_bold"
-                    android:layout_marginEnd="12dp" />
-
-                <TextView
-                    android:id="@+id/tvWeatherDesc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Partly cloudy"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:fontFamily="@font/poppins" />
-            </LinearLayout>
+                android:text="Partly Cloudy"
+                android:textColor="#CCFFFFFF"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:ignore="HardcodedText" />
         </LinearLayout>
 
-        <!-- Remove Button -->
-        <ImageButton
-            android:id="@+id/btnRemove"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+        <!-- Right: Temperature & Remove Button -->
+        <LinearLayout
+            android:id="@+id/rightSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@android:drawable/ic_menu_delete"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="@color/text_secondary"
-            android:contentDescription="Remove" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Temperature -->
+            <TextView
+                android:id="@+id/tvTemperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="27°"
+                android:textColor="#FFFFFF"
+                android:textSize="48sp"
+                android:fontFamily="sans-serif-light"
+                android:layout_marginEnd="16dp"
+                tools:ignore="HardcodedText" />
+
+            <!-- Remove Button -->
+            <ImageButton
+                android:id="@+id/btnRemove"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@android:drawable/ic_menu_delete"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tint="#FF6B6B"
+                android:padding="6dp"
+                android:contentDescription="Remove"
+                tools:ignore="HardcodedText,UseAppTint" />
+        </LinearLayout>
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

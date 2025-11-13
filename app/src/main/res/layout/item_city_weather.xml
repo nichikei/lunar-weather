@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- City Weather Card Item -->
+<!-- iOS Style City Item - Minimalist Design -->
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,115 +7,100 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="4dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
     app:cardBackgroundColor="@android:color/transparent">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/cardBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:background="@drawable/ios_card_background"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:paddingTop="18dp"
-        android:paddingBottom="18dp"
-        android:gravity="center_vertical">
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:minHeight="72dp">
 
-        <!-- Left side: City info -->
+        <!-- Left: City Info -->
         <LinearLayout
+            android:id="@+id/leftSection"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/tvTemperature"
+            android:layout_marginEnd="16dp"
             android:orientation="vertical">
 
             <!-- City Name -->
             <TextView
                 android:id="@+id/tvCityName"
-                style="@style/TextStyle.Title2.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Hanoi"
                 android:textColor="#FFFFFF"
-                android:layout_marginBottom="4dp"
+                android:textSize="22sp"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="2dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 tools:ignore="HardcodedText" />
 
-            <!-- Country -->
-            <TextView
-                android:id="@+id/tvCountry"
-                style="@style/TextStyle.Footnote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Vietnam"
-                android:textColor="#B3FFFFFF"
-                android:layout_marginBottom="8dp"
-                tools:ignore="HardcodedText" />
-
-            <!-- Weather Description -->
+            <!-- Weather Description / Info -->
             <TextView
                 android:id="@+id/tvWeatherDesc"
-                style="@style/TextStyle.Subheadline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Partly Cloudy"
-                android:textColor="#FFFFFF"
-                tools:ignore="HardcodedText" />
-
-            <!-- Temp Range -->
-            <TextView
-                android:id="@+id/tvTempRange"
-                style="@style/TextStyle.Caption1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="H:28° L:22°"
-                android:textColor="#B3FFFFFF"
+                android:textColor="#CCFFFFFF"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif"
+                android:maxLines="1"
+                android:ellipsize="end"
                 tools:ignore="HardcodedText" />
         </LinearLayout>
 
-        <!-- Right side: Icon and Temperature -->
-        <LinearLayout
+        <!-- Right: Temperature -->
+        <TextView
+            android:id="@+id/tvTemperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="27°"
+            android:textColor="#FFFFFF"
+            android:textSize="48sp"
+            android:fontFamily="sans-serif-light"
+            tools:ignore="HardcodedText" />
 
-            <!-- Weather Icon -->
-            <ImageView
-                android:id="@+id/ivWeatherIcon"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/sun_cloud_mid_rain"
-                android:scaleType="fitCenter"
-                android:layout_marginBottom="8dp"
-                android:contentDescription="@string/app_name" />
+        <!-- Hidden views for compatibility -->
+        <TextView
+            android:id="@+id/tvCountry"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-            <!-- Temperature -->
-            <TextView
-                android:id="@+id/tvTemperature"
-                style="@style/TextStyle.LargeTitle.Bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="25°"
-                android:textColor="#FFFFFF"
-                tools:ignore="HardcodedText" />
-        </LinearLayout>
-    </LinearLayout>
+        <TextView
+            android:id="@+id/tvTempRange"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-    <!-- Favorite Button (Heart Icon) -->
-    <ImageButton
-        android:id="@+id/btnFavorite"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="top|end"
-        android:layout_margin="12dp"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_heart_line"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:contentDescription="Add to favorites"
-        app:tint="#FFFFFF"
-        android:alpha="0.85" />
+        <ImageView
+            android:id="@+id/ivWeatherIcon"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:contentDescription="@string/app_name" />
+
+        <ImageButton
+            android:id="@+id/btnFavorite"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:contentDescription="Add to favorites" />
+    </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

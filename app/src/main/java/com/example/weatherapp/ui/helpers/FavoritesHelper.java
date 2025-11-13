@@ -5,6 +5,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+
 import com.example.weatherapp.data.models.FavoriteCity;
 import com.example.weatherapp.domain.model.WeatherData;
 import com.example.weatherapp.R;
@@ -22,12 +24,14 @@ public class FavoritesHelper {
     private final MainActivity activity;
     private final FavoriteCitiesManager favoritesManager;
     private final View favoriteButton;
+    private final ActivityResultLauncher<Intent> favoritesLauncher;
     
     public FavoritesHelper(MainActivity activity, FavoriteCitiesManager favoritesManager, 
-                          View favoriteButton) {
+                          View favoriteButton, ActivityResultLauncher<Intent> favoritesLauncher) {
         this.activity = activity;
         this.favoritesManager = favoritesManager;
         this.favoriteButton = favoriteButton;
+        this.favoritesLauncher = favoritesLauncher;
     }
     
     /**
@@ -157,11 +161,11 @@ public class FavoritesHelper {
     }
     
     /**
-     * Open favorites list activity
+     * Open favorites list activity using launcher
      */
     public void openFavoritesList() {
         Intent intent = new Intent(activity, FavoriteCitiesActivity.class);
-        activity.startActivity(intent);
+        favoritesLauncher.launch(intent);
     }
     
     /**

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -196,7 +197,7 @@ public class CityWeatherAdapter extends RecyclerView.Adapter<CityWeatherAdapter.
         TextView tvTemperature;
         TextView tvTempRange;
         ImageView ivWeatherIcon;
-        LinearLayout cardBackground;
+        RelativeLayout cardBackground;
         ImageButton btnFavorite;
 
         ViewHolder(View itemView) {

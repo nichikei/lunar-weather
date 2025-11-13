@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -172,9 +173,17 @@ public class WeatherMapsActivity extends AppCompatActivity implements OnMapReady
         
         TileOverlayOptions tileOverlayOptions = new TileOverlayOptions()
                 .tileProvider(new WeatherTileProvider(layerType))
-                .transparency(0.3f); // 70% visible
+                .transparency(0.2f) // 80% visible
+                .fadeIn(true);
         
         currentOverlay = mMap.addTileOverlay(tileOverlayOptions);
+        
+        Log.d("WeatherMap", "Added weather layer: " + layerType);
+        if (currentOverlay != null) {
+            Log.d("WeatherMap", "Overlay added successfully");
+        } else {
+            Log.e("WeatherMap", "Failed to add overlay");
+        }
         
         // Hide loading after a delay
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -243,8 +252,10 @@ public class WeatherMapsActivity extends AppCompatActivity implements OnMapReady
                 String url = String.format(Locale.US,
                         "https://tile.openweathermap.org/map/%s/%d/%d/%d.png?appid=%s",
                         layerType, zoom, x, y, API_KEY);
+                Log.d("WeatherTile", "Requesting tile: " + url);
                 return new URL(url);
             } catch (Exception e) {
+                Log.e("WeatherTile", "Error creating tile URL", e);
                 e.printStackTrace();
                 return null;
             }

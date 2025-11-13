@@ -175,28 +175,52 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Recent Searches Header -->
-    <TextView
-        android:id="@+id/tvRecentSearches"
-        android:layout_width="wrap_content"
+    <!-- Favorite Cities Header -->
+    <LinearLayout
+        android:id="@+id/favoritesHeader"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/topBar"
-        android:layout_marginStart="22dp"
-        android:layout_marginTop="28dp"
-        android:layout_marginBottom="8dp"
-        android:text="Recent Searches"
-        android:textColor="#FFFFFF"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:fontFamily="sans-serif-medium"
-        android:letterSpacing="0.01" />
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="22dp"
+        android:layout_marginBottom="12dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-    <!-- Cities List -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Favorite Cities"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.01"
+            tools:ignore="HardcodedText" />
+
+        <!-- Manage Button -->
+        <TextView
+            android:id="@+id/btnManageFavorites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manage"
+            android:textColor="#4A9EFF"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+
+    <!-- Favorite Cities RecyclerView (always visible) -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewCities"
+        android:id="@+id/recyclerViewFavorites"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tvRecentSearches"
+        android:layout_below="@id/favoritesHeader"
         android:layout_marginTop="8dp"
         android:paddingHorizontal="0dp"
         android:paddingBottom="24dp"

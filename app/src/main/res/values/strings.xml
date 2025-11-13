@@ -115,4 +115,8 @@
     <string name="rain_probability">Rain Probability</string>
     <string name="wind_speed_chart">Wind Speed</string>
     <string name="humidity_levels">Humidity Levels</string>
+
+    <!-- Weather Map -->
+    <string name="weather_map">Weather Map</string>
+    <string name="expand_map">Expand Map</string>
 </resources>

@@ -179,7 +179,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="21dp"
                 android:layout_marginEnd="21dp"
-                android:layout_marginTop="30dp">
+                android:layout_marginTop="30dp"
+                android:clipToOutline="true"
+                android:outlineProvider="background"
+                android:background="@drawable/rounded_corner_20dp">
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
@@ -239,7 +242,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="21dp"
                 android:layout_marginEnd="21dp"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="8dp"
+                android:clipToOutline="true"
+                android:outlineProvider="background"
+                android:background="@drawable/rounded_corner_20dp">
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
@@ -420,6 +426,91 @@
                                     android:fontFamily="sans-serif"
                                     android:lineSpacingExtra="2dp"
                                     tools:ignore="HardcodedText" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- Weather Map Card (iOS styled) -->
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardWeatherMap"
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp"
+                            android:layout_marginBottom="8dp"
+                            app:cardCornerRadius="15dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="@android:color/transparent">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/ios_card_background"
+                                android:orientation="vertical">
+
+                                <!-- Header -->
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:padding="16dp"
+                                    android:paddingBottom="8dp">
+
+                                    <ImageView
+                                        android:id="@+id/iconWeatherMap"
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:src="@drawable/ic_map"
+                                        android:layout_alignParentStart="true"
+                                        android:layout_centerVertical="true"
+                                        app:tint="#FFFFFF"
+                                        android:contentDescription="@string/weather_map" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_toEndOf="@id/iconWeatherMap"
+                                        android:layout_marginStart="8dp"
+                                        android:text="WEATHER MAP"
+                                        android:textColor="#B0FFFFFF"
+                                        android:textSize="13sp"
+                                        android:fontFamily="sans-serif-medium"
+                                        android:letterSpacing="0.05"
+                                        tools:ignore="HardcodedText" />
+
+                                    <ImageView
+                                        android:id="@+id/btnExpandMap"
+                                        android:layout_width="28dp"
+                                        android:layout_height="28dp"
+                                        android:layout_alignParentEnd="true"
+                                        android:layout_centerVertical="true"
+                                        android:src="@drawable/ic_fullscreen"
+                                        android:padding="4dp"
+                                        android:background="?attr/selectableItemBackgroundBorderless"
+                                        app:tint="#FFFFFF"
+                                        android:contentDescription="@string/expand_map" />
+                                </RelativeLayout>
+
+                                <!-- Mini Map -->
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="12dp"
+                                    android:layout_marginEnd="12dp"
+                                    android:layout_marginBottom="12dp">
+
+                                    <org.osmdroid.views.MapView
+                                        android:id="@+id/miniMapView"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@drawable/ios_card_background" />
+
+                                    <!-- Tap to open overlay -->
+                                    <View
+                                        android:id="@+id/mapTapOverlay"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@android:color/transparent"
+                                        android:clickable="true"
+                                        android:focusable="true" />
+                                </FrameLayout>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -637,9 +728,9 @@
                                     android:layout_marginStart="58dp"
                                     android:background="#33FFFFFF" />
 
-                                <!-- Voice Assistant Item -->
+                                <!-- Chat Bot Item (Gemini AI) -->
                                 <LinearLayout
-                                    android:id="@+id/btnVoiceAssistant"
+                                    android:id="@+id/btnChatBot"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="horizontal"
@@ -652,7 +743,7 @@
                                     <ImageView
                                         android:layout_width="32dp"
                                         android:layout_height="32dp"
-                                        android:src="@drawable/ic_mic"
+                                        android:src="@drawable/ic_chat"
                                         android:padding="4dp"
                                         android:background="@drawable/icon_background_purple"
                                         app:tint="#FFFFFF" />
@@ -667,7 +758,7 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Voice Assistant"
+                                            android:text="Weather Chat Bot"
                                             android:textSize="16sp"
                                             android:textColor="#FFFFFF"
                                             android:fontFamily="sans-serif-medium" />
@@ -675,7 +766,7 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Ask weather questions with your voice"
+                                            android:text="Chat with Gemini AI about weather"
                                             android:textSize="12sp"
                                             android:textColor="#99FFFFFF"
                                             android:layout_marginTop="2dp" />

@@ -2,7 +2,6 @@ package com.example.weatherapp.ui.activities;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
@@ -21,22 +20,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.weatherapp.R;
 import com.example.weatherapp.data.models.CityWeather;
+import com.example.weatherapp.data.models.FavoriteCity;
 import com.example.weatherapp.databinding.ActivitySearchBinding;
+import com.example.weatherapp.domain.repository.FavoriteCitiesManager;
 import com.example.weatherapp.presentation.state.UIState;
 import com.example.weatherapp.presentation.viewmodel.SearchViewModel;
 import com.example.weatherapp.ui.adapters.CityWeatherAdapter;
 import com.example.weatherapp.ui.helpers.LocationHelper;
-import com.example.weatherapp.ui.helpers.RecyclerViewScrollAnimator;
 import com.example.weatherapp.ui.helpers.SlideInItemAnimator;
 import com.google.android.gms.location.LocationServices;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * SearchActivity with MVVM pattern
@@ -46,21 +41,15 @@ public class SearchActivity extends AppCompatActivity {
 
     private ActivitySearchBinding binding;
     private SearchViewModel viewModel;
-    private CityWeatherAdapter adapter;
+    private CityWeatherAdapter favoritesAdapter;
     private LocationHelper locationHelper;
+    private FavoriteCitiesManager favoritesManager;
     
     public static final String EXTRA_CITY_NAME = "city_name";
     public static final String EXTRA_USE_GPS = "use_gps";
     public static final String EXTRA_LATITUDE = "latitude";
     public static final String EXTRA_LONGITUDE = "longitude";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
-    
-    private static final String PREFS_NAME = "WeatherAppPrefs";
-    private static final String KEY_RECENT_SEARCHES = "recent_searches";
-    private static final int MAX_RECENT_SEARCHES = 10;
-    
-    private SharedPreferences sharedPreferences;
-    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +61,7 @@ public class SearchActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         
         locationHelper = new LocationHelper(this, LocationServices.getFusedLocationProviderClient(this));
-        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        gson = new Gson();
+        favoritesManager = new FavoriteCitiesManager(this);
 
         // Setup animated background
         setupAnimatedBackground();
@@ -81,10 +69,9 @@ public class SearchActivity extends AppCompatActivity {
         
         setupObservers();
         setupListeners();
-        setupRecyclerView();
+        setupFavoritesRecyclerView();
         
-        // Load recent searches first, if none then load popular cities
-        loadRecentSearches();
+        // Data will be loaded in onResume()
     }
     
     /**
@@ -132,19 +119,6 @@ public class SearchActivity extends AppCompatActivity {
      * Setup LiveData observers (MVVM pattern)
      */
     private void setupObservers() {
-        // Observe cities state
-        viewModel.getCitiesState().observe(this, state -> {
-            if (state instanceof UIState.Loading) {
-                // Show loading if needed
-            } else if (state instanceof UIState.Success) {
-                List<CityWeather> cities = ((UIState.Success<List<CityWeather>>) state).getData();
-                updateCitiesList(cities);
-            } else if (state instanceof UIState.Error) {
-                String error = ((UIState.Error<List<CityWeather>>) state).getMessage();
-                Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
-            }
-        });
-        
         // Observe location state
         viewModel.getLocationState().observe(this, state -> {
             if (state instanceof UIState.Success) {
@@ -158,30 +132,24 @@ public class SearchActivity extends AppCompatActivity {
     }
     
     /**
-     * Setup RecyclerView with adapter
+     * Setup Favorites RecyclerView
      */
-    private void setupRecyclerView() {
-        adapter = new CityWeatherAdapter(new ArrayList<>(), this::onCitySelected);
-        binding.recyclerViewCities.setLayoutManager(new LinearLayoutManager(this));
-        binding.recyclerViewCities.setAdapter(adapter);
-        binding.recyclerViewCities.setItemAnimator(new SlideInItemAnimator());
-        
-        // Add scroll animator
-        RecyclerViewScrollAnimator scrollAnimator = new RecyclerViewScrollAnimator();
-        binding.recyclerViewCities.addOnScrollListener(scrollAnimator);
-    }
-    
-    /**
-     * Update cities list in adapter
-     */
-    private void updateCitiesList(List<CityWeather> cities) {
-        adapter = new CityWeatherAdapter(cities, this::onCitySelected);
-        binding.recyclerViewCities.setAdapter(adapter);
+    private void setupFavoritesRecyclerView() {
+        favoritesAdapter = new CityWeatherAdapter(new ArrayList<>(), this::onCitySelected);
+        binding.recyclerViewFavorites.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerViewFavorites.setAdapter(favoritesAdapter);
+        binding.recyclerViewFavorites.setItemAnimator(new SlideInItemAnimator());
     }
 
     private void setupListeners() {
         // Back button click
         binding.btnBack.setOnClickListener(v -> finish());
+
+        // Manage Favorites button click
+        binding.btnManageFavorites.setOnClickListener(v -> {
+            Intent intent = new Intent(this, FavoriteCitiesActivity.class);
+            startActivity(intent);
+        });
 
         // Search button click
         binding.btnSearchIcon.setOnClickListener(v -> {
@@ -261,14 +229,10 @@ public class SearchActivity extends AppCompatActivity {
      * Handle city selection from list
      */
     private void onCitySelected(CityWeather city) {
-        // Save to recent searches
-        saveRecentSearch(city.getCityName());
         returnCityToMain(city.getCityName());
     }
 
     private void searchCity(String cityName) {
-        // Save to recent searches
-        saveRecentSearch(cityName);
         // Return searched city to MainActivity
         returnCityToMain(cityName);
     }
@@ -281,73 +245,31 @@ public class SearchActivity extends AppCompatActivity {
     }
     
     /**
-     * Save a city search to recent searches history
+     * Load favorite cities and display them
      */
-    private void saveRecentSearch(String cityName) {
-        List<String> recentSearches = getRecentSearchesList();
+    private void loadFavoriteCities() {
+        List<FavoriteCity> favorites = favoritesManager.getFavoriteCities();
         
-        // Remove if already exists (to move it to top)
-        recentSearches.remove(cityName);
-        
-        // Add to beginning
-        recentSearches.add(0, cityName);
-        
-        // Keep only last MAX_RECENT_SEARCHES
-        if (recentSearches.size() > MAX_RECENT_SEARCHES) {
-            recentSearches = recentSearches.subList(0, MAX_RECENT_SEARCHES);
+        // Convert FavoriteCity to CityWeather objects for adapter
+        List<CityWeather> favoriteCities = new ArrayList<>();
+        for (FavoriteCity favorite : favorites) {
+            CityWeather city = new CityWeather(
+                favorite.getCityName(),
+                "", // Empty country
+                "Favorite City", // Always show favorite tag
+                (int) favorite.getCurrentTemp(), // Cast to int
+                0, // high
+                0, // low
+                "" // icon name
+            );
+            favoriteCities.add(city);
         }
         
-        // Save to SharedPreferences
-        String json = gson.toJson(recentSearches);
-        sharedPreferences.edit().putString(KEY_RECENT_SEARCHES, json).apply();
+        // Update favorites adapter (always show, even if empty)
+        favoritesAdapter = new CityWeatherAdapter(favoriteCities, this::onCitySelected);
+        binding.recyclerViewFavorites.setAdapter(favoritesAdapter);
     }
     
-    /**
-     * Get recent searches list from SharedPreferences
-     */
-    private List<String> getRecentSearchesList() {
-        String json = sharedPreferences.getString(KEY_RECENT_SEARCHES, null);
-        if (json != null) {
-            Type type = new TypeToken<List<String>>() {}.getType();
-            return new ArrayList<>(gson.fromJson(json, type));
-        }
-        return new ArrayList<>();
-    }
-    
-    /**
-     * Load recent searches and display them
-     */
-    private void loadRecentSearches() {
-        List<String> recentSearches = getRecentSearchesList();
-        
-        if (!recentSearches.isEmpty()) {
-            // Show recent searches header
-            binding.tvRecentSearches.setVisibility(android.view.View.VISIBLE);
-            
-            // Convert city names to CityWeather objects for adapter
-            List<CityWeather> recentCities = new ArrayList<>();
-            for (String cityName : recentSearches) {
-                // Create CityWeather with minimal info for recent searches
-                CityWeather city = new CityWeather(
-                    cityName,
-                    "", // Empty country
-                    "Recent Search", // Description
-                    0, // temp
-                    0, // high
-                    0, // low
-                    "" // icon name
-                );
-                recentCities.add(city);
-            }
-            
-            updateCitiesList(recentCities);
-        } else {
-            // No recent searches, load popular cities
-            binding.tvRecentSearches.setVisibility(android.view.View.GONE);
-            viewModel.loadPopularCities();
-        }
-    }
-
     private void returnLocationToMain(double latitude, double longitude) {
         Intent resultIntent = new Intent();
         resultIntent.putExtra(EXTRA_USE_GPS, true);
@@ -355,6 +277,13 @@ public class SearchActivity extends AppCompatActivity {
         resultIntent.putExtra(EXTRA_LONGITUDE, longitude);
         setResult(RESULT_OK, resultIntent);
         finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reload favorites when activity becomes visible
+        loadFavoriteCities();
     }
 
     @Override

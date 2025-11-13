@@ -26,7 +26,6 @@ import com.example.weatherapp.domain.repository.FavoriteCitiesManager;
 import com.example.weatherapp.presentation.viewmodel.FavoriteCitiesViewModel;
 import com.example.weatherapp.ui.helpers.RecyclerViewScrollAnimator;
 import com.example.weatherapp.ui.helpers.SlideInItemAnimator;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +57,6 @@ public class FavoriteCitiesActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewFavorites);
         tvEmptyState = findViewById(R.id.tvEmptyState);
         progressBar = findViewById(R.id.progressBar);
-        FloatingActionButton fabAddCity = findViewById(R.id.fabAddCity);
         ImageButton btnBack = findViewById(R.id.btnBack);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -75,20 +73,8 @@ public class FavoriteCitiesActivity extends AppCompatActivity {
         // === SETUP OBSERVERS ===
         setupObservers();
 
-        // Load favorite cities
+        // Load favorite cities with weather data
         viewModel.loadFavoriteCities();
-
-        fabAddCity.setOnClickListener(v -> {
-            Boolean canAdd = viewModel.getCanAddMoreCities().getValue();
-            if (canAdd != null && canAdd) {
-                // Open search activity to add new city
-                Intent intent = new Intent(this, SearchActivity.class);
-                intent.putExtra("ADD_TO_FAVORITES", true);
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Maximum 10 favorite cities allowed", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         btnBack.setOnClickListener(v -> finish());
     }
@@ -194,23 +180,24 @@ public class FavoriteCitiesActivity extends AppCompatActivity {
             }
 
             void bind(FavoriteCity city) {
-                tvCityName.setText(city.getDisplayName());
+                // Display city name only (no country code for iOS style)
+                tvCityName.setText(city.getCityName());
 
                 if (city.getCurrentTemp() != 0) {
+                    // iOS style: just number + degree symbol
                     tvTemperature.setText(String.format(Locale.getDefault(),
-                            "%.0f°C", city.getCurrentTemp()));
+                            "%.0f°", city.getCurrentTemp()));
                     tvWeatherDesc.setText(city.getWeatherDescription());
                 } else {
                     tvTemperature.setText("--°");
-                    tvWeatherDesc.setText("Loading...");
+                    tvWeatherDesc.setText("Favorite City");
                 }
 
                 itemView.setOnClickListener(v -> {
-                    // Open MainActivity with this city
-                    Intent intent = new Intent(FavoriteCitiesActivity.this, MainActivity.class);
-                    intent.putExtra("CITY_NAME", city.getCityName());
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                    // Return city name to MainActivity
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("SELECTED_CITY", city.getCityName());
+                    setResult(RESULT_OK, resultIntent);
                     finish();
                 });
 

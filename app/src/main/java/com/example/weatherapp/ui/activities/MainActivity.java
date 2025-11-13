@@ -56,6 +56,12 @@ import com.example.weatherapp.widget.WeatherWidget;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
     
     // Weather Background Views
     private android.widget.VideoView videoBackground;
+    
+    // Mini Map
+    private MapView miniMapView;
     
     // Helper classes (UI only)
     private UIUpdateHelper uiUpdateHelper;
@@ -188,6 +197,20 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     // Permission denied
                     Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    // Favorites launcher - handle city selection from favorites
+    private final ActivityResultLauncher<Intent> favoritesLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    String selectedCity = result.getData().getStringExtra("SELECTED_CITY");
+                    if (selectedCity != null && !selectedCity.isEmpty()) {
+                        // Load weather for selected city
+                        viewModel.loadWeatherByCity(selectedCity);
+                        Toast.makeText(this, "Loading " + selectedCity, Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
 
@@ -315,6 +338,8 @@ public class MainActivity extends AppCompatActivity {
                 hideLoading();
                 WeatherData data = ((UIState.Success<WeatherData>) state).getData();
                 updateWeatherUI(data);
+                // Update mini map location
+                updateMiniMap(data.getLatitude(), data.getLongitude());
             } else if (state instanceof UIState.Error) {
                 hideLoading();
                 String error = ((UIState.Error<WeatherData>) state).getMessage();
@@ -357,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
         forecastViewManager = new ForecastViewManager(this, binding.hourlyForecastContainer, binding.dailyForecastContainer, temperatureUnit);
         uiSetupHelper = new UISetupHelper(this, binding);
         navigationHelper = new NavigationHelper(this);
-        favoritesHelper = new FavoritesHelper(this, favoritesManager, binding.fabAddToFavorites);
+        favoritesHelper = new FavoritesHelper(this, favoritesManager, binding.fabAddToFavorites, favoritesLauncher);
         notificationHelper = new NotificationHelper(this, sharedPreferences, requestPermissionLauncher);
         chartAnimHelper = new ChartAnimationHelper();
         
@@ -664,8 +689,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onWeatherMapsRequested() {
-                // Open Weather Maps activity with current location
-                Intent intent = new Intent(MainActivity.this, WeatherMapsActivity.class);
+                // Open OSM Weather Maps activity with current location
+                Intent intent = new Intent(MainActivity.this, OSMWeatherMapActivity.class);
                 intent.putExtra("latitude", viewModel.getCurrentLatitude());
                 intent.putExtra("longitude", viewModel.getCurrentLongitude());
                 intent.putExtra("cityName", viewModel.getCurrentCityName());
@@ -738,10 +763,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onWeatherMapsClicked() {
                         bottomSheet.dismiss();
-                        // Reuse existing weather maps logic
+                        // Open OSM Weather Maps
                         WeatherData currentWeather = viewModel.getCurrentWeatherData();
                         if (currentWeather != null) {
-                            Intent intent = new Intent(MainActivity.this, WeatherMapsActivity.class);
+                            Intent intent = new Intent(MainActivity.this, OSMWeatherMapActivity.class);
                             intent.putExtra("latitude", currentWeather.getLatitude());
                             intent.putExtra("longitude", currentWeather.getLongitude());
                             intent.putExtra("cityName", currentWeather.getCityName());
@@ -855,18 +880,11 @@ public class MainActivity extends AppCompatActivity {
             btnWeatherMap.setOnClickListener(v -> openMapActivity());
         }
         
-        // Setup Voice Assistant button
-        View btnVoiceAssistant = binding.getRoot().findViewById(R.id.btnVoiceAssistant);
-        if (btnVoiceAssistant != null) {
-            btnVoiceAssistant.setOnClickListener(v -> {
-                Intent intent = new Intent(MainActivity.this, com.example.weatherapp.ui.activities.VoiceWeatherActivity.class);
-                
-                // Pass current weather data if available
-                WeatherData currentWeather = viewModel.getCurrentWeatherData();
-                if (currentWeather != null) {
-                    intent.putExtra("weather_data", currentWeather);
-                }
-                
+        // Setup Chat Bot button (Gemini AI)
+        View btnChatBot = binding.getRoot().findViewById(R.id.btnChatBot);
+        if (btnChatBot != null) {
+            btnChatBot.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, WeatherChatBotActivity.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             });
@@ -927,6 +945,71 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+        
+        // Setup Mini Map
+        setupMiniMap();
+    }
+    
+    /**
+     * Setup Mini Weather Map
+     */
+    private void setupMiniMap() {
+        // Configure osmdroid
+        Configuration.getInstance().setUserAgentValue(getPackageName());
+        
+        miniMapView = binding.miniMapView;
+        if (miniMapView != null) {
+            miniMapView.setTileSource(TileSourceFactory.MAPNIK);
+            miniMapView.setMultiTouchControls(false); // Disable for mini map
+            miniMapView.setBuiltInZoomControls(false);
+            miniMapView.getController().setZoom(10.0);
+            
+            // Default center (will update when weather loads)
+            GeoPoint startPoint = new GeoPoint(21.0285, 105.8542);
+            miniMapView.getController().setCenter(startPoint);
+            
+            // Setup tap to open full map
+            View mapTapOverlay = binding.mapTapOverlay;
+            View btnExpandMap = binding.btnExpandMap;
+            
+            if (mapTapOverlay != null) {
+                mapTapOverlay.setOnClickListener(v -> openFullWeatherMap());
+            }
+            if (btnExpandMap != null) {
+                btnExpandMap.setOnClickListener(v -> openFullWeatherMap());
+            }
+        }
+    }
+    
+    /**
+     * Update mini map location
+     */
+    private void updateMiniMap(double latitude, double longitude) {
+        if (miniMapView != null) {
+            GeoPoint location = new GeoPoint(latitude, longitude);
+            miniMapView.getController().setCenter(location);
+            
+            // Add marker
+            miniMapView.getOverlays().clear();
+            Marker marker = new Marker(miniMapView);
+            marker.setPosition(location);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setTitle("Current Location");
+            miniMapView.getOverlays().add(marker);
+            miniMapView.invalidate();
+        }
+    }
+    
+    /**
+     * Open full weather map
+     */
+    private void openFullWeatherMap() {
+        Intent intent = new Intent(this, OSMWeatherMapActivity.class);
+        intent.putExtra("latitude", viewModel.getCurrentLatitude());
+        intent.putExtra("longitude", viewModel.getCurrentLongitude());
+        intent.putExtra("cityName", viewModel.getCurrentCityName());
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
     
     /**
@@ -1105,8 +1188,8 @@ public class MainActivity extends AppCompatActivity {
 
             binding.tvCityName.setText(data.getCityName() + ", " + data.getCountryCode());
             
-            String tempSymbol = data.getTemperatureUnit().equals("celsius") ? "°C" : "°F";
-            binding.tvTemperature.setText(String.format("%.0f%s", data.getTemperature(), tempSymbol));
+            // iOS style: just degree symbol, no unit letter
+            binding.tvTemperature.setText(String.format("%.0f°", data.getTemperature()));
             binding.tvWeatherDescription.setText(capitalize(data.getWeatherDescription()));
             binding.tvTempRange.setText(String.format("H: %.0f° L: %.0f°", 
                 data.getMaxTemperature(), data.getMinTemperature()));
@@ -1356,7 +1439,8 @@ public class MainActivity extends AppCompatActivity {
                     java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
                     String timeLabel = sdf.format(new java.util.Date(timestamp * 1000));
                     
-                    String tempUnit = temperatureUnit.equals("celsius") ? "°C" : "°F";
+                    // iOS style: just degree symbol
+                    String tempUnit = "°";
                     float temp = (float) item.getTemperature();
                     
                     android.util.Log.d("MainActivity", "Adding point: " + timeLabel + " = " + temp + tempUnit);
@@ -1571,13 +1655,13 @@ public class MainActivity extends AppCompatActivity {
         
         // AI Features menu buttons
         View btnWeatherMap = binding.getRoot().findViewById(R.id.btnWeatherMap);
-        View btnVoiceAssistant = binding.getRoot().findViewById(R.id.btnVoiceAssistant);
+        View btnChatBot = binding.getRoot().findViewById(R.id.btnChatBot);
         View btnWeatherAlarms = binding.getRoot().findViewById(R.id.btnWeatherAlarms);
         View btnOutfitSuggestions = binding.getRoot().findViewById(R.id.btnOutfitSuggestions);
         View btnActivitySuggestions = binding.getRoot().findViewById(R.id.btnActivitySuggestions);
         
         if (btnWeatherMap != null) UISetupHelper.addPressAnimation(btnWeatherMap);
-        if (btnVoiceAssistant != null) UISetupHelper.addPressAnimation(btnVoiceAssistant);
+        if (btnChatBot != null) UISetupHelper.addPressAnimation(btnChatBot);
         if (btnWeatherAlarms != null) UISetupHelper.addPressAnimation(btnWeatherAlarms);
         if (btnOutfitSuggestions != null) UISetupHelper.addPressAnimation(btnOutfitSuggestions);
         if (btnActivitySuggestions != null) UISetupHelper.addPressAnimation(btnActivitySuggestions);
@@ -1726,6 +1810,18 @@ public class MainActivity extends AppCompatActivity {
                 mp.setLooping(true);
                 mp.setVolume(0f, 0f); // Mute the video
                 
+                // Set playback speed to 0.5x for slower, more calming effect
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    try {
+                        android.media.PlaybackParams params = mp.getPlaybackParams();
+                        params.setSpeed(0.5f); // Slow down to 0.5x speed
+                        mp.setPlaybackParams(params);
+                        Log.d(TAG, "Video playback speed set to 0.5x");
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to set playback speed", e);
+                    }
+                }
+                
                 // Scale video to fill screen (crop to fit)
                 // Get video dimensions
                 int videoWidth = mp.getVideoWidth();
@@ -1809,6 +1905,10 @@ public class MainActivity extends AppCompatActivity {
             videoBackground.start();
             Log.d(TAG, "Video restarted in onResume()");
         }
+        // Resume mini map
+        if (miniMapView != null) {
+            miniMapView.onResume();
+        }
     }
 
     @Override
@@ -1818,6 +1918,10 @@ public class MainActivity extends AppCompatActivity {
         if (videoBackground != null && videoBackground.isPlaying()) {
             videoBackground.pause();
             Log.d(TAG, "Video paused in onPause()");
+        }
+        // Pause mini map
+        if (miniMapView != null) {
+            miniMapView.onPause();
         }
     }
 
@@ -1834,6 +1938,11 @@ public class MainActivity extends AppCompatActivity {
         if (videoBackground != null) {
             videoBackground.stopPlayback();
             videoBackground = null;
+        }
+        // Detach mini map
+        if (miniMapView != null) {
+            miniMapView.onDetach();
+            miniMapView = null;
         }
         // Clear chart references
         chartTemperature = null;
