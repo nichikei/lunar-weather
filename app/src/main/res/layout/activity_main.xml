@@ -199,7 +199,7 @@
                         android:id="@+id/tvWeatherInfo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Có mây sẽ tiếp tục đến hết ngày. Gió giật lên đến 11 km/h."
+                        android:text="Loading weather information..."
                         android:textColor="#FFFFFF"
                         android:textSize="15sp"
                         android:fontFamily="sans-serif"
@@ -347,67 +347,6 @@
                         android:paddingHorizontal="16dp"
                         android:paddingTop="16dp"
                         android:paddingBottom="16dp">
-
-                        <!-- More Features Button (iOS styled) -->
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/btnMoreFeatures"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            app:cardCornerRadius="15dp"
-                            app:cardElevation="0dp"
-                            app:strokeWidth="0dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:foreground="?attr/selectableItemBackground"
-                            app:cardBackgroundColor="@android:color/transparent">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/ios_card_background"
-                                android:padding="14dp"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="✨"
-                                    android:textSize="20sp" />
-
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:orientation="vertical"
-                                    android:layout_marginStart="10dp">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="AI Features"
-                                        android:textSize="15sp"
-                                        android:textStyle="bold"
-                                        android:textColor="#FFFFFF" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Maps, Outfit &amp; Activity Suggestions"
-                                        android:textSize="11sp"
-                                        android:textColor="#B0FFFFFF" />
-                                </LinearLayout>
-
-                                <ImageView
-                                    android:layout_width="16dp"
-                                    android:layout_height="16dp"
-                                    android:src="@drawable/ic_arrow_forward"
-                                    android:tint="#666666"
-                                    tools:ignore="UseAppTint" />
-
-                            </LinearLayout>
-                        </com.google.android.material.card.MaterialCardView>
 
                         <!-- Air Quality Index (iOS styled) -->
                         <include
@@ -623,6 +562,67 @@
                                 <include layout="@layout/card_pressure" />
                             </androidx.cardview.widget.CardView>
                         </LinearLayout>
+
+                        <!-- More Features Button (iOS styled) - Moved to bottom -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/btnMoreFeatures"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            app:cardCornerRadius="15dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardBackgroundColor="@android:color/transparent">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/ios_card_background"
+                                android:padding="14dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="✨"
+                                    android:textSize="20sp" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical"
+                                    android:layout_marginStart="10dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="AI Features"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"
+                                        android:textColor="#FFFFFF" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Maps, Outfit &amp; Activity Suggestions"
+                                        android:textSize="11sp"
+                                        android:textColor="#B0FFFFFF" />
+                                </LinearLayout>
+
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:src="@drawable/ic_arrow_forward"
+                                    android:tint="#666666"
+                                    tools:ignore="UseAppTint" />
+
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                         <!-- Hidden chart views for compatibility -->
                         <FrameLayout

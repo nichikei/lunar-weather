@@ -9,7 +9,9 @@ import android.widget.TextView;
 
 import com.example.weatherapp.R;
 import com.example.weatherapp.domain.model.ForecastData;
+import com.example.weatherapp.data.responses.HourlyForecastResponse;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -24,6 +26,9 @@ public class ForecastViewManager {
     private final LinearLayout hourlyForecastContainer;
     private final LinearLayout dailyForecastContainer;
     private final String temperatureUnit;
+    
+    // Store hourly data for dialog charts
+    private List<HourlyForecastResponse.HourlyItem> hourlyDataForCharts;
 
     // Old constructor for backward compatibility
     public ForecastViewManager(Context context, LinearLayout forecastContainer, String temperatureUnit) {
@@ -82,12 +87,21 @@ public class ForecastViewManager {
             return;
         }
 
+        // Sort daily items by timestamp to ensure chronological order
+        List<ForecastData.DailyForecast> sortedItems = new ArrayList<>(dailyItems);
+        java.util.Collections.sort(sortedItems, new java.util.Comparator<ForecastData.DailyForecast>() {
+            @Override
+            public int compare(ForecastData.DailyForecast o1, ForecastData.DailyForecast o2) {
+                return Long.compare(o1.getTimestamp(), o2.getTimestamp());
+            }
+        });
+
         boolean isFirst = true;
-        int itemsToShow = Math.min(10, dailyItems.size()); // Show 10 days
-        android.util.Log.d("ForecastViewManager", "Daily forecast: total items=" + dailyItems.size() + ", showing=" + itemsToShow);
+        int itemsToShow = Math.min(10, sortedItems.size()); // Show 10 days
+        android.util.Log.d("ForecastViewManager", "Daily forecast: total items=" + sortedItems.size() + ", showing=" + itemsToShow);
 
         for (int i = 0; i < itemsToShow; i++) {
-            ForecastData.DailyForecast dailyForecast = dailyItems.get(i);
+            ForecastData.DailyForecast dailyForecast = sortedItems.get(i);
 
             // Use iOS style layout
             View itemView = LayoutInflater.from(context).inflate(R.layout.item_daily_forecast_ios, dailyForecastContainer, false);
@@ -183,10 +197,14 @@ public class ForecastViewManager {
         itemTime.setTimeInMillis(item.getTimestamp() * 1000);
 
         if (isFirst) {
-            tvTime.setText("Bây giờ");
+            tvTime.setText("Now");
         } else {
             int hour = itemTime.get(Calendar.HOUR_OF_DAY);
-            tvTime.setText(String.format(Locale.getDefault(), "%d giờ", hour));
+            // Use 12-hour format with AM/PM like iOS
+            int hour12 = itemTime.get(Calendar.HOUR);
+            if (hour12 == 0) hour12 = 12;
+            String amPm = itemTime.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM";
+            tvTime.setText(String.format(Locale.US, "%d%s", hour12, amPm));
         }
 
         // Set weather icon
@@ -214,10 +232,20 @@ public class ForecastViewManager {
         
         String dayName;
         if (isFirst) {
-            dayName = "Hôm nay";
+            dayName = "Today";
         } else {
-            String[] days = {"CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7"};
-            dayName = days[calendar.get(Calendar.DAY_OF_WEEK) - 1];
+            // Check if it's tomorrow
+            Calendar tomorrow = Calendar.getInstance();
+            tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+            
+            if (calendar.get(Calendar.YEAR) == tomorrow.get(Calendar.YEAR) &&
+                calendar.get(Calendar.DAY_OF_YEAR) == tomorrow.get(Calendar.DAY_OF_YEAR)) {
+                dayName = "Tomorrow";
+            } else {
+                // Use English day names (iOS style)
+                String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+                dayName = days[calendar.get(Calendar.DAY_OF_WEEK) - 1];
+            }
         }
 
         tvDayName.setText(dayName);
@@ -233,6 +261,32 @@ public class ForecastViewManager {
         if (divider != null) {
             divider.setVisibility(View.VISIBLE);
         }
+
+        // Add click listener to show detail dialog for this day
+        itemView.setOnClickListener(v -> showDailyWeatherDetail(dailyForecast));
+    }
+
+    /**
+     * Set hourly data for chart displays in daily detail dialog
+     */
+    public void setHourlyDataForCharts(List<HourlyForecastResponse.HourlyItem> hourlyData) {
+        this.hourlyDataForCharts = hourlyData;
+    }
+
+    /**
+     * Show weather detail dialog for selected day
+     */
+    private void showDailyWeatherDetail(ForecastData.DailyForecast dailyForecast) {
+        android.util.Log.d("ForecastViewManager", "Show detail for day: " + dailyForecast.getTimestamp());
+        
+        // Show iOS-style detail dialog with hourly chart data
+        com.example.weatherapp.ui.dialogs.DailyWeatherDetailDialog dialog = 
+            new com.example.weatherapp.ui.dialogs.DailyWeatherDetailDialog(
+                context, 
+                dailyForecast,
+                hourlyDataForCharts != null ? hourlyDataForCharts : new ArrayList<>()
+            );
+        dialog.show();
     }
 
     private int getWeatherIconResource(String weatherCondition) {

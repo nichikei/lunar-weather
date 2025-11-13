@@ -32,6 +32,8 @@ public class ForecastSummaryGenerator {
     private static String generateFromForecastData(List<ForecastData.HourlyForecast> hourlyForecasts) {
         Map<Integer, Integer> rainyItemsPerDay = new HashMap<>();
         Map<String, Integer> conditionCounts = new HashMap<>();
+        double totalWindSpeed = 0;
+        int windCount = 0;
         Calendar calendar = Calendar.getInstance();
 
         for (ForecastData.HourlyForecast item : hourlyForecasts) {
@@ -48,6 +50,10 @@ public class ForecastSummaryGenerator {
 
             // Count condition occurrences
             conditionCounts.put(condition, conditionCounts.getOrDefault(condition, 0) + 1);
+            
+            // Calculate average wind speed
+            totalWindSpeed += item.getWindSpeed();
+            windCount++;
         }
 
         // Count days with significant rain
@@ -69,25 +75,43 @@ public class ForecastSummaryGenerator {
         }
 
         int totalDays = hourlyForecasts.size() / 8;
-        int forecastDays = Math.min(totalDays, 5);
+        int forecastDays = Math.min(totalDays, 10);
+        double avgWindSpeed = windCount > 0 ? totalWindSpeed / windCount : 0;
+        int windKmh = (int) Math.round(avgWindSpeed * 3.6); // m/s to km/h
 
-        // Generate summary based on actual data
-        if (rainyDays >= 3) {
-            return String.format(Locale.getDefault(),
-                    "Rain expected %d out of %d days ahead",
+        // Generate dynamic summary based on actual data
+        if (rainyDays >= 6) {
+            return String.format(Locale.US,
+                    "Rain expected in %d of the next %d days",
                     rainyDays, forecastDays);
+        } else if (rainyDays >= 3) {
+            return String.format(Locale.US,
+                    "Scattered rain expected. Winds up to %d km/h",
+                    windKmh);
         } else if (rainyDays >= 1) {
-            return String.format(Locale.getDefault(),
-                    "Scattered rain in the next %d days",
-                    forecastDays);
+            return String.format(Locale.US,
+                    "Occasional rain in the next %d days. Winds %d km/h",
+                    forecastDays, windKmh);
         } else if (dominantCondition.contains("snow")) {
-            return "Possible snow in the coming days";
+            return String.format(Locale.US,
+                    "Snow expected in the coming days. Winds %d km/h",
+                    windKmh);
+        } else if (dominantCondition.contains("thunderstorm")) {
+            return String.format(Locale.US,
+                    "Thunderstorms possible. Gusts up to %d km/h",
+                    windKmh);
         } else if (dominantCondition.contains("clear")) {
-            return "Clear skies this week";
+            return String.format(Locale.US,
+                    "Clear skies continue throughout the day. Winds up to %d km/h",
+                    windKmh);
         } else if (dominantCondition.contains("cloud")) {
-            return "Mostly cloudy this week";
+            return String.format(Locale.US,
+                    "Cloudy conditions continue throughout the day. Winds up to %d km/h",
+                    windKmh);
         } else {
-            return "Changing weather in the coming days";
+            return String.format(Locale.US,
+                    "Changing weather in the coming days. Winds %d km/h",
+                    windKmh);
         }
     }
 

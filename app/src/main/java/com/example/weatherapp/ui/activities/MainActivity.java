@@ -847,6 +847,30 @@ public class MainActivity extends AppCompatActivity {
         if (btnAddCity != null) {
             btnAddCity.setOnClickListener(v -> openSearchActivity());
         }
+        
+        // Setup Weather Map button
+        View btnWeatherMap = binding.getRoot().findViewById(R.id.btnWeatherMap);
+        if (btnWeatherMap != null) {
+            btnWeatherMap.setOnClickListener(v -> openMapActivity());
+        }
+    }
+    
+    /**
+     * Open Map Activity
+     */
+    private void openMapActivity() {
+        Intent intent = new Intent(this, MapActivity.class);
+        
+        // Pass current location data
+        WeatherData currentWeather = viewModel.getCurrentWeatherData();
+        if (currentWeather != null) {
+            intent.putExtra("latitude", currentWeather.getLatitude());
+            intent.putExtra("longitude", currentWeather.getLongitude());
+            intent.putExtra("cityName", currentWeather.getCityName());
+        }
+        
+        startActivity(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     /**
@@ -1054,11 +1078,48 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Updating forecast views - Hourly: " + data.getHourlyForecasts().size() + 
                   " items, Daily: " + data.getDailyForecasts().size() + " days");
             
+            // Set hourly data for dialog charts
+            com.example.weatherapp.data.responses.HourlyForecastResponse hourlyResponse = repository.getLatestHourlyForecastResponse();
+            if (hourlyResponse != null && hourlyResponse.getList() != null) {
+                forecastViewManager.setHourlyDataForCharts(hourlyResponse.getList());
+            }
+            
             // Always show hourly forecast (in first card)
             forecastViewManager.createHourlyForecastView(data);
             
             // Always show 10-day forecast (in second card) - iOS style
             forecastViewManager.createWeeklyForecastView(data);
+            
+            // Update forecast summary with dynamic text based on weather conditions
+            updateForecastSummary(data);
+        }
+    }
+    
+    /**
+     * Update forecast summary text based on weather data
+     */
+    private void updateForecastSummary(ForecastData data) {
+        if (data == null || data.getHourlyForecasts().isEmpty()) {
+            return;
+        }
+        
+        try {
+            String weatherCondition = data.getHourlyForecasts().get(0).getWeatherDescription();
+            String summary = ForecastSummaryGenerator.generateSummary(weatherCondition, data.getHourlyForecasts());
+            
+            // Update tvForecastSummary in WEEKEND FORECAST card
+            android.widget.TextView tvForecastSummary = binding.getRoot().findViewById(R.id.tvForecastSummary);
+            if (tvForecastSummary != null) {
+                tvForecastSummary.setText(summary);
+            }
+            
+            // Update tvWeatherInfo at the top
+            android.widget.TextView tvWeatherInfo = binding.getRoot().findViewById(R.id.tvWeatherInfo);
+            if (tvWeatherInfo != null) {
+                tvWeatherInfo.setText(summary);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating forecast summary", e);
         }
     }
 

@@ -12,9 +12,12 @@ import com.example.weatherapp.R;
 import com.example.weatherapp.data.responses.HourlyForecastResponse;
 import com.example.weatherapp.data.responses.WeatherResponse;
 import com.example.weatherapp.presentation.viewmodel.ChartsViewModel;
+import com.example.weatherapp.ui.dialogs.WeatherDetailDialog;
 import com.example.weatherapp.ui.helpers.ChartHelper;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -128,6 +131,9 @@ public class ChartsActivity extends AppCompatActivity {
         chart.setData(new LineData(dataSet));
         ChartHelper.setupLineChart(chart);
         ChartHelper.applyTimeFormatter(chart, hourlyForecastData, count);
+
+        // Add click listener to show detail dialog
+        setupChartClickListener(chart);
 
         chart.animateXY(1200, 1200);
         chart.invalidate();
@@ -269,6 +275,9 @@ public class ChartsActivity extends AppCompatActivity {
         ChartHelper.setYAxisRange(chart, 0f, 100f);
         ChartHelper.applyTimeFormatter(chart, hourlyForecastData, count);
 
+        // Add click listener
+        setupChartClickListener(chart);
+
         chart.animateXY(800, 800);
         chart.invalidate();
     }
@@ -302,6 +311,9 @@ public class ChartsActivity extends AppCompatActivity {
         ChartHelper.setYAxisRange(chart, 0f, chart.getAxisLeft().getAxisMaximum());
         ChartHelper.applyTimeFormatter(chart, hourlyForecastData, count);
 
+        // Add click listener
+        setupChartClickListener(chart);
+
         chart.animateXY(1000, 1000);
         chart.invalidate();
     }
@@ -333,8 +345,54 @@ public class ChartsActivity extends AppCompatActivity {
         ChartHelper.setYAxisRange(chart, 0f, 100f);
         ChartHelper.applyTimeFormatter(chart, hourlyForecastData, count);
 
+        // Add click listener
+        setupChartClickListener(chart);
+
         chart.animateXY(1000, 1000);
         chart.invalidate();
+    }
+
+    /**
+     * Setup click listener for chart to show iOS-style detail dialog
+     */
+    private void setupChartClickListener(LineChart chart) {
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                int index = (int) e.getX();
+                
+                if (hourlyForecastData != null && hourlyForecastData.getList() != null 
+                    && index >= 0 && index < hourlyForecastData.getList().size()) {
+                    
+                    // Get selected hour data
+                    HourlyForecastResponse.HourlyItem selectedData = 
+                        hourlyForecastData.getList().get(index);
+                    
+                    // Get all data for the day (24 hours from selected point)
+                    List<HourlyForecastResponse.HourlyItem> dayData = new ArrayList<>();
+                    int startIndex = Math.max(0, index - 12);
+                    int endIndex = Math.min(hourlyForecastData.getList().size(), index + 12);
+                    
+                    for (int i = startIndex; i < endIndex; i++) {
+                        dayData.add(hourlyForecastData.getList().get(i));
+                    }
+                    
+                    // Show iOS-style detail dialog
+                    WeatherDetailDialog dialog = new WeatherDetailDialog(
+                        ChartsActivity.this,
+                        selectedData,
+                        dayData,
+                        windSpeedUnit
+                    );
+                    dialog.show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected() {
+                // Do nothing
+            }
+        });
     }
 
 

@@ -46,6 +46,10 @@
             android:name=".ui.activities.FavoriteCitiesActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.activities.MapActivity"
+            android:exported="false"
+            android:theme="@style/Theme.WeatherApp.NoActionBar" />
+        <activity
             android:name=".ui.activities.ChartsActivity"
             android:exported="false" />
         <activity
