@@ -1081,7 +1081,70 @@ public class MainActivity extends AppCompatActivity {
      * Update Air Quality UI  
      */
     private void updateAirQualityUI(AirQualityData data) {
-        // Air quality data received and ready for display
+        if (data == null) return;
+        
+        try {
+            // Find views from card_air_quality layout
+            View aqiCard = binding.getRoot().findViewById(R.id.card_air_quality);
+            if (aqiCard == null) return;
+            
+            TextView tvAqiValue = aqiCard.findViewById(R.id.tvAqiValue);
+            TextView tvAqiStatus = aqiCard.findViewById(R.id.tvAqiStatus);
+            TextView tvAqiDescription = aqiCard.findViewById(R.id.tvAqiDescription);
+            TextView tvPm25 = aqiCard.findViewById(R.id.tvPm25);
+            TextView tvPm10 = aqiCard.findViewById(R.id.tvPm10);
+            TextView tvO3 = aqiCard.findViewById(R.id.tvO3);
+            
+            // Update AQI value
+            if (tvAqiValue != null) {
+                tvAqiValue.setText(String.valueOf(data.getAqi()));
+            }
+            
+            // Update status and description based on AQI
+            if (tvAqiStatus != null && tvAqiDescription != null) {
+                String status;
+                String description;
+                int aqi = data.getAqi();
+                
+                if (aqi <= 50) {
+                    status = "Good";
+                    description = "Air quality is satisfactory";
+                } else if (aqi <= 100) {
+                    status = "Moderate";
+                    description = "Acceptable for most people";
+                } else if (aqi <= 150) {
+                    status = "Unhealthy for Sensitive";
+                    description = "Sensitive groups may experience health effects";
+                } else if (aqi <= 200) {
+                    status = "Unhealthy";
+                    description = "Everyone may experience health effects";
+                } else if (aqi <= 300) {
+                    status = "Very Unhealthy";
+                    description = "Health alert: everyone may experience serious health effects";
+                } else {
+                    status = "Hazardous";
+                    description = "Health warnings of emergency conditions";
+                }
+                
+                tvAqiStatus.setText(status);
+                tvAqiDescription.setText(description);
+            }
+            
+            // Update pollutant values
+            if (tvPm25 != null && data.getPm2_5() > 0) {
+                tvPm25.setText(String.format("%.1f", data.getPm2_5()));
+            }
+            if (tvPm10 != null && data.getPm10() > 0) {
+                tvPm10.setText(String.format("%.1f", data.getPm10()));
+            }
+            if (tvO3 != null && data.getO3() > 0) {
+                tvO3.setText(String.format("%.1f", data.getO3()));
+            }
+            
+            Log.d("MainActivity", "Air Quality updated: AQI=" + data.getAqi());
+        } catch (Exception e) {
+            Log.e("MainActivity", "Error updating Air Quality UI", e);
+        }
     }
     
     /**

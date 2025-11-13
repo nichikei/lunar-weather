@@ -4,15 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="22dp"
-    app:cardElevation="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
     app:cardBackgroundColor="@android:color/transparent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/weather_detail_card_background"
+        android:background="@drawable/ios_card_background"
         android:padding="16dp">
 
         <!-- Card Title -->
@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="AIR QUALITY"
-            android:textColor="@color/text_secondary"
+            android:textColor="#B3FFFFFF"
             android:textSize="13sp"
             android:textStyle="bold"
             android:fontFamily="@font/poppins_bold"
@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="42"
-                android:textColor="@color/text_primary"
+                android:textColor="#FFFFFF"
                 android:textSize="48sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins_bold"
@@ -56,7 +56,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Good"
-                    android:textColor="@color/text_primary"
+                    android:textColor="#FFFFFF"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/poppins_semibold" />
@@ -66,7 +66,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Air quality is satisfactory"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#B3FFFFFF"
                     android:textSize="14sp"
                     android:fontFamily="@font/poppins" />
             </LinearLayout>
@@ -77,7 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="MAIN POLLUTANTS"
-            android:textColor="@color/text_secondary"
+            android:textColor="#B3FFFFFF"
             android:textSize="11sp"
             android:textStyle="bold"
             android:fontFamily="@font/poppins_bold"
@@ -103,7 +103,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="PM2.5"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#B3FFFFFF"
                     android:textSize="11sp"
                     android:fontFamily="@font/poppins" />
 
@@ -112,7 +112,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="12"
-                    android:textColor="@color/text_primary"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/poppins_bold" />
@@ -131,7 +131,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="PM10"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#B3FFFFFF"
                     android:textSize="11sp"
                     android:fontFamily="@font/poppins" />
 
@@ -140,7 +140,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="24"
-                    android:textColor="@color/text_primary"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/poppins_bold" />
@@ -159,7 +159,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="O₃"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#B3FFFFFF"
                     android:textSize="11sp"
                     android:fontFamily="@font/poppins" />
 
@@ -168,7 +168,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="58"
-                    android:textColor="@color/text_primary"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/poppins_bold" />
@@ -226,7 +226,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Good"
-                android:textColor="@color/text_secondary"
+                android:textColor="#B3FFFFFF"
                 android:textSize="9sp"
                 android:gravity="start"
                 android:fontFamily="@font/poppins" />
@@ -236,7 +236,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Very Poor"
-                android:textColor="@color/text_secondary"
+                android:textColor="#B3FFFFFF"
                 android:textSize="9sp"
                 android:gravity="end"
                 android:fontFamily="@font/poppins" />

@@ -94,7 +94,7 @@
                         android:id="@+id/tvCityName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Hà Nội"
+                        android:text="Hanoi"
                         android:textColor="#FFFFFF"
                         android:textSize="34sp"
                         android:fontFamily="sans-serif"
@@ -274,7 +274,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="6dp"
-                            android:text="DỰ BÁO 10 NGÀY"
+                            android:text="10-DAY FORECAST"
                             android:textColor="#99FFFFFF"
                             android:textSize="12sp"
                             android:textAllCaps="true"
@@ -686,24 +686,27 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless">
 
                 <ImageView
                     android:id="@+id/ivFavoriteIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
                     android:src="@drawable/ic_heart_line"
-                    app:tint="#000000"
+                    app:tint="#FFFFFF"
                     android:contentDescription="Favorites" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Favorites"
-                    android:textColor="#000000"
-                    android:textSize="10sp"
-                    android:fontFamily="sans-serif"
-                    android:layout_marginTop="2dp" />
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
 
             <!-- Weather Button (Active) -->
@@ -712,23 +715,26 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
                     android:src="@drawable/ic_weather_cloudy_line"
-                    app:tint="#000000"
+                    app:tint="#FFFFFF"
                     android:contentDescription="Weather" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Weather"
-                    android:textColor="#000000"
-                    android:textSize="10sp"
-                    android:fontFamily="sans-serif"
-                    android:layout_marginTop="2dp" />
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
 
             <!-- Settings Button -->
@@ -738,23 +744,26 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
                     android:src="@drawable/ic_settings_line"
-                    app:tint="#000000"
+                    app:tint="#FFFFFF"
                     android:contentDescription="Settings" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Settings"
-                    android:textColor="#000000"
-                    android:textSize="10sp"
-                    android:fontFamily="sans-serif"
-                    android:layout_marginTop="2dp" />
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
         </LinearLayout>
 
