@@ -6,7 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -27,7 +27,7 @@ public class WeatherAlarmActivity extends AppCompatActivity implements WeatherAl
     private RecyclerView recyclerView;
     private LinearLayout emptyStateLayout;
     private FloatingActionButton fabAddAlarm;
-    private ImageButton btnBack;
+    private ImageView btnBack;
 
     private WeatherAlarmAdapter adapter;
     private WeatherAlarmService alarmService;
@@ -95,6 +95,12 @@ public class WeatherAlarmActivity extends AppCompatActivity implements WeatherAl
         btnBack.setOnClickListener(v -> finish());
 
         fabAddAlarm.setOnClickListener(v -> showAddAlarmDialog());
+        
+        // iOS-style add button in nav bar (same as FAB)
+        View btnAddAlarmNav = findViewById(R.id.btnAddAlarmNav);
+        if (btnAddAlarmNav != null) {
+            btnAddAlarmNav.setOnClickListener(v -> showAddAlarmDialog());
+        }
     }
 
     private void showAddAlarmDialog() {

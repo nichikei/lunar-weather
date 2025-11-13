@@ -1,14 +1,12 @@
 package com.example.weatherapp.ui.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weatherapp.R;
@@ -62,7 +60,8 @@ public class ActivitySuggestionAdapter extends RecyclerView.Adapter<ActivitySugg
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        CardView cardView;
+        View cardView;
+        View iconContainer;
         TextView iconText;
         TextView titleText;
         TextView descriptionText;
@@ -75,6 +74,7 @@ public class ActivitySuggestionAdapter extends RecyclerView.Adapter<ActivitySugg
         ViewHolder(View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.cardActivity);
+            iconContainer = itemView.findViewById(R.id.iconContainer);
             iconText = itemView.findViewById(R.id.txtActivityIcon);
             titleText = itemView.findViewById(R.id.txtActivityTitle);
             descriptionText = itemView.findViewById(R.id.txtActivityDescription);
@@ -89,6 +89,9 @@ public class ActivitySuggestionAdapter extends RecyclerView.Adapter<ActivitySugg
             // Icon
             iconText.setText(suggestion.getIcon());
             
+            // Set icon background color based on category
+            iconContainer.setBackgroundResource(getCategoryBackgroundDrawable(suggestion.getCategory()));
+            
             // Title
             titleText.setText(suggestion.getTitle());
             
@@ -101,11 +104,6 @@ public class ActivitySuggestionAdapter extends RecyclerView.Adapter<ActivitySugg
             // Suitability Score
             int score = suggestion.getSuitabilityScore();
             scoreText.setText(score + "%");
-            try {
-                scoreText.setTextColor(Color.parseColor(suggestion.getScoreColor()));
-            } catch (Exception e) {
-                scoreText.setTextColor(Color.parseColor("#4CAF50"));
-            }
             
             // Reason
             reasonText.setText("💡 " + suggestion.getReason());
@@ -131,14 +129,37 @@ public class ActivitySuggestionAdapter extends RecyclerView.Adapter<ActivitySugg
                     listener.onActivityClick(suggestion);
                 }
             });
+        }
+        
+        /**
+         * Get background drawable resource based on category
+         */
+        private int getCategoryBackgroundDrawable(String category) {
+            String categoryLower = category.toLowerCase();
             
-            // Card color based on score
-            if (score >= 80) {
-                cardView.setCardBackgroundColor(Color.parseColor("#E8F5E9")); // Light green
-            } else if (score >= 60) {
-                cardView.setCardBackgroundColor(Color.parseColor("#FFF3E0")); // Light orange
-            } else {
-                cardView.setCardBackgroundColor(Color.parseColor("#FAFAFA")); // Light gray
+            // Outdoor activities → Green
+            if (categoryLower.contains("outdoor") || categoryLower.contains("sport") || 
+                categoryLower.contains("exercise") || categoryLower.contains("fitness")) {
+                return R.drawable.icon_background_green;
+            }
+            // Indoor activities → Blue
+            else if (categoryLower.contains("indoor") || categoryLower.contains("entertainment") || 
+                     categoryLower.contains("leisure")) {
+                return R.drawable.icon_background_blue;
+            }
+            // Social activities → Purple
+            else if (categoryLower.contains("social") || categoryLower.contains("dining") || 
+                     categoryLower.contains("food")) {
+                return R.drawable.icon_background_purple;
+            }
+            // Creative activities → Orange
+            else if (categoryLower.contains("creative") || categoryLower.contains("hobby") || 
+                     categoryLower.contains("art")) {
+                return R.drawable.icon_background_orange;
+            }
+            // Default → Red
+            else {
+                return R.drawable.icon_background_red;
             }
         }
     }

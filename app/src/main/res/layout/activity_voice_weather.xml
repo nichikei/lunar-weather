@@ -3,45 +3,57 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_sunny_background"
-    android:padding="16dp">
+    android:background="@drawable/ios_weather_gradient_bg">
 
-    <!-- Top Bar with Back Button -->
-    <LinearLayout
-        android:id="@+id/topBar"
+    <!-- Status Bar Spacer -->
+    <View
+        android:id="@+id/statusBarSpacer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="16dp">
+        android:layout_height="24dp"
+        android:layout_alignParentTop="true" />
 
-        <ImageButton
+    <!-- iOS Navigation Bar -->
+    <RelativeLayout
+        android:id="@+id/navigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_below="@id/statusBarSpacer"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <!-- Back Button -->
+        <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:src="@drawable/ic_arrow_back"
             android:tint="@android:color/white"
-            android:contentDescription="Back" />
+            android:contentDescription="Back"
+            android:background="?attr/selectableItemBackgroundBorderless" />
 
+        <!-- Centered Title -->
         <TextView
-            android:layout_width="0dp"
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_centerInParent="true"
             android:text="🎙️ Voice Assistant"
             android:textColor="@android:color/white"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_marginStart="8dp" />
-    </LinearLayout>
+            android:fontFamily="sans-serif-medium" />
+    </RelativeLayout>
 
     <!-- Main Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/topBar"
+        android:layout_below="@id/navigationBar"
         android:layout_above="@+id/bottomSection"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:fillViewport="true">
 
         <LinearLayout
@@ -102,42 +114,52 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="#80FFFFFF"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="8dp">
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="15dp"
+                    app:cardElevation="0dp">
 
-                    <TextView
-                        android:id="@+id/tvYouSaid"
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp"
-                        android:text="You: What's the weather like?"
-                        android:textColor="#1E3A8A"
-                        android:textSize="16sp"
-                        android:visibility="gone" />
+                        android:background="@drawable/ios_card_background"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:id="@+id/tvYouSaid"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="You: What's the weather like?"
+                            android:textColor="@android:color/white"
+                            android:textSize="15sp"
+                            android:fontFamily="sans-serif"
+                            android:visibility="gone" />
+                    </RelativeLayout>
                 </androidx.cardview.widget.CardView>
 
                 <!-- Response Card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardBackgroundColor="#99FFFFFF"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="8dp">
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="15dp"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
+                        android:background="@drawable/ios_card_background"
                         android:padding="20dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="🤖 Assistant"
-                            android:textColor="#6B7280"
+                            android:textColor="@android:color/white"
+                            android:alpha="0.7"
                             android:textSize="14sp"
                             android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium"
                             android:layout_marginBottom="8dp" />
 
                         <TextView
@@ -145,8 +167,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="🎙️ Tap the microphone and ask me about the weather!"
-                            android:textColor="#1F2937"
-                            android:textSize="16sp"
+                            android:textColor="@android:color/white"
+                            android:textSize="15sp"
+                            android:fontFamily="sans-serif"
                             android:lineSpacingExtra="4dp" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
@@ -173,36 +196,43 @@
         android:padding="24dp"
         android:gravity="center">
 
-        <!-- Microphone Button -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_centerInParent="true"
-            app:cardCornerRadius="40dp"
-            app:cardElevation="12dp"
-            android:backgroundTint="@android:color/white">
-
-            <ImageButton
-                android:id="@+id/btnMicrophone"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_microphone"
-                android:scaleType="centerInside"
-                android:padding="16dp"
-                android:tint="#3B82F6"
-                android:contentDescription="Tap to speak" />
-        </androidx.cardview.widget.CardView>
-
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/bottomSection"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
-            android:text="Tap to speak"
-            android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- Microphone Button -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                app:cardCornerRadius="35dp"
+                app:cardElevation="8dp"
+                android:backgroundTint="#3B82F6">
+
+                <ImageButton
+                    android:id="@+id/btnMicrophone"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_microphone"
+                    android:scaleType="centerInside"
+                    android:padding="16dp"
+                    android:tint="@android:color/white"
+                    android:contentDescription="Tap to speak" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Tap to speak"
+                android:textColor="@android:color/white"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif"
+                android:alpha="0.9" />
+        </LinearLayout>
     </RelativeLayout>
 
 </RelativeLayout>

@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="#40FFFFFF">
+    app:cardCornerRadius="15dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@android:color/transparent">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:background="@drawable/ios_card_background"
+        android:padding="16dp">
 
         <!-- Left - Icon & Time -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/leftSection"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:orientation="vertical">
 
             <LinearLayout
@@ -43,7 +44,7 @@
                     android:textSize="28sp"
                     android:textColor="@android:color/white"
                     android:textStyle="bold"
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="sans-serif-medium"
                     android:layout_marginStart="12dp" />
 
             </LinearLayout>
@@ -56,7 +57,7 @@
                 android:textSize="16sp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
-                android:fontFamily="@font/poppins_semibold"
+                android:fontFamily="sans-serif-medium"
                 android:layout_marginTop="4dp" />
 
             <TextView
@@ -67,7 +68,7 @@
                 android:textSize="12sp"
                 android:textColor="@android:color/white"
                 android:alpha="0.7"
-                android:fontFamily="@font/poppins"
+                android:fontFamily="sans-serif"
                 android:layout_marginTop="2dp" />
 
             <!-- Days of Week -->
@@ -79,15 +80,19 @@
                 android:textSize="11sp"
                 android:textColor="@android:color/white"
                 android:alpha="0.6"
-                android:fontFamily="@font/poppins"
+                android:fontFamily="sans-serif"
                 android:layout_marginTop="4dp" />
 
         </LinearLayout>
 
         <!-- Right - Toggle & Delete -->
         <LinearLayout
+            android:id="@+id/rightSection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
             android:orientation="vertical"
             android:gravity="center">
 
@@ -112,6 +117,6 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 
-</com.google.android.material.card.MaterialCardView>
+</androidx.cardview.widget.CardView>

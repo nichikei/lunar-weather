@@ -221,14 +221,14 @@ public class OutfitSuggestionActivity extends AppCompatActivity {
             // Build a JSON structure matching WeatherResponse format
             com.google.gson.JsonObject json = new com.google.gson.JsonObject();
             
-            // Main weather info (temperature in Kelvin for API compatibility)
+            // Main weather info (keep in Celsius - do NOT convert to Kelvin)
             com.google.gson.JsonObject main = new com.google.gson.JsonObject();
-            main.addProperty("temp", data.getTemperature() + 273.15); // Celsius to Kelvin
-            main.addProperty("feels_like", data.getFeelsLike() + 273.15);
+            main.addProperty("temp", data.getTemperature()); // Keep as Celsius
+            main.addProperty("feels_like", data.getFeelsLike());
             main.addProperty("humidity", data.getHumidity());
             main.addProperty("pressure", (int) data.getPressure());
-            main.addProperty("temp_min", data.getMinTemperature() + 273.15);
-            main.addProperty("temp_max", data.getMaxTemperature() + 273.15);
+            main.addProperty("temp_min", data.getMinTemperature());
+            main.addProperty("temp_max", data.getMaxTemperature());
             json.add("main", main);
             
             // Wind info

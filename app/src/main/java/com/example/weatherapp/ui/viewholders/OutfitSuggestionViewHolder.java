@@ -1,9 +1,11 @@
 package com.example.weatherapp.ui.viewholders;
 
+import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.weatherapp.R;
 import com.example.weatherapp.data.models.OutfitSuggestion;
@@ -18,6 +20,7 @@ public class OutfitSuggestionViewHolder extends RecyclerView.ViewHolder {
     private final TextView tvCategory;
     private final TextView tvSuggestion;
     private final TextView tvReasoning;
+    private final View iconBackground;
 
     public OutfitSuggestionViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -25,6 +28,7 @@ public class OutfitSuggestionViewHolder extends RecyclerView.ViewHolder {
         tvCategory = itemView.findViewById(R.id.tvCategory);
         tvSuggestion = itemView.findViewById(R.id.tvSuggestion);
         tvReasoning = itemView.findViewById(R.id.tvReasoning);
+        iconBackground = itemView.findViewById(R.id.iconBackground);
     }
 
     /**
@@ -34,37 +38,57 @@ public class OutfitSuggestionViewHolder extends RecyclerView.ViewHolder {
         if (suggestion == null) return;
 
         tvEmoji.setText(suggestion.getEmoji());
-        
-        // Add priority badge to category
-        String categoryWithPriority = suggestion.getPriorityBadge() + suggestion.getCategory();
-        tvCategory.setText(categoryWithPriority);
-        
-        // Highlight suggestion based on priority
+        tvCategory.setText(suggestion.getCategory());
         tvSuggestion.setText(suggestion.getSuggestion());
+        tvReasoning.setText(suggestion.getReasoning());
         
-        // Add fabric type to reasoning if available
-        String reasoning = suggestion.getReasoning();
-        if (suggestion.getFabricType() != null && !suggestion.getFabricType().isEmpty() 
-            && !suggestion.getFabricType().equals("N/A")) {
-            reasoning += "\n🧵 Fabric: " + suggestion.getFabricType();
+        // Set icon background color based on category (iOS style)
+        int backgroundColor = getCategoryColor(suggestion.getCategory());
+        if (iconBackground != null) {
+            iconBackground.setBackgroundResource(getCategoryBackgroundDrawable(suggestion.getCategory()));
         }
-        tvReasoning.setText(reasoning);
+    }
+    
+    /**
+     * Get iOS-style color for category
+     */
+    private int getCategoryColor(String category) {
+        String categoryLower = category.toLowerCase();
         
-        // Style based on priority
-        switch (suggestion.getPriority()) {
-            case ESSENTIAL:
-                tvSuggestion.setTextColor(itemView.getContext().getColor(android.R.color.holo_red_dark));
-                tvCategory.setTextColor(itemView.getContext().getColor(android.R.color.holo_red_dark));
-                break;
-            case RECOMMENDED:
-                tvSuggestion.setTextColor(itemView.getContext().getColor(android.R.color.holo_blue_dark));
-                tvCategory.setTextColor(itemView.getContext().getColor(android.R.color.holo_blue_dark));
-                break;
-            case OPTIONAL:
-                tvSuggestion.setTextColor(itemView.getContext().getColor(android.R.color.darker_gray));
-                tvCategory.setTextColor(itemView.getContext().getColor(android.R.color.darker_gray));
-                break;
+        if (categoryLower.contains("base") || categoryLower.contains("upper")) {
+            return Color.parseColor("#007AFF"); // Blue
+        } else if (categoryLower.contains("outer") || categoryLower.contains("jacket")) {
+            return Color.parseColor("#5856D6"); // Purple
+        } else if (categoryLower.contains("lower") || categoryLower.contains("bottom")) {
+            return Color.parseColor("#FF9500"); // Orange
+        } else if (categoryLower.contains("foot") || categoryLower.contains("shoe")) {
+            return Color.parseColor("#34C759"); // Green
+        } else if (categoryLower.contains("accessories")) {
+            return Color.parseColor("#FF3B30"); // Red
         }
+        
+        return Color.parseColor("#007AFF"); // Default blue
+    }
+    
+    /**
+     * Get background drawable for category
+     */
+    private int getCategoryBackgroundDrawable(String category) {
+        String categoryLower = category.toLowerCase();
+        
+        if (categoryLower.contains("base") || categoryLower.contains("upper")) {
+            return R.drawable.icon_background_blue;
+        } else if (categoryLower.contains("outer") || categoryLower.contains("jacket")) {
+            return R.drawable.icon_background_purple;
+        } else if (categoryLower.contains("lower") || categoryLower.contains("bottom")) {
+            return R.drawable.icon_background_orange;
+        } else if (categoryLower.contains("foot") || categoryLower.contains("shoe")) {
+            return R.drawable.icon_background_green;
+        } else if (categoryLower.contains("accessories")) {
+            return R.drawable.icon_background_red;
+        }
+        
+        return R.drawable.icon_background_blue; // Default
     }
 
     /**

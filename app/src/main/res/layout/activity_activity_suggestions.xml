@@ -1,38 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@drawable/ios_weather_gradient_bg"
     tools:context=".ui.activities.ActivitySuggestionsActivity">
 
-    <!-- AppBar -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+    <!-- Status bar spacer -->
+    <View
+        android:id="@+id/statusBarSpacer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        app:elevation="0dp">
+        android:layout_height="24dp"
+        android:layout_alignParentTop="true" />
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/white"
-            app:title="Activity Suggestions"
-            app:titleTextColor="@android:color/black"
-            app:navigationIcon="?attr/homeAsUpIndicator" />
+    <!-- iOS-style Navigation Bar -->
+    <RelativeLayout
+        android:id="@+id/navigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_below="@id/statusBarSpacer"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:gravity="center_vertical">
 
-    </com.google.android.material.appbar.AppBarLayout>
+        <!-- Back Button -->
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_arrow_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            app:tint="@android:color/white"
+            android:contentDescription="Back" />
+
+        <!-- Centered Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Activity Suggestions"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:fontFamily="sans-serif-medium" />
+
+    </RelativeLayout>
 
     <!-- Main Content -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_below="@id/navigationBar"
+        android:layout_marginTop="8dp">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -45,65 +69,72 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Weather Info Card -->
-                <androidx.cardview.widget.CardView
+                <!-- Weather Info Card (Glassmorphism) -->
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    android:background="@android:color/white">
+                    android:background="@drawable/ios_card_background"
+                    android:padding="20dp">
 
+                    <!-- Location and Temperature Row -->
                     <LinearLayout
+                        android:id="@+id/headerRow"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="20dp"
-                        android:background="@drawable/gradient_background">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
                         <TextView
-                            android:id="@+id/txtCurrentLocation"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/txtLocation"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Current Location"
-                            android:textColor="@android:color/white"
-                            android:textSize="16sp"
-                            android:drawableStart="@android:drawable/ic_menu_mylocation"
-                            android:drawablePadding="8dp"
-                            android:drawableTint="@android:color/white" />
-
-                        <TextView
-                            android:id="@+id/txtCurrentTemp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="25°C"
-                            android:textColor="@android:color/white"
-                            android:textSize="48sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="8dp" />
-
-                        <TextView
-                            android:id="@+id/txtCurrentCondition"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Sunny"
-                            android:textColor="@android:color/white"
+                            android:layout_weight="1"
+                            android:text="📍 Unknown Location"
                             android:textSize="18sp"
-                            android:layout_marginTop="4dp" />
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            android:fontFamily="sans-serif-medium" />
 
                         <TextView
-                            android:id="@+id/txtWeatherDetails"
+                            android:id="@+id/txtTemperature"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="💧 65% • 💨 3.2 m/s • ☀️ UV 5"
+                            android:text="--°C"
+                            android:textSize="36sp"
+                            android:textStyle="bold"
                             android:textColor="@android:color/white"
-                            android:textSize="14sp"
-                            android:layout_marginTop="8dp"
-                            android:alpha="0.9" />
+                            android:fontFamily="sans-serif-light" />
 
                     </LinearLayout>
 
-                </androidx.cardview.widget.CardView>
+                    <!-- Weather Condition -->
+                    <TextView
+                        android:id="@+id/txtWeatherCondition"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/headerRow"
+                        android:text="--"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/white"
+                        android:layout_marginTop="4dp"
+                        android:alpha="0.9"
+                        android:fontFamily="sans-serif" />
+
+                    <!-- Weather Details (Humidity, Wind, UV) -->
+                    <TextView
+                        android:id="@+id/txtWeatherDetails"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/txtWeatherCondition"
+                        android:text="💧 --% • 💨 -- m/s • ☀️ UV: --"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:layout_marginTop="8dp"
+                        android:alpha="0.9"
+                        android:fontFamily="sans-serif" />
+
+                </RelativeLayout>
 
                 <!-- Header with Refresh Button -->
                 <LinearLayout
@@ -111,7 +142,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="16dp">
 
                     <TextView
                         android:layout_width="0dp"
@@ -120,21 +151,18 @@
                         android:text="🎯 Recommended Activities"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="@android:color/black" />
+                        android:textColor="@android:color/white"
+                        android:fontFamily="sans-serif-medium" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <ImageView
                         android:id="@+id/btnRefresh"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:padding="0dp"
-                        app:icon="@android:drawable/ic_popup_sync"
-                        app:iconGravity="textStart"
-                        app:iconPadding="0dp"
-                        app:iconTint="@android:color/white"
-                        app:cornerRadius="24dp"
-                        style="@style/Widget.MaterialComponents.Button.Icon" />
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:src="@android:drawable/ic_popup_sync"
+                        android:padding="10dp"
+                        android:background="@drawable/ios_card_background"
+                        app:tint="@android:color/white"
+                        android:contentDescription="Refresh" />
 
                 </LinearLayout>
 
@@ -145,7 +173,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="32dp"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:indeterminateTint="@android:color/white" />
 
                 <!-- Empty State -->
                 <TextView
@@ -157,7 +186,9 @@
                     android:text="No suggestions available.\nPull to refresh."
                     android:textAlignment="center"
                     android:textSize="16sp"
-                    android:textColor="@android:color/darker_gray"
+                    android:textColor="@android:color/white"
+                    android:alpha="0.8"
+                    android:fontFamily="sans-serif"
                     android:visibility="gone" />
 
                 <!-- RecyclerView for Activities -->
@@ -175,4 +206,4 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>

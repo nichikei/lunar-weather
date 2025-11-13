@@ -93,13 +93,6 @@ public class UISetupHelper {
             callbacks.onLocationRequested();
         });
 
-        // More Features button - Opens bottom sheet with Charts, Maps, AI Suggestions
-        if (binding.btnMoreFeatures != null) {
-            binding.btnMoreFeatures.setOnClickListener(v -> {
-                callbacks.onMoreFeaturesRequested();
-            });
-        }
-
         // Hourly/Weekly toggle buttons
         binding.btnHourly.setOnClickListener(v -> {
             callbacks.onTabChanged(true);

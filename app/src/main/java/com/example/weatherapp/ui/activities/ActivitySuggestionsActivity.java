@@ -72,13 +72,6 @@ public class ActivitySuggestionsActivity extends AppCompatActivity
 
     private void initializeComponents() {
         suggestionService = ActivitySuggestionService.getInstance();
-        
-        // Setup toolbar
-        setSupportActionBar(binding.toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Activity Suggestions");
-        }
     }
 
     private void setupRecyclerView() {
@@ -88,7 +81,8 @@ public class ActivitySuggestionsActivity extends AppCompatActivity
     }
 
     private void setupClickListeners() {
-        binding.toolbar.setNavigationOnClickListener(v -> finish());
+        // iOS-style back button
+        binding.btnBack.setOnClickListener(v -> finish());
         
         binding.btnRefresh.setOnClickListener(v -> {
             loadSuggestions();
@@ -133,9 +127,9 @@ public class ActivitySuggestionsActivity extends AppCompatActivity
     }
 
     private void updateWeatherDisplay() {
-        binding.txtCurrentTemp.setText(String.format("%.0f°C", currentWeather.getTemperature()));
-        binding.txtCurrentCondition.setText(currentWeather.getWeatherDescription());
-        binding.txtCurrentLocation.setText(currentWeather.getCityName());
+        binding.txtTemperature.setText(String.format("%.0f°C", currentWeather.getTemperature()));
+        binding.txtWeatherCondition.setText(currentWeather.getWeatherDescription());
+        binding.txtLocation.setText("📍 " + currentWeather.getCityName());
         
         // Weather details with real UV Index
         String details = String.format(

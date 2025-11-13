@@ -563,66 +563,307 @@
                             </androidx.cardview.widget.CardView>
                         </LinearLayout>
 
-                        <!-- More Features Button (iOS styled) - Moved to bottom -->
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/btnMoreFeatures"
+                        <!-- AI Features Section (iOS styled menu) -->
+                        <androidx.cardview.widget.CardView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8dp"
                             app:cardCornerRadius="15dp"
                             app:cardElevation="0dp"
-                            app:strokeWidth="0dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:foreground="?attr/selectableItemBackground"
                             app:cardBackgroundColor="@android:color/transparent">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="@drawable/ios_card_background"
-                                android:padding="14dp"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical">
+                                android:orientation="vertical"
+                                android:padding="0dp">
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="✨"
-                                    android:textSize="20sp" />
-
+                                <!-- Weather Maps Item -->
                                 <LinearLayout
-                                    android:layout_width="0dp"
+                                    android:id="@+id/btnWeatherMap"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:orientation="vertical"
-                                    android:layout_marginStart="10dp">
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:padding="14dp"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:background="?attr/selectableItemBackground">
 
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="AI Features"
-                                        android:textSize="15sp"
-                                        android:textStyle="bold"
-                                        android:textColor="#FFFFFF" />
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/ic_map"
+                                        android:padding="4dp"
+                                        android:background="@drawable/icon_background_blue"
+                                        app:tint="#FFFFFF" />
 
-                                    <TextView
-                                        android:layout_width="wrap_content"
+                                    <LinearLayout
+                                        android:layout_width="0dp"
                                         android:layout_height="wrap_content"
-                                        android:text="Maps, Outfit &amp; Activity Suggestions"
-                                        android:textSize="11sp"
-                                        android:textColor="#B0FFFFFF" />
+                                        android:layout_weight="1"
+                                        android:orientation="vertical"
+                                        android:layout_marginStart="12dp">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Weather Maps"
+                                            android:textSize="16sp"
+                                            android:textColor="#FFFFFF"
+                                            android:fontFamily="sans-serif-medium" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Interactive radar &amp; temperature maps"
+                                            android:textSize="12sp"
+                                            android:textColor="#99FFFFFF"
+                                            android:layout_marginTop="2dp" />
+                                    </LinearLayout>
+
+                                    <ImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:src="@drawable/ic_arrow_forward"
+                                        app:tint="#666666" />
                                 </LinearLayout>
 
-                                <ImageView
-                                    android:layout_width="16dp"
-                                    android:layout_height="16dp"
-                                    android:src="@drawable/ic_arrow_forward"
-                                    android:tint="#666666"
-                                    tools:ignore="UseAppTint" />
+                                <!-- Divider -->
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0.5dp"
+                                    android:layout_marginStart="58dp"
+                                    android:background="#33FFFFFF" />
+
+                                <!-- Voice Assistant Item -->
+                                <LinearLayout
+                                    android:id="@+id/btnVoiceAssistant"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:padding="14dp"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:background="?attr/selectableItemBackground">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/ic_mic"
+                                        android:padding="4dp"
+                                        android:background="@drawable/icon_background_purple"
+                                        app:tint="#FFFFFF" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical"
+                                        android:layout_marginStart="12dp">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Voice Assistant"
+                                            android:textSize="16sp"
+                                            android:textColor="#FFFFFF"
+                                            android:fontFamily="sans-serif-medium" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Ask weather questions with your voice"
+                                            android:textSize="12sp"
+                                            android:textColor="#99FFFFFF"
+                                            android:layout_marginTop="2dp" />
+                                    </LinearLayout>
+
+                                    <ImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:src="@drawable/ic_arrow_forward"
+                                        app:tint="#666666" />
+                                </LinearLayout>
+
+                                <!-- Divider -->
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0.5dp"
+                                    android:layout_marginStart="58dp"
+                                    android:background="#33FFFFFF" />
+
+                                <!-- Weather Alarms Item -->
+                                <LinearLayout
+                                    android:id="@+id/btnWeatherAlarms"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:padding="14dp"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:background="?attr/selectableItemBackground">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/ic_alarm"
+                                        android:padding="4dp"
+                                        android:background="@drawable/icon_background_red"
+                                        app:tint="#FFFFFF" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical"
+                                        android:layout_marginStart="12dp">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Weather Alarms"
+                                            android:textSize="16sp"
+                                            android:textColor="#FFFFFF"
+                                            android:fontFamily="sans-serif-medium" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Smart alarms based on weather conditions"
+                                            android:textSize="12sp"
+                                            android:textColor="#99FFFFFF"
+                                            android:layout_marginTop="2dp" />
+                                    </LinearLayout>
+
+                                    <ImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:src="@drawable/ic_arrow_forward"
+                                        app:tint="#666666" />
+                                </LinearLayout>
+
+                                <!-- Divider -->
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0.5dp"
+                                    android:layout_marginStart="58dp"
+                                    android:background="#33FFFFFF" />
+
+                                <!-- AI Outfit Suggestions Item -->
+                                <LinearLayout
+                                    android:id="@+id/btnOutfitSuggestions"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:padding="14dp"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:background="?attr/selectableItemBackground">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/ic_outfit"
+                                        android:padding="4dp"
+                                        android:background="@drawable/icon_background_orange"
+                                        app:tint="#FFFFFF" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical"
+                                        android:layout_marginStart="12dp">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="AI Outfit Suggestions"
+                                            android:textSize="16sp"
+                                            android:textColor="#FFFFFF"
+                                            android:fontFamily="sans-serif-medium" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="What to wear based on weather"
+                                            android:textSize="12sp"
+                                            android:textColor="#99FFFFFF"
+                                            android:layout_marginTop="2dp" />
+                                    </LinearLayout>
+
+                                    <ImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:src="@drawable/ic_arrow_forward"
+                                        app:tint="#666666" />
+                                </LinearLayout>
+
+                                <!-- Divider -->
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0.5dp"
+                                    android:layout_marginStart="58dp"
+                                    android:background="#33FFFFFF" />
+
+                                <!-- Activity Suggestions Item -->
+                                <LinearLayout
+                                    android:id="@+id/btnActivitySuggestions"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:padding="14dp"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:background="?attr/selectableItemBackground">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/ic_activity"
+                                        android:padding="4dp"
+                                        android:background="@drawable/icon_background_green"
+                                        app:tint="#FFFFFF" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical"
+                                        android:layout_marginStart="12dp">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Activity Suggestions"
+                                            android:textSize="16sp"
+                                            android:textColor="#FFFFFF"
+                                            android:fontFamily="sans-serif-medium" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Best activities for current weather"
+                                            android:textSize="12sp"
+                                            android:textColor="#99FFFFFF"
+                                            android:layout_marginTop="2dp" />
+                                    </LinearLayout>
+
+                                    <ImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:src="@drawable/ic_arrow_forward"
+                                        app:tint="#666666" />
+                                </LinearLayout>
 
                             </LinearLayout>
-                        </com.google.android.material.card.MaterialCardView>
+                        </androidx.cardview.widget.CardView>
 
                         <!-- Hidden chart views for compatibility -->
                         <FrameLayout

@@ -86,7 +86,7 @@ public class VoiceWeatherActivity extends AppCompatActivity implements TextToSpe
         layoutListening = findViewById(R.id.layoutListening);
         layoutResponse = findViewById(R.id.layoutResponse);
         
-        ImageButton btnBack = findViewById(R.id.btnBack);
+        ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
     }
     

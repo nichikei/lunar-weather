@@ -48,6 +48,7 @@ import com.example.weatherapp.ui.helpers.ParallaxAnimationHelper;
 import com.example.weatherapp.ui.helpers.UISetupHelper;
 import com.example.weatherapp.ui.helpers.UIUpdateHelper;
 import com.example.weatherapp.ui.views.charts.AnimatedProgressRing;
+import com.google.gson.Gson;
 import com.example.weatherapp.ui.views.charts.WeatherLineChart;
 import com.example.weatherapp.ui.views.charts.WindSpeedGauge;
 import com.example.weatherapp.utils.LocaleHelper;
@@ -853,6 +854,79 @@ public class MainActivity extends AppCompatActivity {
         if (btnWeatherMap != null) {
             btnWeatherMap.setOnClickListener(v -> openMapActivity());
         }
+        
+        // Setup Voice Assistant button
+        View btnVoiceAssistant = binding.getRoot().findViewById(R.id.btnVoiceAssistant);
+        if (btnVoiceAssistant != null) {
+            btnVoiceAssistant.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, com.example.weatherapp.ui.activities.VoiceWeatherActivity.class);
+                
+                // Pass current weather data if available
+                WeatherData currentWeather = viewModel.getCurrentWeatherData();
+                if (currentWeather != null) {
+                    intent.putExtra("weather_data", currentWeather);
+                }
+                
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            });
+        }
+        
+        // Setup Weather Alarms button
+        View btnWeatherAlarms = binding.getRoot().findViewById(R.id.btnWeatherAlarms);
+        if (btnWeatherAlarms != null) {
+            btnWeatherAlarms.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, com.example.weatherapp.ui.WeatherAlarmActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            });
+        }
+        
+        // Setup Outfit Suggestions button
+        View btnOutfitSuggestions = binding.getRoot().findViewById(R.id.btnOutfitSuggestions);
+        if (btnOutfitSuggestions != null) {
+            btnOutfitSuggestions.setOnClickListener(v -> {
+                WeatherData currentWeather = viewModel.getCurrentWeatherData();
+                if (currentWeather != null) {
+                    navigationHelper.openOutfitSuggestionActivity(currentWeather);
+                } else {
+                    Toast.makeText(this, "Please wait for weather data to load", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        
+        // Setup Activity Suggestions button
+        View btnActivitySuggestions = binding.getRoot().findViewById(R.id.btnActivitySuggestions);
+        if (btnActivitySuggestions != null) {
+            btnActivitySuggestions.setOnClickListener(v -> {
+                WeatherData currentWeather = viewModel.getCurrentWeatherData();
+                if (currentWeather != null) {
+                    Intent intent = new Intent(MainActivity.this, ActivitySuggestionsActivity.class);
+                    
+                    // Pass full weather data as JSON (same as OutfitSuggestionActivity)
+                    intent.putExtra("weather_data", new Gson().toJson(currentWeather));
+                    
+                    // Pass UV Index if available
+                    UIState<Integer> uvState = viewModel.getUVIndexState().getValue();
+                    if (uvState instanceof UIState.Success) {
+                        int uvIndex = ((UIState.Success<Integer>) uvState).getData();
+                        intent.putExtra("uv_index", uvIndex);
+                    }
+                    
+                    // Pass AQI if available
+                    UIState<AirQualityData> aqiState = viewModel.getAirQualityState().getValue();
+                    if (aqiState instanceof UIState.Success) {
+                        AirQualityData aqiData = ((UIState.Success<AirQualityData>) aqiState).getData();
+                        intent.putExtra("aqi", aqiData.getAqi());
+                    }
+                    
+                    startActivity(intent);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                } else {
+                    Toast.makeText(this, "Please wait for weather data to load", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
     
     /**
@@ -1491,12 +1565,22 @@ public class MainActivity extends AppCompatActivity {
         }
         
         // Action buttons
-        if (binding.btnMoreFeatures != null) {
-            UISetupHelper.addPressAnimation(binding.btnMoreFeatures);
-        }
         if (binding.fabAddToFavorites != null) {
             UISetupHelper.addPressAnimation(binding.fabAddToFavorites);
         }
+        
+        // AI Features menu buttons
+        View btnWeatherMap = binding.getRoot().findViewById(R.id.btnWeatherMap);
+        View btnVoiceAssistant = binding.getRoot().findViewById(R.id.btnVoiceAssistant);
+        View btnWeatherAlarms = binding.getRoot().findViewById(R.id.btnWeatherAlarms);
+        View btnOutfitSuggestions = binding.getRoot().findViewById(R.id.btnOutfitSuggestions);
+        View btnActivitySuggestions = binding.getRoot().findViewById(R.id.btnActivitySuggestions);
+        
+        if (btnWeatherMap != null) UISetupHelper.addPressAnimation(btnWeatherMap);
+        if (btnVoiceAssistant != null) UISetupHelper.addPressAnimation(btnVoiceAssistant);
+        if (btnWeatherAlarms != null) UISetupHelper.addPressAnimation(btnWeatherAlarms);
+        if (btnOutfitSuggestions != null) UISetupHelper.addPressAnimation(btnOutfitSuggestions);
+        if (btnActivitySuggestions != null) UISetupHelper.addPressAnimation(btnActivitySuggestions);
         
         // Tab buttons
         if (binding.btnHourly != null) {
@@ -1527,8 +1611,7 @@ public class MainActivity extends AppCompatActivity {
         
         // Enhanced cards
         android.view.View[] premiumCards = new android.view.View[] {
-            binding.getRoot().findViewById(R.id.card_air_quality),
-            binding.getRoot().findViewById(R.id.btnMoreFeatures)
+            binding.getRoot().findViewById(R.id.card_air_quality)
         };
         
         for (android.view.View card : premiumCards) {
