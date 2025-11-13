@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.example.weatherapp.BuildConfig;
 import com.example.weatherapp.data.api.RetrofitClient;
 import com.example.weatherapp.data.api.WeatherApiService;
 import com.example.weatherapp.data.responses.WeatherResponse;
@@ -19,7 +20,7 @@ import retrofit2.Response;
 
 public class WeatherNotificationWorker extends Worker {
 
-    private static final String API_KEY = "bd5e378503939ddaee76f12ad7a97608";
+    private static final String TAG = "WeatherNotification";
     private static final String PREFS_NAME = "WeatherAppPrefs";
     private static final String KEY_LAST_CITY = "last_city";
     private static final String KEY_NOTIFICATIONS = "notifications";
@@ -50,7 +51,7 @@ public class WeatherNotificationWorker extends Worker {
         try {
             // Fetch weather data
             WeatherApiService apiService = RetrofitClient.getInstance().getWeatherApi();
-            Call<WeatherResponse> call = apiService.getWeatherByCity(cityName, API_KEY, units);
+            Call<WeatherResponse> call = apiService.getWeatherByCity(cityName, BuildConfig.WEATHER_API_KEY, units);
             Response<WeatherResponse> response = call.execute();
 
             if (response.isSuccessful() && response.body() != null) {

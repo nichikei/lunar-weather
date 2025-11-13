@@ -14,12 +14,28 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Load API keys from local.properties
+        def localProperties = new Properties()
+        def localPropertiesFile = rootProject.file('local.properties')
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.newInputStream())
+        }
+        
+        buildConfigField "String", "WEATHER_API_KEY", "\"${localProperties.getProperty('weather.api.key', '')}\""
+        buildConfigField "String", "GEMINI_API_KEY", "\"${localProperties.getProperty('gemini.api.key', '')}\""
     }
 
     buildTypes {
+        debug {
+            buildConfigField "String", "WEATHER_API_KEY", "\"${localProperties.getProperty('weather.api.key', '')}\""
+            buildConfigField "String", "GEMINI_API_KEY", "\"${localProperties.getProperty('gemini.api.key', '')}\""
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "WEATHER_API_KEY", "\"${localProperties.getProperty('weather.api.key', '')}\""
+            buildConfigField "String", "GEMINI_API_KEY", "\"${localProperties.getProperty('gemini.api.key', '')}\""
         }
     }
     compileOptions {

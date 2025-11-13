@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weatherapp.R;
+import com.example.weatherapp.BuildConfig;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,10 +41,8 @@ import okhttp3.Response;
 public class WeatherChatBotActivity extends AppCompatActivity {
 
     private static final String TAG = "WeatherChatBot";
-    private static final String GEMINI_API_KEY = "AIzaSyAPtCim4ke9C8SwsY2bXszsQotGfxE-XH4";
-    // Use same model as ActivitySuggestionService - gemini-2.5-flash with v1 API
-    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY;
     private static final String MODEL_NAME = "gemini-2.5-flash";
+    private static final String GEMINI_API_URL_PREFIX = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=";
 
     private RecyclerView recyclerView;
     private ChatAdapter adapter;
@@ -158,7 +157,7 @@ public class WeatherChatBotActivity extends AppCompatActivity {
             );
 
             Request request = new Request.Builder()
-                .url(GEMINI_API_URL)
+                .url(GEMINI_API_URL_PREFIX + BuildConfig.GEMINI_API_KEY)
                 .post(body)
                 .addHeader("Content-Type", "application/json")
                 .build();
